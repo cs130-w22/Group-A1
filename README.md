@@ -5,6 +5,14 @@
 
 This repo serves as a template for repositories in this organization. The following information describes how the native features/workflows of Github can be customized to work in a scrum development process.
 
+## Building & Running
+In the root directory of the project:
+```
+npm install
+npm run dev
+```
+The server should now be running at localhost:5000 and the React app at localhost:3000.
+
 ## Issues
 
 An issue is a unit of tracking work. Issues can be classified into different classes using [labels](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels). This can be used to classify issues in the scrum process as follows.
