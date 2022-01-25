@@ -22,13 +22,13 @@ mongoose.connect(process.env.DB_URI, { useNewUrlParser: true , useUnifiedTopolog
 // routers
 const loginRouter = require('./routes/login');
 const signupRouter = require('./routes/signup');
-const router = require('./routes/api');
+const userRouter = require('./routes/users');
 
 // routes
 app.use('/login', loginRouter);
 app.use('/signup', signupRouter);
 // todo authenticate
-app.use('/api', router); 
+app.use('/users', userRouter); 
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
