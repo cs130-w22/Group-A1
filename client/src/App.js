@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes,BrowserRouter } from "react-router-dom";
 import Home from './components/Home';
 import NotFound from './components/NotFound';
 import { Container } from 'react-bootstrap'
@@ -16,10 +16,10 @@ function App() {
       
       <Container className="mt-3">
         <Routes>
-          <Route path="/Login" exact element={<Login />} />
-          <Route path="/" exact element={<Home />} />
-          <Route path="*" exact element={<NotFound />} /> 
-          <Route path="/Signup" exact element={<Signup />} />
+          <Route exact path="/Login"  element={<Login />} />
+          <Route path="/" element={<Home />} />
+          <Route path="*" element={<NotFound />} /> 
+          <Route path="/Signup" element={<Signup />} />
         </Routes>
       </Container>
     </div>
