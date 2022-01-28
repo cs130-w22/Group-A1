@@ -3,12 +3,16 @@ import "./colors.scss";
 import logo from './cya.svg';
 import Home from "./Home"
 import styled from 'styled-components'
-import { Button,Box } from "./pagesStyled/button.styled";
+import { Box } from "./pagesStyled/button.styled";
 import { BrowserRouter as Router, Route, Routes, useNavigate,Link,NavLink } from "react-router-dom";
 import {useRef, useState,useEffect} from 'react';
 import { GoogleLogin, GoogleLogout } from 'react-google-login';
 import GLogin from "./google.button";
 import GoogleButton from 'react-google-button';
+import Button from 'react-bootstrap/Button';
+import 'bootstrap/dist/css/bootstrap.min.css'
+import { backgroundColor } from "styled-system";
+
 
 
 function Login ()
@@ -36,11 +40,6 @@ function Login ()
     setError('');
   },[name,password])
 
-  //const navigate = useNavigate();
-  //const handleSubmit = () => {
-   // this.props.history.push("/Login");
-   // }
-   
     return (
       <>
       {yay ? (
@@ -77,7 +76,7 @@ function Login ()
                 ref ={userReferance}
                 onChange={(e)=>setName(e.target.value)}
                 value={name}
-                placeholder="email" 
+                placeholder="example@email.com" 
                 required
                 />
         
@@ -100,7 +99,10 @@ function Login ()
                 marginTop:10,
                 paddingRight:40,
                 marginBottom:10,
-                height:40
+                height:40,
+                backgroundColor:"transparent",
+                //border:"30px",
+                color:"black"
               }}
               onSubmit={handleSubmission}
               type="Login" 

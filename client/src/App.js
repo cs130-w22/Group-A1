@@ -7,15 +7,16 @@ import styled from 'styled-components';
 import { Navigation } from './Navigation';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import { Redirect } from 'react-router-dom';
 
 
 function App() {
   return (
     <div>
-      <Navigation/>
+      
       <Container className="mt-3">
         <Routes>
-          <Route path="/login" exact element={<Login />} />
+          <Route path="/Login" exact element={<Login />} />
           <Route path="/" exact element={<Home />} />
           <Route path="*" exact element={<NotFound />} /> 
           <Route path="/Signup" exact element={<Signup />} />
