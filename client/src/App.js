@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes,BrowserRouter } from "react-router-dom";
 import Home from './components/Home';
 import NotFound from './components/NotFound';
 import { Container } from 'react-bootstrap'
@@ -7,18 +7,19 @@ import styled from 'styled-components';
 import { Navigation } from './Navigation';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import { Redirect } from 'react-router-dom';
 
 
 function App() {
   return (
     <div>
-      <Navigation/>
+      
       <Container className="mt-3">
         <Routes>
-          <Route path="/login" exact element={<Login />} />
-          <Route path="/" exact element={<Home />} />
-          <Route path="*" exact element={<NotFound />} /> 
-          <Route path="/Signup" exact element={<Signup />} />
+          <Route exact path="/Login"  element={<Login />} />
+          <Route path="/" element={<Home />} />
+          <Route path="*" element={<NotFound />} /> 
+          <Route path="/Signup" element={<Signup />} />
         </Routes>
       </Container>
     </div>

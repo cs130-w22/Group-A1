@@ -1,6 +1,11 @@
+import { Navigation } from "../Navigation";
+
 function Home() {
     return (
-        <p>home placeholder</p>
+        <div>
+            <nav className="header"> <Navigation/></nav>
+        </div>
+        
     )
 }
 

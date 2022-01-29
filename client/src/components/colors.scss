@@ -55,7 +55,7 @@ $font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
         box-shadow: 0 14px 38px #e0e7ee;
         border-radius: 20px;
         
-        .form-group {
+        .form-group,.username,.password,.repassword,.email {
             display: flex;
             flex-direction: column;
             align-items: flex-start;

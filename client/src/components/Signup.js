@@ -1,138 +1,112 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { Button } from "./pagesStyled/button.styled";
+//import { Button } from "./pagesStyled/button.styled";
 import logo from './cya.svg';
 import GoogleLogin from "react-google-login";
 import {useRef, useState,useEffect} from 'react';
 import Login from "./Login";
+import { Button, Alert,Breadcrumb,Card, Form} from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css'
+import auth, { signup } from '../api/auth';
+import axios from 'axios';
 
 function Signup () 
 {
-  const userReferance = useRef();
-  const errorReference = useRef();
-  const[username, setUsername] = useState("");
-  const[email, setEmail] = useState("");
-  const[password, setPassword] =useState("");
-  const[repassword, setRepassword] =useState("");
-  const[error, setError] = useState("");
-  const[yay,setYay] = useState(false);
-
-  const handleSubmission = async(event)=>{
-    event.preventDefault();
-    setUsername("");
-    setEmail("");
-    setPassword("");
-    setRepassword("");
-    console.log(username,email,password,repassword);
-    setYay(true);
+  //react hook to match user values with following variables:
+  const[username, setUsername] = useState('');
+  const[email, setEmail] = useState('');
+  const[password, setPassword] = useState('');
+  const[repassword, setRepassword] = useState('');
+  const[err,setErr] = useState(null);
+ 
+  //handles the input 
+  const handleSubmission = () =>{
+   setErr(null);
+   signup(email,username,password);
   }
-
-  useEffect(()=>{
-    userReferance.current.focus();
-  },[]);
-
-  useEffect(()=>{
-    setError('');
-  },[username,email,password,repassword])
-
-  const navigate = useNavigate();
+  //the actually sign up page(HTML)
   return (
-    <>
-    {yay ? (
-    <section>
-      <h1>
-        <Login/>
-      </h1>
-      <br/>
-      <div navigate to ="/Login">  
-        <span href="#" > 
-          Logout
-        </span>
-        </div>
-    </section>):(
-      <div className="base-container">
-        <p
-          ref={errorReference} className={error ? "errmessage":"offscreen"} 
-          aria-live="assertive">{error}
-        </p>
+      <div className="base-container"> 
         <div className="content"> 
         <div className="image">
           <img src={logo} alt="cya" id="cya" />
           </div>
-          <div className="form">
-            <div className="form-group">
+          <form className="form" onSubmit={handleSubmission}>
+            <div className="username">
               <label htmlFor="username">Username</label>
               <input 
               type="text" 
               name="username" 
               placeholder="username"
-              ref ={userReferance}
-              onChange={(e)=>setUsername(e.target.value)}
               value={username}
+              onChange={event=>setUsername(event.target.value)}
               required
               />
               </div>
-              <div className="form-group">
+            <div className="email">
               <label htmlFor="email">Email</label>
               <input 
               type="email" 
               name="email" 
-              placeholder="email"
-              ref ={userReferance}
-              onChange={(e)=>setEmail(e.target.value)}
+              placeholder="example@email.com"
               value={email}
+              onChange={event=>setEmail(event.target.value)}
               required
               />
               </div>
-              <div className="form-group">
+            <div className="password">
               <label htmlFor="password">Password</label>
               <input 
               type="password" 
               name="password" 
               placeholder="password"  
-              ref ={userReferance}
-              onChange={(e)=>setPassword(e.target.value)}
               value={password}
+              onChange={event=>setPassword(event.target.value)}
               required
               />
-            </div>
-            <div className="form-group">
+
+              </div>
+            <div className="repassword">
               <label htmlFor="repassword">Confirm Password</label>
               <input 
               type="password" 
               name="repassword" 
               placeholder="Confirm password"
-              ref ={userReferance}
-              onChange={(e)=>setRepassword(e.target.value)}
-              value={repassword} 
-              required
-              />
-            </div>  
+              value={repassword}
+              onChange={event=>setRepassword(event.target.value)}
+              required/>
+            </div> 
+            {err && <div className="err">{err}</div>}
+          <div>
             <Button
-              style={{
-                textAlign:'center',
-                justifyContent: 'center',
-                alignItems: 'center',
-                paddingLeft:40,
-                marginTop:10,
-                paddingRight:40,
-                marginBottom:10,
-                height:40
-              }}
-              onSubmit={handleSubmission}
+            style={{
+              textAlign:'center',
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingLeft:40,
+              marginTop:10,
+              paddingRight:40,
+              marginBottom:10,
+              height:40,
+              backgroundColor:"transparent",
+              color:'black'
+              
+            }}
+              onClick={handleSubmission}
               type="Signup" 
               className="btn"> 
-            Signup 
+            Sign up 
           </Button >
-            
-          <a style={{marginTop:"10px"}} href={"#"} className = "input-login" onClick={()=> {navigate("/login")}}> 
-            Got An Account? Login!  
-          </a>
           </div>
+          <il>
+          Got An Account? 
+            <a style={{marginTop:"10px",color:'green'}} className = "input-login"> 
+               <NavLink to = "/Login">Log In </NavLink> 
+            </a>
+          </il>
+          </form>
         </div>
       </div>
-      )}</>
     );
   }
   export default Signup;
