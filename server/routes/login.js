@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/user');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken');
+const { generateTokens } = require('../helpers/tokens')
 
 router.post('/', 
     body('email')
@@ -24,11 +24,13 @@ router.post('/',
             bcrypt.compare(req.body.password, hash, function(err, result) {
                 if (err) return res.sendStatus(500);
                 if (!result) return res.sendStatus(401);
-                // TODO session handling
+                // generate jwt tokens
+                let token = generateTokens(user)
                 res.status(200).json({
                     "_id": user._id,
                     "username": user.username,
-                    "token": "placeholder token" // TODO change this when session handling added
+                    "access_token": token
+                    // "refresh_token": tokens.refresh_token
                 })
             });
         });
