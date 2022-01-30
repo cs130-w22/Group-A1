@@ -6,6 +6,7 @@ import App from './App';
 import './colors.scss';
 import reportWebVitals from './reportWebVitals';
 
+
 ReactDOM.render(
   <React.StrictMode>
     {/* <ThemeProvider theme = {theme}> */}

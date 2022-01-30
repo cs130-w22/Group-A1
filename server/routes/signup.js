@@ -3,8 +3,6 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const { body, validationResult } = require('express-validator');
 const User = require('../models/user');
-const Group = require('../models/group')
-const { generateTokens } = require('../helpers/tokens')
 
 // sign up
 router.post('/', 
@@ -39,14 +37,12 @@ router.post('/',
                 email: req.body.email,
                 password: hash
             }).then((user) => {
-                // generate jwt tokens
-                let token = generateTokens(user)
-                return res.status(201).json({
-                    "_id": user._id,
-                    "username": user.username,
-                    "access_token": token
-                    // "refresh_token": tokens.refreshtoken
-                })
+                // generate session
+                req.session.userId = user._id;
+                res.status(201).json({
+                    "userId": user._id,
+                    "username": user.username
+                });
             }).catch((err) => {
                 console.log(err);
                 res.sendStatus(500);

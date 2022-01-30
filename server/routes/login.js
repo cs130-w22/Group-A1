@@ -1,9 +1,8 @@
 const express = require('express')
 const router = express.Router();
-const User = require('../models/user');
-const { body, validationResult } = require('express-validator');
 const bcrypt = require("bcrypt");
-const { generateTokens } = require('../helpers/tokens')
+const { body, validationResult } = require('express-validator');
+const User = require('../models/user');
 
 router.post('/', 
     body('email')
@@ -19,19 +18,26 @@ router.post('/',
         }
         User.findOne({ email: req.body.email }, (err, user) => {
             if (err) return res.sendStatus(500);
-            if (user == null) return res.status(401).statusMessage("No user found for submitted email");
+            if (user == null) {
+                return res.status(401).send('No user exists for entered email');
+            }
+            // verify hashed password
             let hash = user.password;
             bcrypt.compare(req.body.password, hash, function(err, result) {
                 if (err) return res.sendStatus(500);
                 if (!result) return res.sendStatus(401);
-                // generate jwt tokens
-                let token = generateTokens(user)
+                // generate session
+                req.session.userId = user._id;
+                req.session.save();
+                // res.cookie('user', sessionUser,
+                // {
+                //     maxAge: 24*60*60,
+                //     httpOnly: false,
+                // }).status(200);
                 res.status(200).json({
-                    "_id": user._id,
-                    "username": user.username,
-                    "access_token": token
-                    // "refresh_token": tokens.refresh_token
-                })
+                    "userId": user._id,
+                    "username": user.username
+                });
             });
         });
     }

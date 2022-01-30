@@ -1,32 +1,32 @@
-import axios from 'axios';
+import Cookies from "universal-cookie";
+import { apiInstance, authInstance } from "../utils/axiosInstance";
 
 export function login(email, password) {
-    axios
-        .post('/login', {
-            email: email,
-            password: password
-        })
-        .then((res) => {
-            return res.data;
-        })
-        .catch((err) => {
-            console.log(err)
-            return null;
+    return authInstance.post('/login', {
+        email: email,
+        password: password
+    })
+        .then(res => res)
+        .catch(err => {
+            throw err;
         });
 }
 
 export function signup(email, username, password) {
-    axios
-    .post('/signup', {
+    return authInstance.post('/signup', {
         email: email,
         username: username,
         password: password
     })
-    .then((res) => {
-        return res.data;
-    })
-    .catch((err) => {
-        console.log(err)
+        .then(res => res)
+        .catch(err => {
+            throw err;
+        });
+}
+const cookies = new Cookies();
+export function getCookie(){
+    return apiInstance.get('/cookie').then((res) => res).catch((err) => {
+        console.log(err);
         return null;
-    });
+    })
 }
