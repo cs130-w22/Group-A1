@@ -8,5 +8,8 @@
   "devDependencies": {
     "concurrently": "^7.0.0",
     "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "react-multi-date-picker": "^3.3.0"
   }
 }

@@ -6,6 +6,7 @@ import { Container } from 'react-bootstrap'
 import styled from 'styled-components';
 import { Navigation } from './Navigation';
 import Login from './components/Login';
+import Create from './components/Create';
 
 
 function App() {
@@ -15,8 +16,9 @@ function App() {
       <Container className="mt-3">
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/create" element={<Create />} />
           <Route path="/" element={<Home />} />
-          <Route path="*" element={<NotFound />} /> 
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Container>
     </div>
