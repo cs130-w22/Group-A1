@@ -14,14 +14,15 @@ const apiInstance = axios.create();
 //     return Promise.reject(error);
 // });
 
-// // Add a response interceptor
-// apiInstance.interceptors.response.use(function (response) {
-//     // Any status code that lie within the range of 2xx cause this function to trigger
-//     console.log("Response intercepted");
-//     return response;
-// }, function (error) {
-//     // Any status codes that falls outside the range of 2xx cause this function to trigger
-//     return Promise.reject(error);
-// });
+// Add a response interceptor
+apiInstance.interceptors.response.use((response) => response, (error) => {
+  // Any status codes that falls outside the range of 2xx cause this function to trigger
+  if (error?.response?.status === 401) {
+    // invalid session/expired session
+    // localStorage.clear();
+    console.error('invalid session');
+  }
+  return Promise.reject(error);
+});
 
 export { apiInstance, authInstance };

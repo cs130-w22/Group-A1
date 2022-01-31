@@ -20,6 +20,19 @@ export function Navigation({ onLogout }) {
     </Routes>
   );
 }
+export function ProtectedNav() {
+  const { user } = useContext(UserContext);
+  if (user) {
+    return (
+      <LinkContainer to="/example">
+        <Nav.Link className="fw-bold">
+          example
+        </Nav.Link>
+      </LinkContainer>
+    );
+  }
+  return (null);
+}
 export function TopNav({ onLogout }) {
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
@@ -54,6 +67,7 @@ export function TopNav({ onLogout }) {
             </LinkContainer>
           </Nav>
         </Navbar.Collapse>
+        <ProtectedNav />
         {user
           // <LinkContainer to="/logout">
           ? (

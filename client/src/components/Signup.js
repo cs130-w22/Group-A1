@@ -18,7 +18,7 @@ function Signup() {
     signup(data.email, data.username, data.password)
       .then((res) => {
         // on success, save user and navigate to home page
-        setUser(res.data.userId);
+        setUser({ userId: res.data.userId, username: res.data.username });
         navigate('/');
       })
       .catch((err) => {

@@ -5,47 +5,52 @@ import { getUser } from '../api/users';
 import { UserContext } from '../utils/userContext';
 
 function Home() {
-  const { user } = useContext(UserContext);
-  const [username, setUsername] = useState();
+  const { user, setUser } = useContext(UserContext);
+  const [data, setData] = useState();
   const [loading, setLoading] = useState();
   useEffect(() => {
     setLoading(true);
-    if (user) {
-      getUser(user)
+    if (user?.userId) {
+      getUser(user.userId)
         .then((res) => {
-          if (res.data.username) setUsername(res.data.username);
+          if (res.data) setData(res.data);
           setLoading(false);
         })
         .catch((err) => {
           console.log(err);
           setLoading(false);
+          console.error(err);
+          setUser(null);
         });
     } else {
       setLoading(false);
-      setUsername(null);
+      setData(null);
     }
-  }, [setUsername, user]);
+  }, [user, setUser]);
 
-  if (loading) {
-    return (
-      <Watch
-        heigth="100"
-        width="100"
-        color="grey"
-        ariaLabel="loading"
-      />
-    );
-  }
   return (
-    <Container>
-      {username ? (
+    <div>
+      {user?.username ? (
         <div>
-          Hi,
-          {' '}
-          {username}
+          <h2 className="fs-3">
+            Hi
+            {' '}
+            <span className="fw-bold">
+              {user.username}
+              !
+            </span>
+          </h2>
+          { loading && (
+          <Watch
+            heigth="100"
+            width="100"
+            color="grey"
+            ariaLabel="loading"
+          />
+          ) }
         </div>
       ) : <div>placeholder</div>}
-    </Container>
+    </div>
   );
 }
 
