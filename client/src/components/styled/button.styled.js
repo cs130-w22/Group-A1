@@ -1,5 +1,6 @@
-import styled, { css } from 'styled-components'
-import { color,space, buttonStyle } from 'styled-system'
+import styled, { css } from 'styled-components';
+import { color, space, buttonStyle } from 'styled-system';
+
 export const Button = styled.button`
 background: transparent;
 border-radius: 14px;
@@ -9,7 +10,7 @@ margin: centered;
 padding: 0.25em 1em;
 
   
-  ${props => props.primary && css`
+  ${(props) => props.primary && css`
     background: blue;
     color: #76a5af;
   `}
@@ -20,6 +21,4 @@ export const Box = styled.div`
   ${color}
   ${space}
   ${buttonStyle}
-`
-
-
+`;

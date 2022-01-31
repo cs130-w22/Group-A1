@@ -19,8 +19,8 @@ module.exports = {
   ],
   rules: {
     'linebreak-style': 0,
-    'no-console': ['error', { allow: ['log', 'warn', 'error'] }],
-    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
+    'no-console': ['warn', { allow: ['log', 'warn', 'error'] }],
+    'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx'] }],
     'no-unused-vars': 'warn',
     'react/prop-types': 'warn',
   },
