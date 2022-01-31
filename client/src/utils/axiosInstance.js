@@ -24,4 +24,4 @@ const apiInstance = axios.create();
 //     return Promise.reject(error);
 // });
 
-export { apiInstance, authInstance }
+export { apiInstance, authInstance };

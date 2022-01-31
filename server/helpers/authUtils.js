@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 
-exports.generateTokens = function(user) {
+exports.accessToken = function(user) {
     const token_body = {
-        _id: user._id,
+        id: user.id,
         email: user.email,
         username: user.username
     }
@@ -10,4 +10,10 @@ exports.generateTokens = function(user) {
     return accessToken;
     // const refreshToken = jwt.sign({ user: token_body }, process.env.SECRET, { expiresIn: '6h'});
     // return {"accessToken": accessToken, "refreshToken": refreshToken}
+}
+
+exports.userCookie = {
+    maxAge: 24*60*60,
+    httpOnly: false,
+    sameSite: true
 }

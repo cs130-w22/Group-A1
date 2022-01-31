@@ -29,11 +29,6 @@ router.post('/',
                 // generate session
                 req.session.userId = user._id;
                 req.session.save();
-                // res.cookie('user', sessionUser,
-                // {
-                //     maxAge: 24*60*60,
-                //     httpOnly: false,
-                // }).status(200);
                 res.status(200).json({
                     "userId": user._id,
                     "username": user.username

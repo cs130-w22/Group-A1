@@ -8,9 +8,5 @@
   "devDependencies": {
     "concurrently": "^7.0.0",
     "nodemon": "^2.0.15"
-  },
-  "dependencies": {
-    "dotenv": "^14.2.0",
-    "install": "^0.13.0"
   }
 }
