@@ -6,6 +6,7 @@ import { Container } from 'react-bootstrap'
 import styled from 'styled-components';
 import { Navigation } from './Navigation';
 import Login from './components/Login';
+import Poll from './components/Poll'
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Container className="mt-3">
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/poll" element={<Poll />} />
           <Route path="/" element={<Home />} />
           <Route path="*" element={<NotFound />} /> 
         </Routes>

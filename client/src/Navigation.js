@@ -8,7 +8,6 @@ import LoginHeader from './components/LoginHeader';
 export function Navigation() {
   return (
     <Routes>
-    {/* TODO add a custom header nav to the login path, or delete this to use the standard header*/}
     <Route path="/login" element={LoginHeader}></Route>
     <Route path="*" element={TopNav} />
     </Routes>
