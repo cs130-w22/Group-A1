@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }));
 
 // db connection
 mongoose.Promise = Promise;
@@ -23,14 +23,14 @@ mongoose.connect(process.env.DB_URI, { useNewUrlParser: true , useUnifiedTopolog
 const loginRouter = require('./routes/login');
 const signupRouter = require('./routes/signup');
 const router = require('./routes/api');
-const poll = require ('./routes/poll')
+const poll = require ('./routes/poll');
 
 // routes
 app.use('/login', loginRouter);
 app.use('/signup', signupRouter);
 // todo authenticate
 app.use('/api', router);
-app.use('/poll', poll)
+app.use('/poll', poll);
 
 
 app.listen(port, () => {
