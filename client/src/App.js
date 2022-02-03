@@ -11,6 +11,7 @@ import { UserContext } from './utils/userContext';
 import { apiInstance } from './utils/axiosInstance';
 import useLocalStorage from './utils/localStorage';
 import EventPage from './components/EventPage';
+import AllPolls from './components/AllPolls';
 
 function App() {
   const [user, setUser] = useLocalStorage('user', null);
@@ -48,8 +49,9 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/" element={<Home />} />
             <Route path="/event/:id" element={<EventPage />} />
+            <Route path="/polls" element={<AllPolls />} />
+            <Route path="/" element={<Home />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         )}

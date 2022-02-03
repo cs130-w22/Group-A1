@@ -13,7 +13,7 @@ const port = process.env.PORT || 5000;
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }));
 
 // db connection
 mongoose.Promise = Promise;
@@ -48,6 +48,8 @@ const logoutRouter = require('./routes/logout');
 const userRouter = require('./routes/users');
 const authRouter = require('./routes/auth')
 const cookieRouter = require('./routes/cookie')
+const pollRouter = require ('./routes/polls');
+
 
 // routes
 app.use('/login', loginRouter);
@@ -58,6 +60,7 @@ app.use(authRouter);
 // app.use('/cookie', cookieRouter);
 app.use('/users', userRouter); 
 app.use('/logout', logoutRouter);
+app.use('/polls', pollRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
