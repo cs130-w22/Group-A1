@@ -5,8 +5,7 @@ const Poll = require('./poll')
 const PollOptionSchema = new Schema({
   poll: { type: Schema.Types.ObjectId, ref: 'Poll' },
   text: String,
-  votes: Number,
-  voters: []
+  voters: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
 PollOptionSchema.statics.pollOptionsByPollID = function (pollid) {

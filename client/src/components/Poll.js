@@ -1,86 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button } from 'react-bootstrap';
+import { addOption, getPoll } from '../api/polls';
 // import { ThemeProvider } from 'styled-components';
 import PollOption from './PollOption';
 
-function Poll(props) {
+function Poll({ pollId, thisPoll }) {
+  const [pollData, setPollData] = useState({});
   const [options, setOptions] = useState([]); // includes edit property for poll Option for now
   const [editMode, setEditMode] = useState(false);
-  const fetchURL = `http://localhost:5000/poll/getoptions?pollID=${props.ref_id}`;
-  const optionPrototype = Object.create({
-    opt: {},
-    editOn: true,
-  });
+  const fetchURL = `http://localhost:5000/poll/getoptions?pollID=${pollId}`;
 
-  const deleteCallback = (deleted) => {
-    const updatedOptions = options.filter((option) => option.opt._id !== deleted._id);
+  const onDelete = (deleted) => {
+    const updatedOptions = options.filter((option) => option.data._id !== deleted._id);
     setOptions(updatedOptions);
   };
 
-  async function fetchOptions() {
-    const response = await fetch(fetchURL);
-    const data = await response.json();
-    const existingOptions = Array.from(options);
-    for (let i = 0; i < data.length; i++) {
-      const newOption = Object.create(optionPrototype);
-      newOption.opt = data[i];
-      newOption.editOn = false;
-      existingOptions.push(newOption);
+  useEffect(() => {
+    if (pollId != null) {
+      getPoll(pollId).then((res) => {
+        setPollData(res.data);
+      }).catch((err) => {
+        console.log(err);
+      });
     }
-    setOptions(existingOptions);
-  }
+  }, [pollId]);
 
   useEffect(() => {
-    fetchOptions();
-  }, [fetchURL, props.ref_ids]);
+    if (pollData.options != null) {
+      const newOptions = [];
+      const pollOptions = pollData.options;
+      for (let i = 0; i < pollOptions.length; i += 1) {
+        const option = {
+          data: pollOptions[i],
+          editing: false,
+        };
+        newOptions.push(option);
+      }
+      setOptions(newOptions);
+    }
+  }, [pollData]);
 
-  const createNewOption = async () => {
-    const createURL = 'http://localhost:5000/poll/addoption';
-    const createOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        optionID: '', pollID: props.ref_id, text: '', votes: 0, voters: [],
-      }),
-    };
-    fetch(createURL, createOptions)
-      .then((response) => response.json())
-      .then((newOption) => {
-        const updatedOptions = Array.from(options);
-        const optionListAdd = Object.create(optionPrototype);
-        optionListAdd.opt = newOption;
-        optionListAdd.editOn = true;
-        updatedOptions.push(optionListAdd);
-        setOptions(updatedOptions);
+  // useEffect(() => {
+  //   console.log(options);
+  // }, [options]);
+
+
+  const createNewOption = () => {
+    addOption(pollId, 'New Option')
+      .then((res) => {
+        const option = {
+          data: res.data,
+          editing: true,
+        };
+        setOptions((prevOptions) => [...prevOptions, option]);
       }).catch((error) => { console.log(error); });
-  	};
+  };
 
-  	const allowEdits = () => {
-  		setEditMode(true);
-  	};
+  const allowEdits = () => {
+    setEditMode(true);
+  };
 
-  	const savePoll = () => {
-  		setEditMode(false);
-  		/*
-  		const saveRequestOptions = {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({ max_option_id: optionList.length, votes_allowed: 2, add_option_enabled: true, curr_id: pollID })
-		}
-		fetch('http://localhost:5000/poll', saveRequestOptions)
-			.then(response => response.json())
-			.then(data => console.log(data))
-			.catch(error => )
-		*/
-  	};
+  const savePoll = () => {
+    setEditMode(false);
+  };
 
   return (
-    <Card id={props.ref_id} class="border">
-      <h1>One Poll</h1>
-      { options.map((option, i) => <PollOption key={i} keyProp={i} opt={JSON.stringify(option.opt)} editMode={option.editOn} cb={deleteCallback} />) }
-      <Button onClick={createNewOption}>add option</Button>
-      <Button onClick={savePoll} hidden={!editMode}>save poll</Button>
-      <Button onClick={allowEdits} hidden={editMode}>edit poll</Button>
+    <Card id={pollId} className="border py-4 px-4 mb-3">
+      <h3 className='fs-5 mb-0 fw-bold'>{pollData?.question}</h3>
+      <hr />
+      {options.map((option, i) => (
+        <PollOption
+          key={option.data._id}
+          keyProp={i}
+          data={option.data}
+          editing={option.editing}
+          onDelete={onDelete}
+        />
+      ))}
+      <Button className="mt-2" onClick={createNewOption}>add option</Button>
+      <Button className="mt-2" onClick={savePoll} hidden={!editMode}>save poll</Button>
+      <Button className="mt-2" onClick={allowEdits} hidden={editMode}>edit poll</Button>
     </Card>
 
   );

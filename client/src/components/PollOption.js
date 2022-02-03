@@ -1,135 +1,112 @@
-import React, { useState } from 'react';
-import { ToggleButton, Button, CloseButton } from 'react-bootstrap';
+import React, { useContext, useEffect, useState } from 'react';
+import {
+  ToggleButton, Button, CloseButton, Form, Row, Col, Container,
+} from 'react-bootstrap';
+import {
+  addOption, deleteOption, updateOption, voteOption,
+} from '../api/polls';
 import EditIcon from '../assets/edit_icon_small.svg';
+import { UserContext } from '../utils/userContext';
 
+const editButton = {
+  boxSizing: 'content-box',
+  width: '1em',
+  height: '1em',
+  color: '#000',
+  background: 'transparent',
+  border: '0',
+  borderRadius: '0.25rem',
+  opacity: '0.5',
+};
 
-function PollOption(props) {
+function PollOption({ data, onDelete, editing }) {
+  const { user } = useContext(UserContext);
+  const optionId = data._id;
+  const [optionText, setOptionText] = useState(data.text);
+  const [checked, setChecked] = useState(data.voters.includes(user.userId));
+  const [editMode, setEditMode] = useState(editing);
+  const [votes, setVotes] = useState(data.voters.length);
 
-	const optionObj = JSON.parse(props.opt)
-	const [option, setOption] = useState(optionObj);
-	const [voteStatus, setVoteStatus] = useState("Vote");
-	const [checked, setChecked] = useState(false)
-	const [editMode, setEditMode] = useState(props.editMode);
-	console.log(editMode)
-	const [votes, setVotes] = useState(0)
+  const changeVote = (e) => {
+    voteOption(optionId).then((res) => {
+      setVotes(res.data.voters.length);
+      setChecked(!checked);
+    }).catch((err) => console.log(err));
+  };
 
+  const saveText = (e) => {
+    e.preventDefault();
+    updateOption(optionId, { text: optionText })
+      .then(() => setEditMode(false))
+      .catch((err) => console.log(err));
+  };
 
-	const changeVote = ()  => {
-		if (checked == true) {
-			setVotes(votes - 1);
-			setVoteStatus("Vote");
-			setChecked(false);
-		}
-		else {
-			setVotes(votes+1)
-			setVoteStatus("Remove Vote")
-			setChecked(true)
-		}
-	}
+  const handleChange = (e) => {
+    setOptionText(e.target.value);
+  };
 
-	const saveText = () => {
-		let enteredText = document.getElementById("poll-text".concat(option._id)).value
-		let updatedOpt = option
-		updatedOpt.text = enteredText
-		setOption(updatedOpt)
-		
-		savePollOption(enteredText)
-		setEditMode(false)
-	}
+  const allowEdits = () => {
+    setEditMode(true);
+  };
 
-	const savePollOption = (text) => {
-		const saveURL = 'http://localhost:5000/poll/addoption'
-		const saveRequestOptions = {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({optionID: option._id, pollID: props.opt.poll, text: text, votes: votes, voters: ['user'] })
-		}
-		fetch(saveURL, saveRequestOptions)
-			.then((ret) => { console.log("Saved")
-			}).catch((error) => {console.log(error)})
-	}
+  const removeOption = () => {
+    if (optionId) {
+      deleteOption(optionId)
+        .then((res) => {
+          onDelete(res.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  };
 
+  useEffect(() => {
+    setVotes(data.voters.length);
+  }, [data]);
 
-	const handleKeyPress = e => {
-		if (e.key === "Enter") {
-      		saveText();
-    	}
-	}
+  return (
+    <Container className="px-1">
 
-	const allowEdits = () => {
-		setEditMode(true);
-		document.getElementById("poll-text".concat(option._id)).hidden = false;	
-	}
+      <div className="d-flex justify-content-between">
+        <Button
+          style={editButton}
+          hidden={editMode}
+          onClick={allowEdits}
+        >
+          <img src={EditIcon} alt="Edit" />
+        </Button>
+        <CloseButton onClick={removeOption} />
+        {editMode && (
+          <Form className="w-75 d-flex" onSubmit={saveText}>
+            <Form.Control
+              key={'poll-text-'.concat(optionId)}
+              id={'poll-text'.concat(optionId)}
+              type="text"
+              placeholder="Enter Poll Option"
+              onChange={handleChange}
+              // readOnly={!editMode}
+              value={optionText || ''}
+            />
+          </Form>
+        )}
+        <ToggleButton
+          id={'vote-button'.concat(optionId)}
+          checked={checked}
+          onClick={changeVote}
+          disabled={editMode}
+        >
+          {checked ? 'Remove Vote' : 'Vote'}
+        </ToggleButton>
+        <p hidden={editMode} className="mx-3 text-nowrap w-50">{optionText}</p>
+        <p className="voteCount" hidden={editMode}>
+          Votes:
+          {' '}
+          {votes}
+          {' '}
+        </p>
+      </div>
 
-	const removeOption = () => {
-		const deleteOptions = {
-			method: 'DELETE',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({ optionID: option._id, pollID: props.opt.poll })
-		}
-		fetch("http://localhost:5000/poll/deletethisoption", deleteOptions)
-			.then(response => response.json())
-			.then(data => {
-				props.cb(data)
-			})
-			.catch(err => console.log(err))
-	}
-
-	const optionStyle = {
-		height: '100px',
-		lineHeight: '100px',
-		textAlign: 'center',
-		fontSize: '30px'
-	}
-
-	const editInput = {
-		border: 'none',
-		width: '100%',
-		height: '100%',
-		fontSize: '30px',
-		textAlign: 'center',
-		lineHeight: '100px'
-
-	}
-
-	const editButton = {
-		    boxSizing: 'content-box',
-    		width: '1em',
-    		height: '1em',
-    		color: '#000',
-    		background: 'transparent',
-   			border: '0',
-    		borderRadius: '0.25rem',
-    		opacity: '0.5'
-	}
-
-	return (
-		<div id={option._id} class="container row">
-		<CloseButton onClick={removeOption}/>
-		<button style={editButton} hidden={editMode} onClick={allowEdits}><img src={EditIcon}/></button>
-			<div class="col border rounded" style={optionStyle}>
-    		<input key={"poll-text-".concat(option._id)} id={"poll-text".concat(option._id)} type="text" placeholder="Enter Poll Option" 
-    			onKeyPress={handleKeyPress} hidden={!editMode} style={editInput}/>
-    		<div class="row">
-    			<p class="col" hidden={editMode}>{option.text}</p>
-    			
-    		</div>
-
-    		</div>
-    		<div class="col"> 
-    		<ToggleButton
-    			id={"vote-button".concat(option._id)}
-        		checked={checked}
-        		onClick={changeVote} disabled={editMode}>
-    		{voteStatus}
-     		</ToggleButton>
-      		<p id={"votes-text".concat(option._id)} hidden={editMode}>Votes: {votes} </p>
-      		</div>
-      	</div>
-	);
+    </Container>
+  );
 }
-
-
-
 
 export default PollOption;
