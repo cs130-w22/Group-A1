@@ -1,152 +1,134 @@
 const express = require('express')
 const router = express.Router();
-const mongoose = require('mongoose'); 
+const mongoose = require('mongoose');
 const PollOption = require('../models/pollOption')
-const Poll = require('../models/poll')
+const Poll = require('../models/poll');
+const { options } = require('./login');
 
-
-router.get('/', function(req, res, next) {
-    mongoose.connect(process.env.DB_URI, { useNewUrlParser: true , useUnifiedTopology: true})
-            .then(() => {
-                let findAllPollsQuery = Poll.find()
-                findAllPollsQuery.exec().then((polls) => {
-                    res.status(200)
-                    if (polls.length == 0) {
-                        res.send("No polls found")
-                    }
-                    else {
-                        res.json(polls)
-                    }
-                })
-            })
-            .catch((err) => console.log(err));
-
-}) 
-
-router.post('/create', function(req, res, next) {
-    mongoose.connect(process.env.DB_URI, { useNewUrlParser: true , useUnifiedTopology: true})
-            .then(() => {
-                Poll.create(req.body).then((newPoll) => {
-                    res.status(200)
-                    res.json(newPoll)
-                })
-            })
-            .catch((err) => console.log(err));
-})
-/*
-router.post('/', function(req, res, next) { //save once created
-
-
-        mongoose.Promise = Promise;
-        mongoose.connect(process.env.DB_URI, { useNewUrlParser: true , useUnifiedTopology: true})
-            .then(() => Poll.find({_id: curr_id}).exec()
-                .then((pollFound) => {
-                    res.status(200)
-                    res.send("Poll ")
-                })
-                if (err) {
-                    res.status()
-                    res.json({messsage:'error'})
-                }
-                else {
-
-                    res.status(200)
-                }
-                res.send("Poll Added Successfully")
-            }))
-            .catch((err) => res.send("Could Not Add Poll"));
-
-
-    
-})
-*/
-
-router.post('/addoption', function(req, res, next) {
-        mongoose.connect(process.env.DB_URI, { useNewUrlParser: true , useUnifiedTopology: true})
-            .then(() => {
-                if (req.body.optionID != "") {
-                    PollOption.findOne({_id: req.body.optionID}).exec()
-                    .then((pollOption) => {
-                        if (pollOption) {
-                            pollOption.text = req.body.text
-                            pollOption.votes = req.body.votes
-                            pollOption.voters = req.body.voters
-                            pollOption.save().then(() => {
-                                res.status(200)
-                                res.json(pollOption)
-                            })
-                            .catch((err) => {
-                                res.status(404)
-                                res.send("unable to update option")
-                            })
-                        }
-                    }).catch((err) => res.send("could not find option"))
-                }
-                else {
-                        //let poll = new Array(mongoose.Types.ObjectId(req.body.pollID))
-                        PollOption.create({poll: req.body.pollID, text: req.body.text, votes: req.body.votes, voters: req.body.voters}).then((newOption) => {
-                                res.status(200)
-                                res.json(newOption)
-                            }).catch((err) => res.send("could not create option"))
-                }
-            }).catch((err) => console.log(err));
-                
-    
+// get all polls
+router.get('/', function (req, res, next) {
+  Poll.find()
+    .populate('options')
+    .then((polls) => res.json(polls))
+    .catch((err) => console.log(err));
 })
 
+// add poll
+router.post('/', function (req, res, next) {
+  Poll.create(req.body).then((poll) => res.json(poll))
+    .catch((err) => console.log(err));
+});
 
-router.get('/getoptions', function(req, res, next) {
-    mongoose.connect(process.env.DB_URI, { useNewUrlParser: true , useUnifiedTopology: true})
-        .then(() => {
-        PollOption.find({poll: mongoose.Types.ObjectId(req.query.pollID)}).exec().then((pollOptions) => {
-            res.status(200)
-           if (pollOptions.length == 0) {
-                console.log("none") 
-           }
-           else {
-                res.status(200)
-                res.json(pollOptions)
-           }
-            
-        }).catch((err) => {console.log(err)})
+// add option
+router.post('/:id/options', function (req, res, next) {
+  const pollId = req.params.id;
+  if (req.body.text?.length == 0)
+    return res.status(400).send('Option text cannot be blank');
+
+  Poll.findById(pollId)
+    .then((poll) => {
+      if (poll == null) return res.sendStatus(404);
+      PollOption.create({
+        poll: pollId,
+        text: req.body.text,
+        votes: req.body.votes || 0,
+        voters: req.body.voters || []
+      }).then((option) => {
+        poll.options.push(option);
+        poll.save()
+          .then(() => res.status(201).json(option))
+          .catch((err) => {
+            console.log(err);
+            res.sendStatus(500)
+          });
+      }).catch((err) => {
+        console.log(err);
+        res.sendStatus(500);
+      })
+    }).catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    })
+});
+
+// update option
+router.patch('/:id/options/:optionId', function (req, res, next) {
+  const pollId = req.params.id;
+  const optionId = req.params.optionId;
+  const update = req.body.update;
+  PollOption.findOneAndUpdate({ poll: pollId, _id: optionId }, req.body.update, {
+    new: true
+  }).then((option) => option ? res.json(option) : res.sendStatus(404))
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
+
+// get poll options
+router.get('/:id/options', function (req, res, next) {
+  Poll.findById(req.params.id, 'options')
+    .populate("options")
+    .then((data) => (data) ? res.json(data) : res.sendStatus(404))
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    })
+});
+
+// get all options
+router.get('/options', function (req, res, next) {
+  PollOption.find().then((options) => {
+    res.json(options)
+  }).catch((err) => {
+    console.log(err);
+    res.sendStatus(500);
+  })
+});
+
+// delete option
+router.delete('/options/:optionId', (req, res, next) => {
+  PollOption.findOneAndDelete({ _id: req.params.optionId })
+    .then((deleted) => deleted ? res.json(deleted) : res.sendStatus(404))
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
     })
 })
 
-router.post('/geteveryoption', function(req, res, next) {
-    
-    try {
-    
-        const findAllQuery = PollOption.find()
-        findAllQuery.exec().then((pollOptions) => {
-            res.status(200)
-           if (pollOptions.length == 0) {
-                console.log("none") 
-           }
-           else {
-                res.status(200)
-                res.json(pollOptions)
-           }
-            
-        })
-    }
-    catch (error) {
-        res.json({message: "Error: ", error})
-    }
+// delete all options
+router.delete('/options', (req, res, next) => {
+  PollOption.deleteMany()
+    .then(() => res.sendStatus(204))
+    .catch((error) => {
+      console.log(err);
+      res.sendStatus(500);
+    })
 })
 
-router.delete('/deletethisoption', (req, res, next) => {
-  PollOption.findOneAndDelete({_id: req.body.optionID}).then((deleted) => res.json(deleted))
-    .catch((err) => console.log(err))  
+// delete all polls
+router.delete('/', (req, res, next) => {
+  Poll.deleteMany()
+    .then(() => {
+      res.sendStatus(204)
+    })
+    .catch((error) => {
+      console.log(err);
+      res.sendStatus(500);
+    })
 })
 
-router.delete('/deletealloptions', (req, res, next) => {
-    PollOption.deleteMany().then(()=> res.send("All options deleted"))
-        .catch((error) => res.status(404))
+// delete poll by id
+router.delete('/:id', (req, res, next) => {
+  Poll.deleteOne({ _id: req.params.id })
+    .then((res) => {
+      if (res.n === 0) return res.sendStatus(404);
+      res.sendStatus(204)
+    })
+    .catch((error) => {
+      console.log(err);
+      res.sendStatus(500);
+    })
 })
 
-router.delete('/deletepolls', (req, res, next) => {
-    Poll.deleteMany().then(()=> res.send("All polls deleted"))
-        .catch((error) => res.status(404))
-})
-
-  module.exports = router;
+module.exports = router;
