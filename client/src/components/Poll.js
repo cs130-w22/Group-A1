@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button } from 'react-bootstrap';
+import { Card, Button,Container,Col,Row, Modal } from 'react-bootstrap';
 import { addOption, getPoll } from '../api/polls';
 // import { ThemeProvider } from 'styled-components';
 import PollOption from './PollOption';
@@ -63,12 +63,29 @@ function Poll({ pollId, thisPoll }) {
   const savePoll = () => {
     setEditMode(false);
   };
+  function getPlls()
+  {
+    
+  }
+  //handles the modal close/open
+  const[shw,setShw] = useState();
 
   return (
-    <Card id={pollId} className="border py-4 px-4 mb-3">
-      <h3 className='fs-5 mb-0 fw-bold'>{pollData?.question}</h3>
-      <hr />
-      {options.map((option, i) => (
+  
+<Container>
+  <Button id={pollId} className="border py-1 px-5 mb-3 bg-light "  className="mb-3" 
+    onClick={()=>setShw(true)} type="button" class="btn btn-primary" 
+    data-toggle="modal" data-target="#myModal">
+  <h3 className=' fs-5 '>{pollData?.question}</h3>
+  </Button>
+  <Modal show={shw} onHide={()=>setShw(false)}>
+    <Modal.Header closeButton >
+        <h3 className='fs-5 mb-0 fw-bold'>{pollData?.question}</h3>
+      </Modal.Header>
+    <Modal.Body>
+      <Card >
+          <hr />
+          {options.map((option, i) => (
         <PollOption
           key={option.data._id}
           keyProp={i}
@@ -76,13 +93,18 @@ function Poll({ pollId, thisPoll }) {
           editing={option.editing}
           onDelete={onDelete}
         />
-      ))}
-      <Button className="mt-2" onClick={createNewOption}>add option</Button>
-      <Button className="mt-2" onClick={savePoll} hidden={!editMode}>save poll</Button>
-      <Button className="mt-2" onClick={allowEdits} hidden={editMode}>edit poll</Button>
+        ))}
+        <Modal.Footer>
+          <Button className=" mb-3" onClick={createNewOption}>add option</Button>
+          <Button className="mb-3" onClick={savePoll} hidden={!editMode}>save poll</Button>
+          <Button className="mb-3" onClick={allowEdits} hidden={editMode}>edit poll</Button>
+          <Button className="mb-3 bg-secondary " >Delete</Button>
+        </Modal.Footer>
     </Card>
+    </Modal.Body>
+    </Modal>
+    </Container>
 
   );
 }
-
 export default Poll;

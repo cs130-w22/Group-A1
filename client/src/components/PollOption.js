@@ -67,14 +67,14 @@ function PollOption({ data, onDelete, editing }) {
     <Container className="px-1">
 
       <div className="d-flex justify-content-between">
-        <Button
+        <Button className='m-2 color-secondary'
           style={editButton}
           hidden={editMode}
           onClick={allowEdits}
         >
           <img src={EditIcon} alt="Edit" />
         </Button>
-        <CloseButton onClick={removeOption} />
+        <CloseButton className='m-3 mt-3' onClick={removeOption} />
         {editMode && (
           <Form className="w-75 d-flex" onSubmit={saveText}>
             <Form.Control
@@ -88,7 +88,7 @@ function PollOption({ data, onDelete, editing }) {
             />
           </Form>
         )}
-        <ToggleButton
+        <ToggleButton className=' border border-warning mb-2 rounded-pill text-centered'
           id={'vote-button'.concat(optionId)}
           checked={checked}
           onClick={changeVote}
