@@ -1,28 +1,62 @@
-import React, { useState } from 'react';
-import { Route, Routes } from "react-router-dom";
+import React, { useState, useMemo } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
+import { Watch } from 'react-loader-spinner';
 import Home from './components/Home';
 import NotFound from './components/NotFound';
-import { Container } from 'react-bootstrap'
-import styled from 'styled-components';
-import { Navigation } from './Navigation';
 import Login from './components/Login';
 import Create from './components/Create';
 
+import Signup from './components/Signup';
+import { Navigation } from './Navigation';
+import { UserContext } from './utils/userContext';
+import { apiInstance } from './utils/axiosInstance';
+import useLocalStorage from './utils/localStorage';
 
 function App() {
+  const [user, setUser] = useLocalStorage('user', null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const logout = () => {
+    setIsLoading(true);
+    return new Promise((resolve, reject) => {
+      apiInstance.post('/logout').then(() => {
+        setUser(null);
+        localStorage.clear();
+        console.log('Logged out');
+        setIsLoading(false);
+        resolve();
+      }).catch((err) => {
+        console.log(err);
+        reject();
+      });
+    });
+  };
+
+  const contextProvider = useMemo(() => ({ user, setUser }), [user, setUser]);
   return (
-    <div>
-      <Navigation/>
-      <Container className="mt-3">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/create" element={<Create />} />
-          <Route path="/" element={<Home />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+    <UserContext.Provider value={contextProvider}>
+      <Navigation onLogout={logout} />
+      <Container className="pt-3 h-100">
+        {(isLoading) ? (
+          <Watch
+            heigth="100"
+            width="100"
+            color="grey"
+            ariaLabel="loading"
+          />
+        ) : (
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/create" element={<Create />} />
+            <Route path="/" element={<Home />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        )}
       </Container>
-    </div>
-  )
+    </UserContext.Provider>
+  );
 }
 
 export default App;

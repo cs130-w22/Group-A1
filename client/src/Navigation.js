@@ -1,34 +1,103 @@
-import React from 'react';
-import { Route, Routes } from "react-router-dom";
-import { LinkContainer } from "react-router-bootstrap";
-import { Navbar, Container, Nav, Button } from 'react-bootstrap';
-import logo from './assets/logo.svg';
+import React, { useContext } from 'react';
+import {
+  Route, Routes, useNavigate,
+} from 'react-router-dom';
+import { LinkContainer } from 'react-router-bootstrap';
+import {
+  Navbar, Container, Nav, Button,
+} from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import logo from './assets/cya.svg';
 import LoginHeader from './components/LoginHeader';
+import { UserContext } from './utils/userContext';
 
-export function Navigation() {
+export function Navigation({ onLogout }) {
   return (
     <Routes>
-    {/* TODO add a custom header nav to the login path, or delete this to use the standard header*/}
-    <Route path="/login" element={LoginHeader}></Route>
-    <Route path="*" element={TopNav} />
+      <Route path="/login" element={LoginHeader} />
+      <Route path="/signup" element={LoginHeader} />
+      <Route path="*" element={<TopNav onLogout={onLogout} />} />
     </Routes>
   );
 }
-const TopNav = (
-  <Navbar expand="lg" className="mt-3">
-    <Container>
-      <LinkContainer to="/">
-        <Navbar.Brand href="/">
-          <img src={logo} width="200" height="40" className="d-inline-block align-top" alt="👋 see you there" />
-        </Navbar.Brand>
+export function ProtectedNav() {
+  const { user } = useContext(UserContext);
+  if (user) {
+    return (
+      <LinkContainer to="/example">
+        <Nav.Link className="fw-bold">
+          example
+        </Nav.Link>
       </LinkContainer>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="ms-auto fw-bold">
-          <LinkContainer to="/"><Nav.Link className="text-secondary">home</Nav.Link></LinkContainer>
-        </Nav>
-      </Navbar.Collapse>
-      <LinkContainer to="/login"><Button variant="outline-primary" className="ms-1 fw-bold">login</Button></LinkContainer>
-    </Container>
-  </Navbar>
-);
+    );
+  }
+  return (null);
+}
+export function TopNav({ onLogout }) {
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+  const logout = () => {
+    onLogout().then(() => {
+      navigate('/');
+    });
+  };
+  return (
+    <Navbar expand="lg" className="mt-3">
+      <Container>
+        <LinkContainer to="/">
+          <Navbar.Brand href="/">
+            <img
+              src={logo}
+              width="100"
+              height="40"
+              className="d-inline-block align-top"
+              alt="👋 cya"
+            />
+          </Navbar.Brand>
+        </LinkContainer>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ms-auto fw-bold">
+            <LinkContainer to="/">
+              <Nav.Link
+                className="text-secondary"
+              >
+                home
+              </Nav.Link>
+            </LinkContainer>
+          </Nav>
+        </Navbar.Collapse>
+        <ProtectedNav />
+        {user
+          // <LinkContainer to="/logout">
+          ? (
+            <Button
+              onClick={logout}
+              variant="outline-primary"
+              className="ms-1 fw-bold"
+            >
+              sign out
+            </Button>
+          )
+          // </LinkContainer> */
+          : (
+            <LinkContainer to="/login">
+              <Button
+                variant="outline-primary"
+                className="ms-1 fw-bold"
+              >
+                sign in
+              </Button>
+            </LinkContainer>
+          )}
+      </Container>
+    </Navbar>
+  );
+}
+Navigation.propTypes = {
+  onLogout: PropTypes.func.isRequired,
+};
+
+TopNav.propTypes = {
+  onLogout: PropTypes.func.isRequired,
+};
