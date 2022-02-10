@@ -82,4 +82,3 @@ export function voteOption(optionId) {
       throw err;
     });
 }
-

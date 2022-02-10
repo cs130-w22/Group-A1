@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Card, ListGroup, Button } from 'react-bootstrap';
+import {
+  Card, ListGroup, Button, Alert,
+} from 'react-bootstrap';
 import { ThemeProvider } from 'styled-components';
 import { createPoll, getPolls } from '../api/polls';
 import Poll from './Poll';
@@ -15,7 +17,11 @@ function PollList() {
         const polls = [];
         for (let i = 0; i < resPolls.length; i += 1) {
           const pollId = resPolls[i]._id;
-          polls.push(<Poll key={i} pollId={pollId} thisPoll={resPolls[i]} />);
+          polls.push(<Poll
+            key={i}
+            pollId={pollId}
+            pollData={resPolls[i]}
+          />);
         }
         setPollList(polls);
       })
@@ -28,7 +34,12 @@ function PollList() {
   const createNewPoll = () => {
     createPoll('Placeholder Name', 0, 2, true)
       .then((createdPoll) => {
-        setPollList((p) => [p, <Poll key={pollList.length} pollId={createdPoll._id} />]);
+        setPollList((p) => [p,
+          <Poll
+            key={pollList.length}
+            pollId={createdPoll.data._id}
+            pollData={createdPoll.data}
+          />]);
       })
       .catch((error) => {
         console.error(error);
@@ -38,6 +49,7 @@ function PollList() {
 
   return (
     <div>
+      {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
       {pollList}
       <Button onClick={createNewPoll}>add Poll</Button>
     </div>
