@@ -1,31 +1,28 @@
 import React from 'react';
 import { useState } from "react"
-import DatePicker from "react-multi-date-picker"
-import { Calendar } from "react-multi-date-picker"
+import {Calendar, DateObject} from "react-multi-date-picker"
+import DatePanel from "react-multi-date-picker/plugins/date_panel";
 
 
-
-
-
- function Create() {
-        const today = new Date()
-        const tomorrow = new Date()
-      
-        tomorrow.setDate(tomorrow.getDate() + 1)
-      
-        const [values, setValues] = useState([today, tomorrow])
+ function Create  () 
+ {     
+        const [dates, setDates] = useState();
       
         return (
             
-            <div style={{ textAlign: "center" }}>
-            <p>Create placeholder</p>
-            <DatePicker 
+            <div >
+              <h1>Create Events</h1>
+              <Calendar
+                value={dates}
+                onChange={setDates}
                 multiple
-                value={values} 
-                onChange={setValues}
-             />
-          </div>
-        )
-}
+                sort
+                format={"MM/DD/YYYY"}
+                calendarPosition="bottom-center"
+                plugins={[<DatePanel />]}
+              />
+            </div>
+        );
+};
 
 export default Create;
