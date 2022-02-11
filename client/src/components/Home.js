@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Container } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import { getUser } from '../api/users';
 import { UserContext } from '../utils/userContext';

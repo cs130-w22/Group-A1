@@ -22,10 +22,12 @@
     "express-validator": "^6.14.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.3.1",
-    "mongoose": "^6.1.8"
+    "mongoose": "^5.11.15"
   },
   "devDependencies": {
-    "eslint": "^8.7.0",
+    "eslint": "^8.8.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
     "jest": "^27.4.7"
   }
 }
