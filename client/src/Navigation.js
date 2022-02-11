@@ -20,15 +20,23 @@ export function Navigation({ onLogout }) {
     </Routes>
   );
 }
+
 export function ProtectedNav() {
   const { user } = useContext(UserContext);
   if (user) {
     return (
-      <LinkContainer to="/example">
-        <Nav.Link className="fw-bold">
-          example
-        </Nav.Link>
-      </LinkContainer>
+      <>
+        <LinkContainer to="/example">
+          <Nav.Link className="fw-bold text-primary">
+            example
+          </Nav.Link>
+        </LinkContainer>
+        <LinkContainer to="/event/foikddfiowemlskSDjfd">
+          <Nav.Link className="fw-bold text-primary">
+            example event
+          </Nav.Link>
+        </LinkContainer>
+      </>
     );
   }
   return (null);
@@ -65,16 +73,17 @@ export function TopNav({ onLogout }) {
                 home
               </Nav.Link>
             </LinkContainer>
+            <ProtectedNav />
           </Nav>
         </Navbar.Collapse>
-        <ProtectedNav />
+
         {user
           // <LinkContainer to="/logout">
           ? (
             <Button
               onClick={logout}
               variant="outline-primary"
-              className="ms-1 fw-bold"
+              className="ms-3 fw-bold"
             >
               sign out
             </Button>
