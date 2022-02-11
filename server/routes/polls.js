@@ -169,10 +169,10 @@ router.delete('/', (req, res) => {
 
 // delete poll by id
 router.delete('/:id', (req, res) => {
-  Poll.deleteOne({ _id: req.params.id })
-    .then((data) => {
-      if (data.n === 0) return res.sendStatus(404);
-      res.sendStatus(204);
+  Poll.findOneAndDelete({ _id: req.params.id })
+    .then((deleted) => {
+      if (deleted == null) return res.sendStatus(404);
+      res.json({ _id: deleted._id });
     })
     .catch((err) => {
       console.log(err);

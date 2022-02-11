@@ -12,8 +12,11 @@ function PollList() {
   const [creating, setCreating] = useState(false);
   const [creatingPoll, setCreatingPoll] = useState();
   const handleDelete = (deleted) => {
-    const updatedPollList = pollList.filter((poll) => poll.data._id !== deleted._id);
+    const updatedPollList = pollList.filter((poll) => poll.data._id !== deleted);
     setPollList(updatedPollList);
+  };
+  const handleClose = () => {
+    setCreating(false);
   };
   useEffect(() => {
     getPolls()
@@ -28,6 +31,7 @@ function PollList() {
             pollData={resPolls[i]}
             editMode={false}
             handleDelete={handleDelete}
+            handleClose={handleClose}
           />);
         }
         setPollList(polls);
@@ -50,6 +54,7 @@ function PollList() {
             pollData={createdPoll.data}
             editMode
             handleDelete={handleDelete}
+            handleClose={handleClose}
           />
         );
         setPollList((p) => [p, poll,

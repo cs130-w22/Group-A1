@@ -4,7 +4,7 @@ import {
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import {
-  addOption, createPoll, getPoll, updatePoll,
+  addOption, createPoll, deletePoll, getPoll, updatePoll,
 } from '../api/polls';
 // import { ThemeProvider } from 'styled-components';
 import PollOption from './PollOption';
@@ -18,7 +18,7 @@ function Poll({
   const [errorMsg, setErrorMsg] = useState();
   const [pollTitle, setPollTitle] = useState(pollData?.question);
 
-  const onDelete = (deleted) => {
+  const onDeleteOption = (deleted) => {
     const updatedOptions = options.filter((option) => option.data._id !== deleted._id);
     setOptions(updatedOptions);
   };
@@ -94,9 +94,9 @@ function Poll({
     if (e.target.value.length > 0) setErrorMsg('');
   };
 
-  const deletePoll = (e) => {
+  const onDelete = (e) => {
     deletePoll(pollId).then((res) => {
-      handleDelete(res.id);
+      handleDelete(res.data._id);
     }).catch((err) => console.log(err));
   };
 
@@ -120,7 +120,7 @@ function Poll({
               />
             </Form>
             <Button variant="success" className="ms-2 " onClick={savePoll}>save</Button>
-            <Button variant="danger" className="ms-2 " onClick={deletePoll}>delete</Button>
+            <Button variant="danger" className="ms-2 " onClick={onDelete}>delete</Button>
           </div>
         )}
         <hr />
@@ -130,7 +130,7 @@ function Poll({
             keyProp={i}
             data={option.data}
             editing={option.editing}
-            onDelete={onDelete}
+            onDelete={onDeleteOption}
             onError={setErrorMsg}
           />
         ))}
