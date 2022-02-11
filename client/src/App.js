@@ -36,7 +36,7 @@ function App() {
   return (
     <UserContext.Provider value={contextProvider}>
       <Navigation onLogout={logout} />
-      <Container className="pt-3 h-100">
+      <Container className="pt-3 h-100 pb-5">
         {(isLoading) ? (
           <Watch
             heigth="100"

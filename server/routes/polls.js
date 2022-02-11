@@ -23,14 +23,33 @@ router.post('/vote', (req, res) => {
     });
 });
 
+// update poll
+router.patch('/:id', (req, res) => {
+  const { update } = req.body;
+  Poll.findOneAndUpdate({ _id: req.params.id }, update, {
+    new: true,
+  }).populate({
+    path: 'options',
+    populate: {
+      path: 'voters',
+      select: '_id username',
+    },
+  }).then((data) => (data ? res.json(data) : res.sendStatus(404)))
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
 // get all options
 router.get('/options', (req, res) => {
-  PollOption.find().then((options) => {
-    res.json(options);
-  }).catch((err) => {
-    console.log(err);
-    res.sendStatus(500);
-  });
+  PollOption.find()
+    .populate('voters', '_id username')
+    .then((options) => {
+      res.json(options);
+    }).catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
 });
 // delete option
 router.delete('/options/:optionId', (req, res) => {
@@ -69,8 +88,13 @@ router.post('/', (req, res) => {
 // get poll
 router.get('/:id', (req, res) => {
   Poll.findById(req.params.id)
-    .populate('options')
-    .then((data) => ((data) ? res.json(data) : res.sendStatus(404)))
+    .populate({
+      path: 'options',
+      populate: {
+        path: 'voters',
+        select: '_id username',
+      },
+    }).then((data) => ((data) ? res.json(data) : res.sendStatus(404)))
     .catch((err) => {
       console.log(err);
       res.sendStatus(500);

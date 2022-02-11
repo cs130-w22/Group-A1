@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Card, ListGroup, Button, Alert,
+  Card, ListGroup, Button, Alert, Modal, Form,
 } from 'react-bootstrap';
 import { ThemeProvider } from 'styled-components';
 import { createPoll, getPolls } from '../api/polls';
@@ -9,7 +9,12 @@ import Poll from './Poll';
 function PollList() {
   const [pollList, setPollList] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
-
+  const [creating, setCreating] = useState(false);
+  const [creatingPoll, setCreatingPoll] = useState();
+  const handleDelete = (deleted) => {
+    const updatedPollList = pollList.filter((poll) => poll.data._id !== deleted._id);
+    setPollList(updatedPollList);
+  };
   useEffect(() => {
     getPolls()
       .then((res) => {
@@ -21,6 +26,8 @@ function PollList() {
             key={i}
             pollId={pollId}
             pollData={resPolls[i]}
+            editMode={false}
+            handleDelete={handleDelete}
           />);
         }
         setPollList(polls);
@@ -32,14 +39,22 @@ function PollList() {
   }, []);
 
   const createNewPoll = () => {
+    // check if allowed
+    setCreating(true);
     createPoll('Placeholder Name', 0, 2, true)
       .then((createdPoll) => {
-        setPollList((p) => [p,
+        const poll = (
           <Poll
             key={pollList.length}
             pollId={createdPoll.data._id}
             pollData={createdPoll.data}
-          />]);
+            editMode
+            handleDelete={handleDelete}
+          />
+        );
+        setPollList((p) => [p, poll,
+        ]);
+        setCreatingPoll(poll);
       })
       .catch((error) => {
         console.error(error);
@@ -52,6 +67,16 @@ function PollList() {
       {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
       {pollList}
       <Button onClick={createNewPoll}>add Poll</Button>
+      <Modal show={creating} onHide={() => setCreating(false)}>
+        <Modal.Header closeButton>
+          <h3>Create Poll</h3>
+        </Modal.Header>
+        <Modal.Body>
+          <Card>
+            {creatingPoll}
+          </Card>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }

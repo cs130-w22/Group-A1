@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Alert } from 'react-bootstrap';
+import {
+  Card, Button, Alert, Container, Col, Row, Modal, Form,
+} from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { addOption, getPoll } from '../api/polls';
+import {
+  addOption, createPoll, getPoll, updatePoll,
+} from '../api/polls';
 // import { ThemeProvider } from 'styled-components';
 import PollOption from './PollOption';
 
-function Poll({ pollId, pollData: data }) {
+function Poll({
+  pollId, pollData: data, editMode: editState, handleDelete,
+}) {
   const [pollData, setPollData] = useState(data);
   const [options, setOptions] = useState([]); // includes edit property for poll Option for now
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(editState);
   const [errorMsg, setErrorMsg] = useState();
+  const [pollTitle, setPollTitle] = useState(pollData?.question);
 
   const onDelete = (deleted) => {
     const updatedOptions = options.filter((option) => option.data._id !== deleted._id);
@@ -17,7 +24,7 @@ function Poll({ pollId, pollData: data }) {
   };
 
   useEffect(() => {
-    if (pollId != null) {
+    if (pollId != null && pollId.length > 0) {
       getPoll(pollId).then((res) => {
         setPollData(res.data);
       }).catch((err) => {
@@ -25,6 +32,10 @@ function Poll({ pollId, pollData: data }) {
       });
     }
   }, [pollId]);
+
+  useEffect(() => {
+    setPollTitle(pollData?.question);
+  }, [pollData]);
 
   useEffect(() => {
     if (pollData.options != null) {
@@ -37,6 +48,7 @@ function Poll({ pollId, pollData: data }) {
         };
         newOptions.push(option);
       }
+      newOptions.sort((a, b) => b.data.voters.length - a.data.voters.length);
       setOptions(newOptions);
     }
   }, [pollData]);
@@ -63,15 +75,54 @@ function Poll({ pollId, pollData: data }) {
     setEditMode(true);
   };
 
-  const savePoll = () => {
-    setEditMode(false);
+  const savePoll = (e) => {
+    // update poll
+    e.preventDefault();
+    if (pollTitle.length === 0) setErrorMsg('Poll title cannot be empty!');
+    else {
+      updatePoll(pollId, { question: pollTitle })
+        .then((res) => {
+          setEditMode(false);
+          setPollData(res.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  };
+
+  const handleChange = (e) => {
+    setPollTitle(e.target.value);
+    if (e.target.value.length > 0) setErrorMsg('');
+  };
+
+  const deletePoll = (e) => {
+    deletePoll(pollId).then((res) => {
+      handleDelete(res.id);
+    }).catch((err) => console.log(err));
   };
 
   return (
     <>
       {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
       <Card id={pollId} className="border py-4 px-4 mb-3">
-        <h3 className="fs-5 mb-0 fw-bold">{data?.question}</h3>
+        {!editMode && (
+
+          <h3 className="fs-5 mb-0 fw-bold">{pollTitle}</h3>
+
+        )}
+        {editMode && (
+          <div className="d-flex">
+            <Form className="w-100 d-flex" onSubmit={savePoll}>
+              <Form.Control
+                type="text"
+                placeholder="Poll Title"
+                onChange={handleChange}
+                value={pollTitle || ''}
+              />
+            </Form>
+            <Button variant="success" className="ms-2 " onClick={savePoll}>save</Button>
+            <Button variant="danger" className="ms-2 " onClick={deletePoll}>delete</Button>
+          </div>
+        )}
         <hr />
         {options.map((option, i) => (
           <PollOption
@@ -84,7 +135,7 @@ function Poll({ pollId, pollData: data }) {
           />
         ))}
         <Button className="mt-2" onClick={createNewOption}>add option</Button>
-        <Button className="mt-2" onClick={savePoll} hidden={!editMode}>save poll</Button>
+
         <Button className="mt-2" onClick={allowEdits} hidden={editMode}>edit poll</Button>
       </Card>
     </>

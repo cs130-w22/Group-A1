@@ -1,6 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {
+  useContext, useEffect, useRef, useState,
+} from 'react';
 import {
-  ToggleButton, Button, CloseButton, Form, Row, Col, Container,
+  ToggleButton, Button, CloseButton, Form, Row, Col, Container, Overlay, OverlayTrigger, Tooltip,
 } from 'react-bootstrap';
 import {
   addOption, deleteOption, updateOption, voteOption,
@@ -25,11 +27,14 @@ function PollOption({ data, onDelete, editing }) {
   const [optionText, setOptionText] = useState(data.text);
   const [checked, setChecked] = useState(data.voters.includes(user.userId));
   const [editMode, setEditMode] = useState(editing);
-  const [votes, setVotes] = useState(data.voters.length);
-
+  const [votes, setVotes] = useState(data.voters);
   const changeVote = (e) => {
-    voteOption(optionId).then((res) => {
-      setVotes(res.data.voters.length);
+    voteOption(data._id).then((res) => {
+      if (checked) {
+        setVotes(votes.filter((voter) => res.data.voters.includes(voter._id)));
+      } else {
+        setVotes([...votes, { _id: user.userId, username: user.username }]);
+      }
       setChecked(!checked);
     }).catch((err) => console.log(err));
   };
@@ -60,23 +65,42 @@ function PollOption({ data, onDelete, editing }) {
   };
 
   useEffect(() => {
-    setVotes(data.voters.length);
+    setVotes(data.voters);
   }, [data]);
 
   return (
-    <Container className="px-1">
+    <Container className="px-1 mb-3">
 
-      <div className="d-flex justify-content-between">
-        <Button
-          style={editButton}
-          hidden={editMode}
-          onClick={allowEdits}
-        >
-          <img src={EditIcon} alt="Edit" />
-        </Button>
-        <CloseButton onClick={removeOption} />
+      <div className="d-flex justify-content-between align-items-center">
+        <div className="pe-2 flex-shrink-1 d-flex align-items-center">
+          {!editMode
+            && (
+              <div>
+                <Button
+                  className="color-secondary align-self-center mb-3 me-3 p-0"
+                  style={editButton}
+                  hidden={editMode}
+                  onClick={allowEdits}
+                >
+                  <img src={EditIcon} alt="Edit" />
+                </Button>
+                <input className="form-check-input mt-2 mb-2 ms-2" type="checkbox" checked={checked} readOnly onClick={changeVote} />
+              </div>
+            )}
+          {/* <ToggleButton
+            variant="link"
+            id={'vote-button'.concat(optionId)}
+            checked={checked}
+            onClick={changeVote}
+            disabled={editMode}
+          >
+            {checked ? '☑' : '☐'}
+          </ToggleButton> */}
+
+        </div>
+        {' '}
         {editMode && (
-          <Form className="w-75 d-flex" onSubmit={saveText}>
+          <Form className="w-100 d-flex ms-n2" onSubmit={saveText}>
             <Form.Control
               key={'poll-text-'.concat(optionId)}
               id={'poll-text'.concat(optionId)}
@@ -86,23 +110,37 @@ function PollOption({ data, onDelete, editing }) {
               // readOnly={!editMode}
               value={optionText || ''}
             />
+            <Button
+              variant="success"
+              className="align-self-center ms-2"
+              hidden={!editMode}
+              onClick={saveText}
+            >
+              Save
+            </Button>
+            <Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>
           </Form>
+
         )}
-        <ToggleButton
-          id={'vote-button'.concat(optionId)}
-          checked={checked}
-          onClick={changeVote}
-          disabled={editMode}
+        <span hidden={editMode} className="mx-3 text-nowrap flex-grow-1">{optionText}</span>
+
+        <OverlayTrigger
+          placement="right"
+          overlay={votes.length > 0 ? (
+            <Tooltip>
+              {votes.map((voter, i) => [
+                i > 0 && ', ',
+                <span key={voter.username}>{voter.username}</span>,
+              ])}
+            </Tooltip>
+          ) : <span />}
         >
-          {checked ? 'Remove Vote' : 'Vote'}
-        </ToggleButton>
-        <p hidden={editMode} className="mx-3 text-nowrap w-50">{optionText}</p>
-        <p className="voteCount" hidden={editMode}>
-          Votes:
-          {' '}
-          {votes}
-          {' '}
-        </p>
+          <span className="voteCount" hidden={editMode}>
+            Votes:
+            {' '}
+            {votes.length}
+          </span>
+        </OverlayTrigger>
       </div>
 
     </Container>

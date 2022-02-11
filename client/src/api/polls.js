@@ -58,8 +58,29 @@ export function deleteOption(optionId) {
     });
 }
 
+export function deletePoll(pollId) {
+  const url = `${BASE}/${pollId}`;
+  return apiInstance.delete(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
 export function updateOption(optionId, data) {
   const url = `${BASE}/options/${optionId}`;
+  return apiInstance.patch(
+    url,
+    { update: data },
+  )
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function updatePoll(pollId, data) {
+  const url = `${BASE}/${pollId}`;
   return apiInstance.patch(
     url,
     { update: data },
