@@ -47,9 +47,9 @@ const signupRouter = require('./routes/signup');
 const logoutRouter = require('./routes/logout');
 const userRouter = require('./routes/users');
 const authRouter = require('./routes/auth')
-const cookieRouter = require('./routes/cookie')
+const cookieRouter = require('./routes/cookie');
 const pollRouter = require('./routes/polls');
-
+const eventRouter = require('./routes/event');
 
 // routes
 app.use('/login', loginRouter);
@@ -61,6 +61,7 @@ app.use(authRouter);
 app.use('/users', userRouter);
 app.use('/logout', logoutRouter);
 app.use('/polls', pollRouter);
+app.use('/event', eventRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
