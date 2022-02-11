@@ -22,13 +22,13 @@ router.post(
     User.findOne({ email: req.body.email }, (err, user) => {
       if (err) return res.sendStatus(500);
       if (user == null) {
-        return res.status(401).send('No user exists for entered email');
+        return res.status(401).send({ field: 'email', msg: 'No user exists for entered email' });
       }
       // verify hashed password
       const hash = user.password;
       bcrypt.compare(req.body.password, hash, (bcryptErr, result) => {
         if (bcryptErr) return res.sendStatus(500);
-        if (!result) return res.sendStatus(401);
+        if (!result) return res.status(401).send({ field: 'password', msg: 'Incorrect email/password' });
         // generate session
         req.session.userId = user._id;
         req.session.save();

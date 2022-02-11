@@ -25,16 +25,10 @@ class ErrorHandler {
         );
       }
     } else if (this.errorStatus === 401) {
-      if (this.errResponse !== 'Unauthorized') {
+      if (this.errResponse.data) {
         setError(
-          'email',
-          { type: this.errType, message: 'No user exists for this email' },
-          this.errFocus,
-        );
-      } else {
-        setError(
-          'password',
-          { type: this.errType, message: 'Incorrect email/password' },
+          this.errResponse.data.field,
+          { type: this.errType, message: this.errResponse.data.msg },
           this.errFocus,
         );
       }

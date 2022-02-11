@@ -1,18 +1,14 @@
 import axios from 'axios';
 
+const axiosConfig = {
+  baseURL: '/api',
+  timeout: 30000,
+};
 // axios instance for login/signup
-const authInstance = axios.create();
+const authInstance = axios.create(axiosConfig);
 
 // axios instance for api calls
-const apiInstance = axios.create();
-
-// // Add a request interceptor
-// apiInstance.interceptors.request.use(function (req) {
-//     console.log("Request intercepted");
-//     return req;
-// }, function (error) {
-//     return Promise.reject(error);
-// });
+const apiInstance = axios.create(axiosConfig);
 
 // Add a response interceptor
 apiInstance.interceptors.response.use((response) => response, (error) => {
