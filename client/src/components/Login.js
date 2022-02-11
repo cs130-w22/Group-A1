@@ -3,11 +3,10 @@ import React, { useContext } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
-import { login } from '../api/auth';
 import { UserContext } from '../utils/userContext';
+import loginFacade from '../utils/loginFacade';
 
 function Login() {
-  const navigate = useNavigate();
   // use react hook form to handle form navigation
   const {
     handleSubmit,
@@ -15,54 +14,14 @@ function Login() {
     setError,
     formState: { errors },
   } = useForm();
-    // get login and user from context
+  const navigate = useNavigate();
+  // get login and user from context
   const { user, setUser } = useContext(UserContext);
   // handles the input
   const onSubmit = (data) => {
-    login(data.email, data.password)
-      .then((res) => {
-        // on success, save user and navigate to home page
-        setUser({ userId: res.data.userId, username: res.data.username });
-        navigate('/');
-      })
-      .catch((err) => {
-        // add server-side errors to validation displays
-        const errData = err.response?.data;
-        if (errData == null) {
-          console.error(err);
-          return;
-        }
-        const apiErrors = errData.errors;
-        if (apiErrors?.length > 0) {
-          for (let i = 0; i < apiErrors.length; i += 1) {
-            const errorType = apiErrors[i].param;
-            const errorMsg = apiErrors[i].msg;
-            setError(
-              errorType,
-              { type: 'api', message: errorMsg },
-              { shouldFocus: true },
-            );
-          }
-        } else if (err.response.status === 401) {
-          if (errData !== 'Unauthorized') {
-            setError(
-              'email',
-              { type: 'api', message: 'No user exists for this email' },
-              { shouldFocus: true },
-            );
-          } else {
-            setError(
-              'password',
-              { type: 'api', message: 'Incorrect email/password' },
-              { shouldFocus: true },
-            );
-          }
-        } else if (err.response.status === 500) {
-          errors.form = "We're sorry! Something went wrong on our end.";
-        }
-      });
+    loginFacade(data.email, data.password, setError, navigate, setUser);
   };
-    // redirect to home page if already signed in
+  // redirect to home page if already signed in
   if (user?.id) return <Navigate to="/" replace />;
   return (
     <Container className="d-flex h-100 justify-content-center">
@@ -137,7 +96,7 @@ function Login() {
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Control.Feedback type="invalid">
-              {errors.form}
+              {errors.form?.message}
             </Form.Control.Feedback>
             <Button
               variant="outline-primary"
