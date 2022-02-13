@@ -3,10 +3,11 @@ import {
   Card, ListGroup, Button, Alert, Modal, Form,
 } from 'react-bootstrap';
 import { ThemeProvider } from 'styled-components';
+import { getEventPolls } from '../api/event';
 import { createPoll, getPolls } from '../api/polls';
 import Poll from './Poll';
 
-function PollList() {
+function PollList({ eventId }) {
   const [pollList, setPollList] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [creating, setCreating] = useState(false);
@@ -19,7 +20,8 @@ function PollList() {
     setCreating(false);
   };
   useEffect(() => {
-    getPolls()
+    console.log(eventId);
+    getEventPolls(eventId)
       .then((res) => {
         const resPolls = res.data;
         setPollList(resPolls);
@@ -37,7 +39,7 @@ function PollList() {
   const createNewPoll = () => {
     // check if allowed
     setCreating(true);
-    createPoll('Placeholder Name', 0, 2, true)
+    createPoll(eventId, 'Placeholder Name', 0, 2, true)
       .then((createdPoll) => {
         setPollList([...pollList, createdPoll.data]);
         const poll = (
@@ -71,7 +73,7 @@ function PollList() {
           handleClose={handleClose}
         />
       ))}
-      <Button onClick={createNewPoll}>add Poll</Button>
+      <Button variant="outline-primary" className="fw-bold" onClick={createNewPoll}>+ add poll</Button>
       <Modal show={creating} onHide={() => setCreating(false)}>
         <Modal.Header closeButton>
           <h3>Create Poll</h3>

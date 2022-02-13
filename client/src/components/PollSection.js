@@ -2,11 +2,11 @@ import React from 'react';
 import PollList from './PollList';
 import { SectionTitle } from './styled/headers';
 
-function PollSection() {
+function PollSection({ eventId }) {
   return (
     <div>
       <SectionTitle className="mt-5">Polls 🗳️</SectionTitle>
-      <PollList />
+      <PollList eventId={eventId} />
     </div>
   );
 }

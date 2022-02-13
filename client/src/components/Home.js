@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Button } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
+import { LinkContainer } from 'react-router-bootstrap';
 import { getUser } from '../api/users';
 import { UserContext } from '../utils/userContext';
 
@@ -39,14 +41,22 @@ function Home() {
               !
             </span>
           </h2>
-          { loading && (
-          <Watch
-            heigth="100"
-            width="100"
-            color="grey"
-            ariaLabel="loading"
-          />
-          ) }
+          <LinkContainer to="/event/create">
+            <Button
+              variant="outline-primary"
+              className="ms-1 fw-bold"
+            >
+              create event +
+            </Button>
+          </LinkContainer>
+          {loading && (
+            <Watch
+              heigth="100"
+              width="100"
+              color="grey"
+              ariaLabel="loading"
+            />
+          )}
         </div>
       ) : <div>placeholder</div>}
     </div>

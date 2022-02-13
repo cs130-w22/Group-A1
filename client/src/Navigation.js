@@ -31,7 +31,7 @@ export function ProtectedNav() {
             example
           </Nav.Link>
         </LinkContainer>
-        <LinkContainer to="/event/foikddfiowemlskSDjfd">
+        <LinkContainer to="/event/62098bce59b677377499a563">
           <Nav.Link className="fw-bold text-primary">
             example event
           </Nav.Link>

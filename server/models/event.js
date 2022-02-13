@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+
+const { Schema } = mongoose;
 
 const EventSchema = new Schema({
   name: { type: String, required: true },
@@ -10,7 +11,7 @@ const EventSchema = new Schema({
   archived: { type: Boolean, required: true },
   finalTime: [{ type: Number }],
   owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  members: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+  members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 }, { timestamps: true });
 
 const Event = mongoose.model('event', EventSchema);

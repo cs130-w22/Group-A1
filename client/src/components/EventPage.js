@@ -1,12 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import {
+  Col, Container, Row, Alert,
+} from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import PropTypes from 'prop-types';
+import { useParams } from 'react-router-dom';
+import { format, parseISO } from 'date-fns';
 import { UserContext } from '../utils/userContext';
 import AvailabilitySection from './AvailabilitySection';
 import InviteBox from './InviteBox';
 import PollSection from './PollSection';
 import { CategoryTitle, SectionTitle } from './styled/headers';
+import { getEvent } from '../api/event';
 
 const dummyData = {
   name: 'Mango Party',
@@ -16,7 +21,6 @@ const dummyData = {
   invited: [{ id: '1', username: 'AppleGobbler' }],
   coming: [{ id: '2', username: 'StrawberryEater' }],
   declined: [{ id: '3', username: 'PartyPooper' }],
-  id: 'rwcB1Udmdasdfxgge',
 };
 
 function UserList({ users }) {
@@ -50,14 +54,30 @@ function EventMembers({ coming, invited, declined }) {
 
 function EventPage() {
   const { user } = useContext(UserContext);
+  const { id } = useParams();
   const [data, setData] = useState();
   const [inviteField, setInviteField] = useState('');
   const [loading, setLoading] = useState();
+  const [errorMsg, setErrorMsg] = useState();
+
   useEffect(() => {
     setLoading(true);
-    setData(dummyData);
-    setLoading(false);
-  }, [user, data]);
+    getEvent(id)
+      .then((res) => {
+        const eventData = res.data;
+        setData({
+          ...eventData,
+          invited: [{ id: '1', username: 'AppleGobbler' }],
+          coming: [{ id: '2', username: 'StrawberryEater' }],
+          declined: [{ id: '3', username: 'PartyPooper' }],
+        });
+      })
+      .catch((err) => {
+        setErrorMsg('Sorry! Something went wrong.');
+      }).finally(() => setLoading(false));
+  }, [id]);
+
+  useEffect(() => console.log(data), [data]);
 
   const handleInvite = (e) => {
     e.preventDefault();
@@ -68,34 +88,42 @@ function EventPage() {
   };
   return (
     <Container fluid className="px-0 pt-4">
-      { loading || !data ? (
+
+      {loading && (
         <Watch
           heigth="100"
           width="100"
           color="grey"
           ariaLabel="loading"
         />
-      ) : (
+      )}
+      {!loading && data ? (
         <Row>
           {/* Left Column */}
           <Col xs={8}>
-            <span className="text-uppercase text-secondary fw-bold">{ data?.time || 'TIME TBA'}</span>
+            <span className="text-uppercase text-secondary fw-bold">{data?.time || 'TIME TBA'}</span>
             <h2 className="fs-3 fw-bold mt-1 mb-1">{data?.name}</h2>
             <span className="text-muted">
               Hosted by
               {' '}
-              {data?.creator}
+              {data?.owner?.username}
             </span>
             <p className="mt-3">{data?.description}</p>
-            <AvailabilitySection />
-            <PollSection />
+            <AvailabilitySection eventId={id} />
+            <PollSection eventId={id} />
+            <hr className="mt-4" />
+            <p className="mt-3 fs-6 text-muted">
+              Created on
+              {' '}
+              {format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
+            </p>
           </Col>
           <Col>
             <InviteBox
               handleInvite={handleInvite}
               inviteField={inviteField}
               handleChange={handleChange}
-              eventURL={data?.id || ''}
+              eventURL={id || ''}
             />
             <EventMembers
               coming={data?.coming}
@@ -104,6 +132,11 @@ function EventPage() {
             />
           </Col>
         </Row>
+      ) : (
+        <>
+          {' '}
+          {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
+        </>
       )}
     </Container>
   );

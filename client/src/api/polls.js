@@ -2,11 +2,12 @@
 import { apiInstance } from '../utils/axiosInstance';
 
 const BASE = '/polls';
-export function createPoll(question, maxOptionId, votesAllowed, addOptionEnabled) {
+export function createPoll(event, question, maxOptionId, votesAllowed, addOptionEnabled) {
   const url = `${BASE}/`;
   return apiInstance.post(
     url,
     {
+      event,
       question,
       maxOptionId,
       votesAllowed,

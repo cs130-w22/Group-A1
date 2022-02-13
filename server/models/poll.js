@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const PollSchema = new Schema({
+  event: { type: Schema.Types.ObjectId, ref: 'Event' },
   question: String,
   maxOptionId: Number,
   // owner: { type: Schema.Types.ObjectId, ref: 'User' },
-  // event: {type: Schema.Types.ObjectId, ref:'Event'},
   votesAllowed: Number,
   addOptionEnabled: Boolean,
   options: [{ type: Schema.Types.ObjectId, ref: 'PollOption' }],

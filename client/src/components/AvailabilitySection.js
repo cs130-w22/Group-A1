@@ -1,7 +1,7 @@
 import React from 'react';
 import { SectionTitle } from './styled/headers';
 
-function AvailabilitySection() {
+function AvailabilitySection({ eventId }) {
   return (
     <div>
       <SectionTitle className="mt-5">Availability ⏰</SectionTitle>
