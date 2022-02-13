@@ -4,17 +4,17 @@ import { Button, Dropdown } from 'react-bootstrap';
 import {Calendar, DateObject} from "react-multi-date-picker"
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import { apiInstance, authInstance } from '../utils/axiosInstance';
+import { useNavigate } from 'react-router-dom';
 
  function Create  () 
  {     
+        const navigate = useNavigate();
         const [dates, setDates] = useState();
         const [earlistTime, setEarliestTime] = useState(-1);
         const [latestTime, setLatestTime] = useState(-1); 
         const [eventName, setEventName] = useState(""); 
         const [description, setDescription] = useState(""); 
         const [timeZone, setTimeZone] = useState(); 
- 
-
         const hoursInDay = Array.from({length: 24}, (x, i) => i);
 
         const hoursDisplayFormat = (hour) => {
@@ -37,7 +37,9 @@ import { apiInstance, authInstance } from '../utils/axiosInstance';
           return apiInstance.post(
             url, body,
           )
-            .then((res) => console.log(res))
+            .then((res) => {
+              navigate(`/event/${res.data}`);
+            })
             .catch((err) => {
               throw err;
             });

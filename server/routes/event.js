@@ -24,7 +24,7 @@ router.post(
       archived: false
     });
     event.save()
-      .then(result => res.send(result))
+      .then(result => res.send(result._id))
       .catch(err => console.log(err));
   },
 );
