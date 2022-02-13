@@ -1,5 +1,5 @@
 const express = require('express');
-
+const mongoose = require('mongoose');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const Event = require('../models/event');
@@ -11,17 +11,21 @@ router.post(
   body('name')
     .exists().withMessage('Please enter an event name'),
   (req, res) => {
+    const { userId } = req.session;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+    Event.deleteMany();
     const event = new Event({
       name: req.body.name,
       description: req.body.description,
       dates: req.body.dates,
       timeEarliest: req.body.timeEarliest,
       timeLatest: req.body.timeLatest,
-      archived: false
+      archived: false,
+      owner: mongoose.Types.ObjectId(userId),
+      members: [mongoose.Types.ObjectId(userId)]
     });
     event.save()
       .then(result => res.send(result._id))
