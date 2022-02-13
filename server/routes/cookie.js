@@ -7,7 +7,7 @@ router.get(
   '/',
   (req, res) => {
     const sessionUser = req.session.userId;
-    if (req.cookies?.user == null && sessionUser != null) {
+    if (req.cookies.user == null && sessionUser != null) {
       res.cookie(
         'user',
         sessionUser,

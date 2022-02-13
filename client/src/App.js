@@ -5,6 +5,8 @@ import { Watch } from 'react-loader-spinner';
 import Home from './components/Home';
 import NotFound from './components/NotFound';
 import Login from './components/Login';
+import Create from './components/Create';
+
 import Signup from './components/Signup';
 import { Navigation } from './Navigation';
 import { UserContext } from './utils/userContext';
@@ -48,6 +50,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/event/create" element={<Create />} />
             <Route path="/event/:id" element={<EventPage />} />
             <Route path="/" element={<Home />} />
             <Route path="*" element={<NotFound />} />
