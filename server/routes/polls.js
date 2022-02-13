@@ -80,7 +80,7 @@ router.get('/:id', (req, res) => {
 // add option
 router.post('/:id/options', (req, res) => {
   const pollId = req.params.id;
-  if (req.body.text?.length === 0) { return res.status(400).send('Option text cannot be blank'); }
+  if (req.body.text.length === 0) { return res.status(400).send('Option text cannot be blank'); }
   Poll.findById(pollId)
     .then((poll) => {
       if (poll == null) return res.sendStatus(404);

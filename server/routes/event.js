@@ -6,28 +6,28 @@ const Event = require('../models/event');
 
 // TODO:
 // - Add owner to the document 
-// router.post(
-//   '/',
-//   body('name')
-//     .exists().withMessage('Please enter an event name'),
-//   (req, res) => {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(400).json({ errors: errors.array() });
-//     }
-//     name = req.body.name;
-//     const event = new Event({
-//       name,
-//       timeEarliest: 1,
-//       timeLatest: 1,
-//       archived: false
-//     });
-//     event.save()
-//       .then(result => res.send(result))
-//       .catch(err => console.log(err));
-//     // GET /event/:id
-//   },
-// );
+router.post(
+  '/',
+  body('name')
+    .exists().withMessage('Please enter an event name'),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const event = new Event({
+      name: req.body.name,
+      description: req.body.description,
+      dates: req.body.dates,
+      timeEarliest: req.body.timeEarliest,
+      timeLatest: req.body.timeLatest,
+      archived: false
+    });
+    event.save()
+      .then(result => res.send(result))
+      .catch(err => console.log(err));
+  },
+);
 
 // TODO:
 // - Only members of the event can view page

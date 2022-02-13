@@ -5,7 +5,6 @@ import {Calendar, DateObject} from "react-multi-date-picker"
 import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import { apiInstance, authInstance } from '../utils/axiosInstance';
 
-
  function Create  () 
  {     
         const [dates, setDates] = useState();
@@ -26,25 +25,22 @@ import { apiInstance, authInstance } from '../utils/axiosInstance';
         }
 
         const handleSubmit = (e) => {
-          const url = `/event/create`;
+          const url = `/event`;
           const body ={
-            eventName,
+            name: eventName,
             description,
-            earlistTime,
-            latestTime,
+            timeEarliest: earlistTime,
+            timeLatest: latestTime,
             dates,
             timeZone 
-          }; 
-          console.log(body);
+          };
           return apiInstance.post(
             url, body,
           )
-            .then((res) => res)
-            /*
+            .then((res) => console.log(res))
             .catch((err) => {
               throw err;
             });
-            */
         }
           
 
