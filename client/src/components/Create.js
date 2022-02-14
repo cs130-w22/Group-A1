@@ -44,10 +44,16 @@ function Create() {
         navigate(`/event/${res.data}`);
       }).catch((error) => {
         console.log(error);
-        if (error.status !== 500) {
+        if (error.status === 500) {
           setError(
             'form',
             { type: 'api', message: "We're sorry! Something went wrong on our end." },
+            { shouldFocus: true },
+          );
+        } else if (error.status === 401) {
+          setError(
+            'form',
+            { type: 'api', message: 'Authentication error, please sign out and back in.' },
             { shouldFocus: true },
           );
         } else {

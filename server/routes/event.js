@@ -15,6 +15,7 @@ router.post(
     .exists().notEmpty().withMessage('Please enter an event name'),
   (req, res) => {
     const { userId } = req.session;
+    if (userId == null) return res.sendStatus(401);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -45,7 +46,7 @@ router.post(
 router.get(
   '/:id',
   (req, res) => {
-    if (!ObjectId.isValid(req.params.id)) return res.sendStatus(401);
+    if (!ObjectId.isValid(req.params.id)) return res.sendStatus(400);
     Event.findById(req.params.id)
       .populate('owner')
       .populate('members')
