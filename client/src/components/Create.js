@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Alert, Button, Dropdown, Form,
 } from 'react-bootstrap';
@@ -8,8 +8,10 @@ import DatePanel from 'react-multi-date-picker/plugins/date_panel';
 import { useNavigate } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
 import { createEvent } from '../api/event';
+import { UserContext } from '../utils/userContext';
 
 function Create() {
+  const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [dates, setDates] = useState();
   const [earlistTime, setEarliestTime] = useState(-1);
@@ -44,18 +46,15 @@ function Create() {
         navigate(`/event/${res.data}`);
       }).catch((error) => {
         console.log(error);
-        if (error.status === 500) {
+        if (error.response.status === 500) {
           setError(
             'form',
             { type: 'api', message: "We're sorry! Something went wrong on our end." },
             { shouldFocus: true },
           );
-        } else if (error.status === 401) {
-          setError(
-            'form',
-            { type: 'api', message: 'Authentication error, please sign out and back in.' },
-            { shouldFocus: true },
-          );
+        } else if (error.response.status === 401) {
+          setUser(null);
+          navigate('/login');
         } else {
           const validationErrors = error.data?.errors;
           if (validationErrors?.length > 0) {
