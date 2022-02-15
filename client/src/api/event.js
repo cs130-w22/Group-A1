@@ -28,3 +28,12 @@ export function getEventPolls(id) {
       throw err;
     });
 }
+
+export function joinEvent(id) {
+  const url = `${BASE}/${id}/members`;
+  return apiInstance.post(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}

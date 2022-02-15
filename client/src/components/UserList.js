@@ -11,7 +11,9 @@ export function UserList({ users }) {
   ));
   return <ul className="list-unstyled mb-4">{listItems}</ul>;
 }
-export function EventMembers({ coming, invited, declined }) {
+export function EventMembers({
+  coming, invited, declined, members,
+}) {
   return (
     <Container className="mt-4">
       <SectionTitle className="mb-3">Who&apos;s Coming?</SectionTitle>
@@ -21,17 +23,25 @@ export function EventMembers({ coming, invited, declined }) {
           <UserList users={coming} />
         </Col>
         <Col>
+          <CategoryTitle count={members.length}>Members</CategoryTitle>
+          <UserList users={members} />
+        </Col>
+        <Col>
           <CategoryTitle count={invited.length}>Invited</CategoryTitle>
           <UserList users={invited} />
         </Col>
+        <Col>
+          <CategoryTitle count={declined.length}>Not Coming</CategoryTitle>
+          <UserList users={declined} />
+        </Col>
       </Row>
-      <CategoryTitle count={declined.length}>Not Coming</CategoryTitle>
-      <UserList users={declined} />
+
     </Container>
   );
 }
 EventMembers.propTypes = {
   coming: PropTypes.arrayOf(PropTypes.object).isRequired,
+  members: PropTypes.arrayOf(PropTypes.object).isRequired,
   invited: PropTypes.arrayOf(PropTypes.object).isRequired,
   declined: PropTypes.arrayOf(PropTypes.object).isRequired,
 };

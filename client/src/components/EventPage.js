@@ -6,13 +6,13 @@ import {
 } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { UserContext, EventContext } from '../utils/context';
 import AvailabilitySection from './AvailabilitySection';
 import InviteBox from './InviteBox';
 import PollSection from './PollSection';
-import { getEvent } from '../api/event';
+import { getEvent, joinEvent } from '../api/event';
 import { EventMembers, UserList } from './UserList';
 
 const dummyData = {
@@ -33,6 +33,7 @@ function EventPage() {
   const [loading, setLoading] = useState();
   const [errorMsg, setErrorMsg] = useState();
   const [isMember, setIsMember] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -48,9 +49,10 @@ function EventPage() {
         setIsMember(eventData.members.some((member) => member._id === user.userId));
       })
       .catch((err) => {
-        setErrorMsg('Sorry! Something went wrong.');
+        console.log(err);
+        navigate('/404');
       }).finally(() => setLoading(false));
-  }, [id, user]);
+  }, [id, user, navigate]);
 
   // useEffect(() => console.log(data), [data]);
 
@@ -62,8 +64,14 @@ function EventPage() {
     setInviteField(e.target.value);
   };
 
-  const joinEvent = () => {
-    console.log('Placeholder for joining event');
+  const handleJoin = () => {
+    joinEvent(id)
+      .then(() => {
+        setIsMember(true);
+      })
+      .catch((err) => {
+        setErrorMsg(err.response.data);
+      });
   };
 
   const contextProvider = useMemo(
@@ -73,14 +81,7 @@ function EventPage() {
 
   return (
     <Container fluid className="px-0 pt-4">
-      {!isMember
-        && (
-          <Alert className="d-flex justify-content-between">
-            You are not a part of this group yet!
-            You can take a look around, or join the event to start planning!
-            <Button variant="outline-primary fw-bold btn-sm" onClick={joinEvent}>Join Event</Button>
-          </Alert>
-        )}
+
       {loading && (
         <Watch
           heigth="100"
@@ -89,8 +90,18 @@ function EventPage() {
           ariaLabel="loading"
         />
       )}
-      {!loading && data ? (
+      {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
+      {(!loading && data) && (
         <EventContext.Provider value={contextProvider}>
+          {/* banner for signed in non-members */}
+          {!isMember && !errorMsg
+            && (
+              <Alert className="d-flex justify-content-between">
+                You are not a part of this group yet!
+                You can take a look around, or join the event to start planning!
+                <Button variant="outline-primary fw-bold btn-sm" onClick={handleJoin}>Join Event</Button>
+              </Alert>
+            )}
           <Row>
             {/* Left Column */}
             <Col xs={8}>
@@ -122,17 +133,13 @@ function EventPage() {
               )}
               <EventMembers
                 coming={data?.coming}
+                members={data?.members}
                 invited={data?.invited}
                 declined={data?.declined}
               />
             </Col>
           </Row>
         </EventContext.Provider>
-      ) : (
-        <>
-          {' '}
-          {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-        </>
       )}
     </Container>
   );
