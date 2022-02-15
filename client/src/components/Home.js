@@ -3,7 +3,7 @@ import { Button } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUser } from '../api/users';
-import { UserContext } from '../utils/userContext';
+import { UserContext } from '../utils/context';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);

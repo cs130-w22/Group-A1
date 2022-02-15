@@ -8,7 +8,8 @@ import {
   addOption, deleteOption, updateOption, voteOption,
 } from '../api/polls';
 import EditIcon from '../assets/edit_icon_small.svg';
-import { UserContext } from '../utils/userContext';
+import { UserContext, EventContext } from '../utils/context';
+import { EventButton, overlayFunction } from './EventButton';
 
 const editButton = {
   boxSizing: 'content-box',
@@ -23,6 +24,7 @@ const editButton = {
 
 function PollOption({ data, onDelete, editing }) {
   const { user } = useContext(UserContext);
+  const { readOnly } = useContext(EventContext);
   const optionId = data._id;
   const [optionText, setOptionText] = useState(data.text);
   const [checked, setChecked] = useState(data.voters.includes(user.userId));
@@ -41,20 +43,24 @@ function PollOption({ data, onDelete, editing }) {
 
   const saveText = (e) => {
     e.preventDefault();
+    if (readOnly) return;
     updateOption(optionId, { text: optionText })
       .then(() => setEditMode(false))
       .catch((err) => console.log(err));
   };
 
   const handleChange = (e) => {
+    if (readOnly) return;
     setOptionText(e.target.value);
   };
 
   const allowEdits = () => {
+    if (readOnly) return;
     setEditMode(true);
   };
 
   const removeOption = () => {
+    if (readOnly) return;
     if (optionId) {
       deleteOption(optionId)
         .then((res) => {
@@ -68,6 +74,15 @@ function PollOption({ data, onDelete, editing }) {
     setVotes(data.voters);
   }, [data]);
 
+  const votesOverlay = () => (
+    <Tooltip hidden={votes.length === 0}>
+      {votes.map((voter, i) => [
+        i > 0 && ', ',
+        <span key={voter.username}>{voter.username}</span>,
+      ])}
+    </Tooltip>
+  );
+
   return (
     <Container className="px-1 mb-3">
 
@@ -76,15 +91,26 @@ function PollOption({ data, onDelete, editing }) {
           {!editMode
             && (
               <div>
-                <Button
+                <EventButton
                   className="color-secondary align-self-center mb-3 me-3 p-0"
                   style={editButton}
                   hidden={editMode}
                   onClick={allowEdits}
+                  readOnly={readOnly}
                 >
                   <img src={EditIcon} alt="Edit" />
-                </Button>
-                <input className="form-check-input mt-2 mb-2 ms-2" type="checkbox" checked={checked} readOnly onClick={changeVote} />
+                </EventButton>
+                <OverlayTrigger
+                  placement="right"
+                  overlay={
+                    overlayFunction(readOnly)
+                  }
+                >
+                  <span>
+
+                    <input className="form-check-input mt-2 mb-2 ms-2" type="checkbox" checked={checked} readOnly disabled={readOnly} onClick={changeVote} />
+                  </span>
+                </OverlayTrigger>
               </div>
             )}
           {/* <ToggleButton
@@ -126,14 +152,7 @@ function PollOption({ data, onDelete, editing }) {
 
         <OverlayTrigger
           placement="right"
-          overlay={votes.length > 0 ? (
-            <Tooltip>
-              {votes.map((voter, i) => [
-                i > 0 && ', ',
-                <span key={voter.username}>{voter.username}</span>,
-              ])}
-            </Tooltip>
-          ) : <span />}
+          overlay={votesOverlay()}
         >
           <span className="voteCount" hidden={editMode}>
             Votes:
