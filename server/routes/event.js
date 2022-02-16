@@ -68,6 +68,40 @@ router.get(
   },
 );
 
+router.post(
+  '/:id',
+  body('name')
+    .exists().notEmpty().withMessage('Event name cannot be empty'),
+  (req, res) => {
+    if (!ObjectId.isValid(req.params.id)) return res.sendStatus(400);
+    Event.findById(req.params.id)
+      .then((result) => {
+        return new Promise((resolve, reject) => {
+          if (result.owner === req.session.userId)
+            resolve(result.name, result.description);
+          else
+            reject('Forbidden');
+        });
+      })
+      .then((name, description) => {
+        const filter = { _id: req.params.id };
+        const update = {
+          name,
+          description
+        };
+        return Event.findOneAndUpdate(filter, update);
+      })
+      .then((result) => res.send(result))
+      .catch((err) => {
+        console.log(err);
+        if(error === 'Forbidden')
+          res.sendStatus(403)
+        else
+          res.sendStatus(500);
+      });
+  }
+);
+
 router.delete(
   '/:id',
   (req, res) => {
