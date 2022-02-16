@@ -7,8 +7,6 @@ const { ObjectId } = require('mongodb');
 const Event = require('../models/event');
 const Poll = require('../models/poll');
 
-// TODO:
-// - Add owner to the document
 router.post(
   '/',
   body('name')
@@ -40,9 +38,6 @@ router.post(
   },
 );
 
-// TODO:
-// - Only members of the event can view page
-// - Send 404 if ID is invalid
 router.get(
   '/:id',
   (req, res) => {
@@ -73,17 +68,31 @@ router.get(
   },
 );
 
-// TODO:
-// - Only owner of the event can delete event
-// - Send 404 if ID is invalid
-// router.delete(
-//   '/:id',
-//   (req, res) => {
-//     const id = req.params.id;
-//     Event.findByIdAndDelete(id)
-//       .then(result => console.log(result))
-//       .catch(err => console.log(err));
-//   }
-// );
+router.delete(
+  '/:id',
+  (req, res) => {
+    if (!ObjectId.isValid(req.params.id)) return res.sendStatus(400);
+    Event.findById(req.params.id)
+      .then((result) => {
+        return new Promise((resolve, reject) => {
+          if (result.owner === req.session.userId)
+            resolve();
+          else
+            reject('Forbidden');
+        });
+      })
+      .then(() => {
+        return Event.findByIdAndDelete(req.params.id)
+      })
+      .then((result) => res.send(result))
+      .catch((err) => {
+        console.log(err);
+        if(error === 'Forbidden')
+          res.sendStatus(403)
+        else
+          res.sendStatus(500);
+      });
+  }
+);
 
 module.exports = router;
