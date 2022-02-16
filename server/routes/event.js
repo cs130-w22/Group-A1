@@ -5,6 +5,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { ObjectId } = require('mongodb');
 const Event = require('../models/event');
+const { EventInvite } = require('../models/invite');
 const Poll = require('../models/poll');
 
 // TODO:
@@ -88,6 +89,17 @@ router.post(
         }
         return res.status(400).send("You're already a member of this event!");
       }).catch((err) => {
+        console.log(err);
+        res.sendStatus(500);
+      });
+  },
+);
+
+router.get(
+  '/:id/invites',
+  (req, res) => {
+    EventInvite.find({ target: req.params.id })
+      .then((invites) => res.send(invites)).catch((err) => {
         console.log(err);
         res.sendStatus(500);
       });

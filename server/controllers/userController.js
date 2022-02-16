@@ -37,3 +37,14 @@ exports.getUserGroups = (req, res, next) => {
     })
     .finally(() => next());
 };
+
+exports.getUserInvites = (req, res, next) => {
+  User.findOne({ _id: req.params.id }, 'invites')
+    .populate('invites')
+    .then((data) => res.json({ data }))
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    })
+    .finally(() => next());
+};
