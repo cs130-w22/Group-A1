@@ -14,6 +14,7 @@ import InviteBox from './InviteBox';
 import PollSection from './PollSection';
 import { getEvent, joinEvent } from '../api/event';
 import { EventMembers, UserList } from './UserList';
+import { getEventInvites } from '../api/invite';
 
 const dummyData = {
   name: 'Mango Party',
@@ -29,9 +30,10 @@ function EventPage() {
   const { user } = useContext(UserContext);
   const { id } = useParams();
   const [data, setData] = useState();
-  const [inviteField, setInviteField] = useState('');
+
   const [loading, setLoading] = useState();
   const [errorMsg, setErrorMsg] = useState();
+  const [invited, setInvited] = useState([]);
   const [isMember, setIsMember] = useState(false);
   const navigate = useNavigate();
 
@@ -42,7 +44,6 @@ function EventPage() {
         const eventData = res.data;
         setData({
           ...eventData,
-          invited: [{ id: '1', username: 'AppleGobbler' }],
           coming: [{ id: '2', username: 'StrawberryEater' }],
           declined: [{ id: '3', username: 'PartyPooper' }],
         });
@@ -54,15 +55,19 @@ function EventPage() {
       }).finally(() => setLoading(false));
   }, [id, user, navigate]);
 
+  useEffect(() => {
+    getEventInvites(id).then((res) => {
+      const invitedUsers = [];
+      const invites = res.data;
+      for (let i = 0; i < invites.length; i += 1) {
+        invitedUsers.push(invites[i].recipient);
+      }
+      setInvited(invitedUsers);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }, [id]);
   // useEffect(() => console.log(data), [data]);
-
-  const handleInvite = (e) => {
-    e.preventDefault();
-    if (inviteField?.length > 0) { console.log(`Invite ${inviteField}`); }
-  };
-  const handleChange = (e) => {
-    setInviteField(e.target.value);
-  };
 
   const handleJoin = () => {
     joinEvent(id)
@@ -79,6 +84,9 @@ function EventPage() {
     [isMember, id],
   );
 
+  const onInvite = (invite) => {
+    setInvited([...invited, invite]);
+  };
   return (
     <Container fluid className="px-0 pt-4">
 
@@ -125,16 +133,14 @@ function EventPage() {
             <Col>
               {isMember && (
                 <InviteBox
-                  handleInvite={handleInvite}
-                  inviteField={inviteField}
-                  handleChange={handleChange}
                   eventURL={id || ''}
+                  onInvite={onInvite}
                 />
               )}
               <EventMembers
                 coming={data?.coming}
                 members={data?.members}
-                invited={data?.invited}
+                invited={invited}
                 declined={data?.declined}
               />
             </Col>

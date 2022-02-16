@@ -9,7 +9,7 @@ const InviteSchema = new Schema({
 }, { timestamps: true });
 
 const EventInviteSchema = new Schema({
-  target: { type: Schema.Types.ObjectId, ref: 'Event' },
+  target: { type: Schema.Types.ObjectId, ref: 'event' },
 });
 
 // Create model for invite

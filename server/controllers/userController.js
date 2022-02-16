@@ -1,4 +1,5 @@
 const User = require('../models/user');
+require('../models/event');
 
 exports.getUser = ((req, res, next) => {
   User.findById(req.params.id, 'username email groups')
@@ -40,8 +41,14 @@ exports.getUserGroups = (req, res, next) => {
 
 exports.getUserInvites = (req, res, next) => {
   User.findOne({ _id: req.params.id }, 'invites')
-    .populate('invites')
-    .then((data) => res.json({ data }))
+    .populate({
+      path: 'invites',
+      populate: [
+        { path: 'sender', select: '_id username' },
+        { path: 'target', select: '_id name' },
+      ],
+    })
+    .then((data) => res.json(data))
     .catch((err) => {
       console.log(err);
       res.sendStatus(500);

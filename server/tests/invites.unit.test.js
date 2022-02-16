@@ -22,7 +22,7 @@ const sessionMiddleware = session({
   resave: true,
 });
 
-let recipientId = null;
+let recipient = null;
 let inviteId = null;
 let eventId = null;
 
@@ -37,12 +37,11 @@ const setup = async () => {
       if (err) return err;
       userId = res.body.userId;
     });
-  const recipient = await User.create({
+  recipient = await User.create({
     username: 'test2',
     email: 'test2@gmail.com',
     password: 'abcd',
   });
-  recipientId = recipient._id;
   const event = await Event.create({
     name: 'test event',
     timeEarliest: 0,
@@ -66,7 +65,7 @@ describe('Sending normal event invite', () => {
   });
   it('should send a valid event invite and return the id', async () => {
     const mockRequest = {
-      recipient: recipientId,
+      recipient: recipient.username,
       id: eventId,
       type: 'Event',
     };
@@ -79,7 +78,7 @@ describe('Sending normal event invite', () => {
       });
   });
   it('should add the invite to the user\'s invite list', async () => {
-    const user = await User.findById(recipientId);
+    const user = await User.findOne({ username: recipient.username });
     return expect(user.invites.includes(inviteId));
   });
 });
@@ -107,7 +106,7 @@ describe('Sending bad invite', () => {
   });
   it('should return an error if invite already exists', async () => {
     const mockRequest = {
-      recipient: recipientId,
+      recipient: recipient.username,
       id: eventId,
       type: 'Event',
     };
@@ -129,7 +128,7 @@ describe('Sending bad invite', () => {
   it('should return an error if event is not valid', async () => {
     await agent
       .post('/invite')
-      .send({ recipient: recipientId, id: 'blah', type: 'Event' })
+      .send({ recipient: recipient.username, id: 'blah', type: 'Event' })
       .expect(400);
   });
   it('should return an error if event is archived', async () => {
@@ -138,16 +137,16 @@ describe('Sending bad invite', () => {
     await event.save();
     await agent
       .post('/invite')
-      .send({ recipient: recipientId, id: event._id, type: 'Event' })
+      .send({ recipient: recipient.username, id: event._id, type: 'Event' })
       .expect(400);
   });
   it('should return an error if user is kicked from event', async () => {
     const event = await Event.findById(eventId);
-    event.kicked.push({ _id: recipientId });
+    event.kicked.push({ _id: recipient._id });
     await event.save();
     await agent
       .post('/invite')
-      .send({ recipient: recipientId, id: event._id, type: 'Event' })
+      .send({ recipient: recipient.username, id: event._id, type: 'Event' })
       .expect(400);
   });
   it('should return an error if user is not an event member', async () => {
@@ -156,7 +155,16 @@ describe('Sending bad invite', () => {
     await event.save();
     await agent
       .post('/invite')
-      .send({ recipient: recipientId, id: event._id, type: 'Event' })
+      .send({ recipient: recipient.username, id: event._id, type: 'Event' })
+      .expect(400);
+  });
+  it('should return an error if recipient is already an event member', async () => {
+    const event = await Event.findById(eventId);
+    event.members.push({ _id: recipient._id });
+    await event.save();
+    await agent
+      .post('/invite')
+      .send({ recipient: recipient.username, id: event._id, type: 'Event' })
       .expect(400);
   });
 });

@@ -99,12 +99,21 @@ router.get(
   '/:id/invites',
   (req, res) => {
     EventInvite.find({ target: req.params.id })
+      .populate('recipient', '_id username')
       .then((invites) => res.send(invites)).catch((err) => {
         console.log(err);
         res.sendStatus(500);
       });
   },
 );
+
+router.delete('/:id/invites', (req, res) => {
+  EventInvite.deleteMany({ target: req.params.id }).then(() => res.sendStatus(204))
+    .catch((err) => {
+      console.log(err);
+      return res.sendStatus(500);
+    });
+});
 
 // TODO:
 // - Only owner of the event can delete event
