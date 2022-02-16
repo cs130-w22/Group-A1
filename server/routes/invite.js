@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, oneOf } = require('express-validator');
-const { sendInvite } = require('../controllers/inviteController');
+const { sendInvite, acceptInvite, declineInvite } = require('../controllers/inviteController');
 const PollOption = require('../models/pollOption');
 const Event = require('../models/event');
 const { EventInvite } = require('../models/invite');
@@ -16,4 +16,6 @@ router.post(
   sendInvite,
 );
 
+router.post('/:id/accept', acceptInvite);
+router.post('/:id/decline', declineInvite);
 module.exports = router;

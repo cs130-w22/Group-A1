@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const { Invite } = require('../models/invite');
 const User = require('../models/user');
 const Event = require('../models/event');
+const { EventInvite } = require('../models/invite');
 
 exports.sendInvite = async (req, res) => {
   const errors = validationResult(req);
@@ -46,6 +47,33 @@ exports.sendInvite = async (req, res) => {
     await inviteDoc.save();
     await recipient.save();
     return res.status(201).send(inviteDoc);
+  } catch (err) {
+    console.log(err);
+    return res.sendStatus(500);
+  }
+};
+
+exports.acceptInvite = async (req, res) => {
+  try {
+    const invite = await EventInvite.findOne({ _id: req.params.id, recipient: req.session.userId });
+    if (invite === null) return res.sendStatus(404);
+    const event = await Event.findById(invite.target);
+    event.members.push({ _id: req.session.userId });
+    event.save();
+    await invite.delete();
+    return res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    return res.sendStatus(500);
+  }
+};
+
+exports.declineInvite = async (req, res) => {
+  try {
+    const invite = await EventInvite.findOne({ _id: req.params.id, recipient: req.session.userId });
+    if (invite === null) return res.sendStatus(404);
+    await invite.delete();
+    return res.sendStatus(200);
   } catch (err) {
     console.log(err);
     return res.sendStatus(500);
