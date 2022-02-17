@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  Col, Container, Row, Alert,
-} from 'react-bootstrap';
+import {Col, Container, Row, Alert} from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
@@ -86,6 +84,11 @@ function EventPage() {
   const handleChange = (e) => {
     setInviteField(e.target.value);
   };
+   //this is probably is temp way to retrieve the data for list of events
+   const createString = JSON.stringify(data);
+   localStorage.setItem("user",createString);
+
+
   return (
     <Container fluid className="px-0 pt-4">
 

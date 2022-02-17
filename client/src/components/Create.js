@@ -1,16 +1,16 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useState, useContext } from 'react';
-import {
-  Alert, Button, Dropdown, Form,
-} from 'react-bootstrap';
+import {Alert, Button, Dropdown, Form,} from 'react-bootstrap';
 import { Calendar, DateObject } from 'react-multi-date-picker';
 import DatePanel from 'react-multi-date-picker/plugins/date_panel';
 import { useNavigate } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
 import { createEvent } from '../api/event';
 import { UserContext } from '../utils/userContext';
+import EventList from './EventList';
 
-function Create() {
+function Create() 
+{
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [dates, setDates] = useState();
@@ -30,6 +30,7 @@ function Create() {
     control,
     setError,
     formState: { errors },
+    
   } = useForm();
 
   const onSubmit = (data) => {
@@ -41,9 +42,12 @@ function Create() {
       dates,
       timeZone,
     };
+    const createString = JSON.stringify(body);
     return createEvent(body)
       .then((res) => {
         navigate(`/event/${res.data}`);
+    //this is probably is temp way to retrieve the data for list of events
+      localStorage.setItem("persist_data",createString);
       }).catch((error) => {
         console.log(error);
         if (error.response.status === 500) {
@@ -68,9 +72,12 @@ function Create() {
               );
             }
           }
+          
         }
       });
   };
+
+  
 
   return (
     <div>
@@ -85,6 +92,7 @@ function Create() {
         calendarPosition="bottom-center"
         plugins={[<DatePanel />]}
       />
+      
       <br />
       <Form className="w-50" onSubmit={handleSubmit(onSubmit)}>
         <Form.Group controlId="formName" className="mb-3">
@@ -128,7 +136,8 @@ function Create() {
             name="descriptionTextArea"
             placeholder="Enter Event Description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)
+            }
           />
         </Form.Group>
         <Form.Group controlId="formEarliest" className="mb-3">
@@ -176,8 +185,10 @@ function Create() {
 
         </Form.Group>
         <Button variant="outline-primary" className="fw-bold" type="submit">
+          
           create event
         </Button>
+        
       </Form>
     </div>
   );
