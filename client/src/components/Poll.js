@@ -18,6 +18,7 @@ function Poll({
   const [pollData, setPollData] = useState(data);
   const [options, setOptions] = useState([]); // includes edit property for poll Option for now
   const [editMode, setEditMode] = useState(editState);
+  const [votesAllowed, setVotesAllowed] = useState(1);
   const [errorMsg, setErrorMsg] = useState();
   const [pollTitle, setPollTitle] = useState(pollData?.question);
 
@@ -85,7 +86,7 @@ function Poll({
     if (readOnly) return;
     if (pollTitle.length === 0) setErrorMsg('Poll title cannot be empty!');
     else {
-      updatePoll(pollId, { question: pollTitle })
+      updatePoll(pollId, { question: pollTitle, votesAllowed: votesAllowed})
         .then((res) => {
           setEditMode(false);
           setPollData(res.data);
@@ -107,6 +108,16 @@ function Poll({
     }).catch((err) => console.log(err));
   };
 
+  const voteOptions = () => {
+    let voteOpts = [<option key={0} value={1}>{1}</option>]
+    for (let i = 1; i < options.length; i++) {
+      voteOpts.push(<option key={i} value={i+1}>{i+1}</option>)
+    }
+    return voteOpts;
+  }
+
+  const updateVotesAllowed = e => setVotesAllowed(e.target.value);
+
   return (
     <>
       {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
@@ -126,6 +137,12 @@ function Poll({
                 value={pollTitle || ''}
               />
             </Form>
+            <div class="form-group">
+            <label for="vote-range">Votes Allowed</label>
+            <select class="form-control" id="exampleFormControlSelect1" onChange={updateVotesAllowed} value={votesAllowed}>
+              {voteOptions()}
+    </select>
+            </div>
             <EventButton variant="success" className="ms-2 " onClick={savePoll}>save</EventButton>
             <EventButton variant="danger" className="ms-2 " onClick={onDelete}>delete</EventButton>
           </div>
