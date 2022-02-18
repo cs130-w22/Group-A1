@@ -6,7 +6,7 @@ import DatePanel from 'react-multi-date-picker/plugins/date_panel';
 import { useNavigate } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
 import { createEvent } from '../api/event';
-import { UserContext } from '../utils/userContext';
+import { UserContext } from '../utils/context';
 import EventList from './EventList';
 
 function Create() 
