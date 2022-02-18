@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUser } from '../api/users';
-import { UserContext } from '../utils/context';
+import { UserContext } from '../utils/userContext';
+import EventList from './EventList';
+import EventSection from './EventSection';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);
@@ -41,14 +43,18 @@ function Home() {
               !
             </span>
           </h2>
-          <LinkContainer to="/event/create">
-            <Button
-              variant="outline-primary"
-              className="ms-1 fw-bold"
-            >
-              create event +
-            </Button>
-          </LinkContainer>
+          <div className="col-md-12 mt-5 mb-3">
+            <div className="row py-1">
+                <div className="h3 fw-bold col-md-2 text-secondary">my events</div>
+                <div className="col">
+                  <LinkContainer to="/event/create"> 
+                    <Button variant="outline-primary" className="ms-1 fw-bold">
+                        create event +
+                    </Button>
+                  </LinkContainer></div>
+            </div>
+          </div>
+          <EventList/>
           {loading && (
             <Watch
               heigth="100"
