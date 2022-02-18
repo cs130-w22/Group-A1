@@ -1,9 +1,11 @@
 import '../assets/custom.scss';
 import React, { useContext } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import {
+  Link, Navigate, useLocation, useNavigate,
+} from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
-import { UserContext } from '../utils/userContext';
+import { UserContext } from '../utils/context';
 import loginFacade from '../utils/loginFacade';
 
 function Login() {
@@ -14,12 +16,14 @@ function Login() {
     setError,
     formState: { errors },
   } = useForm();
+  const redirect = useLocation().state?.from?.pathname || '/';
   const navigate = useNavigate();
   // get login and user from context
   const { user, setUser } = useContext(UserContext);
   // handles the input
   const onSubmit = (data) => {
-    loginFacade(data.email, data.password, setError, navigate, setUser);
+    console.log(redirect);
+    loginFacade(data, setError, navigate, redirect, setUser);
   };
   // redirect to home page if already signed in
   if (user?.id) return <Navigate to="/" replace />;
