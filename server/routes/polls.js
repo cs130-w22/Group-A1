@@ -4,36 +4,23 @@ const router = express.Router();
 const PollOption = require('../models/pollOption');
 const Poll = require('../models/poll');
 
-// toggle vote of current user (only if toggle does not exceed allotted votes)
+// toggle vote of current user
 router.post('/vote', (req, res) => {
-  console.log("router called");
   PollOption.findById(req.body.optionId)
     .then((option) => {
       const { userId } = req.session;
       if (option == null) return res.sendStatus(404);
       if (option.voters.includes(userId)) {
         option.voters.pull({ _id: userId });
-        option.save();
-        res.status(200).send(option);
       } else {
-        Poll.findById(option.poll)
-          .then((poll) => {
-            poll.userCanVoteInPoll(userId)
-              .then((result) => {
-                if (result) {
-                  option.voters.push({ _id: userId });
-                  option.save();
-                  res.status(200).send(option);
-                }
-                else
-                  res.status(202).send("User Votes Exceeded");
-              })
-        })
-    }
-  }).catch((err) => {
+        option.voters.push({ _id: userId });
+      }
+      option.save();
+      res.status(200).send(option);
+    }).catch((err) => {
       console.log(err);
       res.sendStatus(500);
-  });
+    });
 });
 
 // update poll
@@ -53,7 +40,6 @@ router.patch('/:id', (req, res) => {
       res.sendStatus(500);
     });
 });
-
 // get all options
 router.get('/options', (req, res) => {
   PollOption.find()
@@ -65,7 +51,6 @@ router.get('/options', (req, res) => {
       res.sendStatus(500);
     });
 });
-
 // delete option
 router.delete('/options/:optionId', (req, res) => {
   PollOption.findOneAndDelete({ _id: req.params.optionId })
@@ -130,7 +115,6 @@ router.post('/:id/options', (req, res) => {
         voters: req.body.voters || [],
       }).then((option) => {
         poll.options.push(option);
-        poll.maxOptionId++;
         poll.save()
           .then(() => res.status(201).json(option))
           .catch((err) => {

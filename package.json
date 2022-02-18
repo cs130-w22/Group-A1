@@ -1,6 +1,4 @@
 {
-  "name": "cya",
-  "version": "1.0.0",
   "scripts": {
     "start": "cd server && node server.js",
     "start-watch": "cd server && nodemon server.js",

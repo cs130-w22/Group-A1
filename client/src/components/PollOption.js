@@ -28,31 +28,16 @@ function PollOption({ data, onDelete, editing }) {
   const optionId = data._id;
   const [optionText, setOptionText] = useState(data.text);
   const [checked, setChecked] = useState(data.voters.includes(user.userId));
-  const [voteMode, setVoteMode] = useState(readOnly);
   const [editMode, setEditMode] = useState(editing);
   const [votes, setVotes] = useState(data.voters);
-
   const changeVote = (e) => {
     voteOption(data._id).then((res) => {
-      console.log("checked", checked);
       if (checked) {
-        setVoteMode(true);
         setVotes(votes.filter((voter) => res.data.voters.includes(voter._id)));
-        console.log(votes);
-        setChecked(!checked);
       } else {
-        if (res.status === 202) {
-          setVoteMode(false);
-          alert("Maximum number of votes reached!");
-        }
-        else {
-          setVoteMode(true);
-          setVotes([...votes, { _id: user.userId, username: user.username }]);
-          setChecked(!checked);
-        }
-
+        setVotes([...votes, { _id: user.userId, username: user.username }]);
       }
-      
+      setChecked(!checked);
     }).catch((err) => console.log(err));
   };
 

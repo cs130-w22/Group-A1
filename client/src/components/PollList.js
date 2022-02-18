@@ -22,7 +22,6 @@ function PollList() {
   const handleClose = () => {
     setCreating(false);
   };
-  
   useEffect(() => {
     getEventPolls(eventId)
       .then((res) => {

@@ -8,5 +8,6 @@ const UserSchema = new Schema({
   groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }]
 });
 
+// Create model for todo
 const User = mongoose.model('User', UserSchema);
 module.exports = User;
