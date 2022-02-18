@@ -7,33 +7,32 @@ const { ObjectId } = require('mongodb');
 const Event = require('../models/event');
 const Poll = require('../models/poll');
 
-//should be deleted eventually
-router.get(
-  '/all', (req, res) => {
-    Event.find()
-      .then((events) => res.send(events))
-      .catch((err) => {
-        console.log(err);
-        res.sendStatus(500);
-      })
-  });
+// should be deleted eventually
+router.get('/all', (req, res) => {
+  Event.find()
+    .then((events) => res.send(events))
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
 
 // get all events for user + specify whether I am owner or member
 router.get('/', (req, res) => {
   const { userId } = req.session;
   if (userId == null) return res.sendStatus(401);
-  Event.find({owner: userId, members: userId})
-  .then((myevents) => {
-    owned = myevents.filter(event => event.owner == userId);
-    memberTo = myevents.filter(event => event.owner != userId);
-    console.log(myevents);
-    res.status(200).json({'owned' : owned, 'memberOnly' : memberTo});
-  })
-  .catch((err) => {
-    console.log(err);
-    res.sendStatus(500);
-  })
-})
+  Event.find({ owner: userId, members: userId })
+    .then((myevents) => {
+      owned = myevents.filter((event) => event.owner == userId);
+      memberTo = myevents.filter((event) => event.owner != userId);
+      console.log(myevents);
+      res.status(200).json({ owned, memberOnly: memberTo });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+});
 
 // TODO:
 // - Add owner to the document
@@ -67,9 +66,6 @@ router.post(
   },
 );
 
-// TODO:
-// - Only members of the event can view page
-// - Send 404 if ID is invalid
 router.get(
   '/:id',
   (req, res) => {
@@ -79,11 +75,7 @@ router.get(
     Event.findById(req.params.id)
       .populate('owner')
       .populate('members')
-      .then((result) => {
-        if (userId != result.owner || !result.members.includes(userId)) {
-          res.status(404).send("You do not have access to this event");
-        }
-      })
+      .then((result) => res.send(result))
       .catch((err) => {
         console.log(err);
         res.sendStatus(500);
@@ -127,29 +119,27 @@ router.post(
   },
 );
 
-
 // TODO:
 // - Only owner of the event can delete event
 // - Send 404 if ID is invalid
 router.delete(
   '/:id',
-   (req, res) => {
-     const id = req.params.id;
-     const { userId } = req.session;
-     if (userId == null) return res.sendStatus(401);
-     Event.findById(req.params.id)
-      .then(result => {
+  (req, res) => {
+    const { id } = req.params;
+    const { userId } = req.session;
+    if (userId == null) return res.sendStatus(401);
+    Event.findById(req.params.id)
+      .then((result) => {
         console.log(result);
         if (result.owner != userId) {
-          res.status(404).send("You cannot delete an event if you are not the owner");
-        }
-        else {
+          res.status(404).send('You cannot delete an event if you are not the owner');
+        } else {
           result.remove();
-          res.status(200).send("Deleted the event");
+          res.status(200).send('Deleted the event');
         }
       })
-      .catch(err => console.log(err));
-   }
+      .catch((err) => console.log(err));
+  },
 );
 
 module.exports = router;
