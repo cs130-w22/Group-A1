@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {Card,Row, Col, ListGroup, Button, Alert, Modal, Form} from 'react-bootstrap';
+import { Card, Row, Col, ListGroup, Button, Alert, Modal, Form} from 'react-bootstrap';
 import { createEvent, getEvent } from '../api/event';
 import { getUserByUsername } from '../api/users';
 import {Create} from './Create'

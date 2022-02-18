@@ -6,7 +6,7 @@ import DatePanel from 'react-multi-date-picker/plugins/date_panel';
 import { useNavigate } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
 import { createEvent } from '../api/event';
-import { UserContext } from '../utils/userContext';
+import { UserContext } from '../utils/context';
 import EventList from './EventList';
 
 function Create() 
@@ -42,12 +42,12 @@ function Create()
       dates,
       timeZone,
     };
-    const createString = JSON.stringify(body);
+    //const createString = JSON.stringify(body);
     return createEvent(body)
       .then((res) => {
         navigate(`/event/${res.data}`);
     //this is probably is temp way to retrieve the data for list of events
-      localStorage.setItem("persist_data",createString);
+     // localStorage.setItem("persist_data",createString);
       }).catch((error) => {
         console.log(error);
         if (error.response.status === 500) {
