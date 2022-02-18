@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Card, Button, Alert, Container, Col, Row, Modal, Form,
 } from 'react-bootstrap';
@@ -8,10 +8,13 @@ import {
 } from '../api/polls';
 // import { ThemeProvider } from 'styled-components';
 import PollOption from './PollOption';
+import { EventContext } from '../utils/context';
+import { EventButton } from './EventButton';
 
 function Poll({
   pollId, pollData: data, editMode: editState, handleDelete,
 }) {
+  const { readOnly } = useContext(EventContext);
   const [pollData, setPollData] = useState(data);
   const [options, setOptions] = useState([]); // includes edit property for poll Option for now
   const [editMode, setEditMode] = useState(editState);
@@ -58,6 +61,7 @@ function Poll({
   // }, [options]);
 
   const createNewOption = () => {
+    if (readOnly) return;
     addOption(pollId, 'New Option')
       .then((res) => {
         const option = {
@@ -72,12 +76,13 @@ function Poll({
   };
 
   const allowEdits = () => {
-    setEditMode(true);
+    if (!readOnly) setEditMode(true);
   };
 
   const savePoll = (e) => {
     // update poll
     e.preventDefault();
+    if (readOnly) return;
     if (pollTitle.length === 0) setErrorMsg('Poll title cannot be empty!');
     else {
       updatePoll(pollId, { question: pollTitle })
@@ -90,11 +95,13 @@ function Poll({
   };
 
   const handleChange = (e) => {
+    if (readOnly) return;
     setPollTitle(e.target.value);
     if (e.target.value.length > 0) setErrorMsg('');
   };
 
   const onDelete = (e) => {
+    if (readOnly) return;
     deletePoll(pollId).then((res) => {
       handleDelete(res.data._id);
     }).catch((err) => console.log(err));
@@ -119,11 +126,12 @@ function Poll({
                 value={pollTitle || ''}
               />
             </Form>
-            <Button variant="success" className="ms-2 " onClick={savePoll}>save</Button>
-            <Button variant="danger" className="ms-2 " onClick={onDelete}>delete</Button>
+            <EventButton variant="success" className="ms-2 " onClick={savePoll}>save</EventButton>
+            <EventButton variant="danger" className="ms-2 " onClick={onDelete}>delete</EventButton>
           </div>
         )}
         <hr />
+        {options.length === 0 && <p className="text-muted">No options yet!</p>}
         {options.map((option, i) => (
           <PollOption
             key={option.data._id}
@@ -134,9 +142,10 @@ function Poll({
             onError={setErrorMsg}
           />
         ))}
-        <Button className="mt-2" onClick={createNewOption}>add option</Button>
-
-        <Button className="mt-2" onClick={allowEdits} hidden={editMode}>edit poll</Button>
+        <span className="d-flex">
+          <EventButton variant="primary fw-bold me-2" className="mt-2" onClick={createNewOption} readOnly={readOnly}>add option</EventButton>
+          <EventButton variant="outline-primary fw-bold" className="mt-2" onClick={allowEdits} readOnly={readOnly} hidden={editMode}>edit poll</EventButton>
+        </span>
       </Card>
     </>
   );

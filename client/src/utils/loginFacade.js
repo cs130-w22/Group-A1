@@ -41,12 +41,12 @@ class ErrorHandler {
     }
   }
 }
-const loginFacade = (email, password, setError, navigate, setUser) => {
-  login(email, password)
+const loginFacade = (data, setError, navigate, redirect, setUser) => {
+  login(data.email, data.password)
     .then((res) => {
       // on success, save user and navigate to home page
       setUser({ userId: res.data.userId, username: res.data.username });
-      navigate('/');
+      navigate(redirect, { replace: true });
     })
     .catch((err) => {
       // add server-side errors to validation displays

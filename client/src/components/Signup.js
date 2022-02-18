@@ -4,7 +4,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import { signup } from '../api/auth';
-import { UserContext } from '../utils/userContext';
+import { UserContext } from '../utils/context';
 
 function Signup() {
   const navigate = useNavigate();

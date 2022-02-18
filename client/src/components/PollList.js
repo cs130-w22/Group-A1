@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
-  Card, ListGroup, Button, Alert, Modal, Form,
+  Card, ListGroup, Button, Alert, Modal, Form, OverlayTrigger, Tooltip,
 } from 'react-bootstrap';
 import { ThemeProvider } from 'styled-components';
 import { getEventPolls } from '../api/event';
 import { createPoll, getPolls } from '../api/polls';
+import { EventContext } from '../utils/context';
+import { EventButton } from './EventButton';
 import Poll from './Poll';
 
-function PollList({ eventId }) {
+function PollList() {
+  const { eventId, readOnly } = useContext(EventContext);
   const [pollList, setPollList] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [creating, setCreating] = useState(false);
@@ -20,7 +23,6 @@ function PollList({ eventId }) {
     setCreating(false);
   };
   useEffect(() => {
-    console.log(eventId);
     getEventPolls(eventId)
       .then((res) => {
         const resPolls = res.data;
@@ -30,7 +32,7 @@ function PollList({ eventId }) {
         console.error(error);
         setErrorMsg('Error fetching polls, please try again later!');
       });
-  }, []);
+  }, [eventId]);
 
   // useEffect(() => {
   //   console.log(pollList);
@@ -38,6 +40,7 @@ function PollList({ eventId }) {
 
   const createNewPoll = () => {
     // check if allowed
+    if (readOnly) return;
     setCreating(true);
     createPoll(eventId, 'Placeholder Name', 0, 2, true)
       .then((createdPoll) => {
@@ -50,6 +53,7 @@ function PollList({ eventId }) {
             editMode
             handleDelete={handleDelete}
             handleClose={handleClose}
+            readOnly={readOnly}
           />
         );
         setCreatingPoll(poll);
@@ -71,9 +75,16 @@ function PollList({ eventId }) {
           editMode={false}
           handleDelete={handleDelete}
           handleClose={handleClose}
+          readOnly={readOnly}
         />
       ))}
-      <Button variant="outline-primary" className="fw-bold" onClick={createNewPoll}>+ add poll</Button>
+
+      <EventButton
+        onClick={createNewPoll}
+        readOnly={readOnly}
+      >
+        + add poll
+      </EventButton>
       <Modal show={creating} onHide={() => setCreating(false)}>
         <Modal.Header closeButton>
           <h3>Create Poll</h3>

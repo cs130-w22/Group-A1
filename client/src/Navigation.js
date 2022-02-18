@@ -9,7 +9,7 @@ import {
 import PropTypes from 'prop-types';
 import logo from './assets/cya.svg';
 import LoginHeader from './components/LoginHeader';
-import { UserContext } from './utils/userContext';
+import { UserContext } from './utils/context';
 
 export function Navigation({ onLogout }) {
   return (

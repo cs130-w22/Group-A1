@@ -1,17 +1,19 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {
+  useContext, useEffect, useMemo, useState,
+} from 'react';
 import {
-  Col, Container, Row, Alert,
+  Col, Container, Row, Alert, Button,
 } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
-import { UserContext } from '../utils/userContext';
+import { UserContext, EventContext } from '../utils/context';
 import AvailabilitySection from './AvailabilitySection';
 import InviteBox from './InviteBox';
 import PollSection from './PollSection';
-import { CategoryTitle, SectionTitle } from './styled/headers';
-import { getEvent } from '../api/event';
+import { getEvent, joinEvent } from '../api/event';
+import { EventMembers, UserList } from './UserList';
 
 const dummyData = {
   name: 'Mango Party',
@@ -23,35 +25,6 @@ const dummyData = {
   declined: [{ id: '3', username: 'PartyPooper' }],
 };
 
-function UserList({ users }) {
-  const listItems = users.map((user) => (
-    <li key={user.id}>
-      {user.username}
-    </li>
-  ));
-  return <ul className="list-unstyled mb-4">{listItems}</ul>;
-}
-
-function EventMembers({ coming, invited, declined }) {
-  return (
-    <Container className="mt-4">
-      <SectionTitle className="mb-3">Who&apos;s Coming?</SectionTitle>
-      <Row>
-        <Col>
-          <CategoryTitle count={coming.length}>Coming</CategoryTitle>
-          <UserList users={coming} />
-        </Col>
-        <Col>
-          <CategoryTitle count={invited.length}>Invited</CategoryTitle>
-          <UserList users={invited} />
-        </Col>
-      </Row>
-      <CategoryTitle count={declined.length}>Not Coming</CategoryTitle>
-      <UserList users={declined} />
-    </Container>
-  );
-}
-
 function EventPage() {
   const { user } = useContext(UserContext);
   const { id } = useParams();
@@ -59,6 +32,8 @@ function EventPage() {
   const [inviteField, setInviteField] = useState('');
   const [loading, setLoading] = useState();
   const [errorMsg, setErrorMsg] = useState();
+  const [isMember, setIsMember] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -71,13 +46,15 @@ function EventPage() {
           coming: [{ id: '2', username: 'StrawberryEater' }],
           declined: [{ id: '3', username: 'PartyPooper' }],
         });
+        setIsMember(eventData.members.some((member) => member._id === user.userId));
       })
       .catch((err) => {
-        setErrorMsg('Sorry! Something went wrong.');
+        console.log(err);
+        navigate('/404');
       }).finally(() => setLoading(false));
-  }, [id]);
+  }, [id, user, navigate]);
 
-  useEffect(() => console.log(data), [data]);
+  // useEffect(() => console.log(data), [data]);
 
   const handleInvite = (e) => {
     e.preventDefault();
@@ -86,6 +63,22 @@ function EventPage() {
   const handleChange = (e) => {
     setInviteField(e.target.value);
   };
+
+  const handleJoin = () => {
+    joinEvent(id)
+      .then(() => {
+        setIsMember(true);
+      })
+      .catch((err) => {
+        setErrorMsg(err.response.data);
+      });
+  };
+
+  const contextProvider = useMemo(
+    () => ({ readOnly: !isMember, eventId: id }),
+    [isMember, id],
+  );
+
   return (
     <Container fluid className="px-0 pt-4">
 
@@ -97,59 +90,59 @@ function EventPage() {
           ariaLabel="loading"
         />
       )}
-      {!loading && data ? (
-        <Row>
-          {/* Left Column */}
-          <Col xs={8}>
-            <span className="text-uppercase text-secondary fw-bold">{data?.time || 'TIME TBA'}</span>
-            <h2 className="fs-3 fw-bold mt-1 mb-1">{data?.name}</h2>
-            <span className="text-muted">
-              Hosted by
-              {' '}
-              {data?.owner?.username}
-            </span>
-            <p className="mt-3">{data?.description}</p>
-            <AvailabilitySection eventId={id} />
-            <PollSection eventId={id} />
-            <hr className="mt-4" />
-            <p className="mt-3 fs-6 text-muted">
-              Created on
-              {' '}
-              {format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
-            </p>
-          </Col>
-          <Col>
-            <InviteBox
-              handleInvite={handleInvite}
-              inviteField={inviteField}
-              handleChange={handleChange}
-              eventURL={id || ''}
-            />
-            <EventMembers
-              coming={data?.coming}
-              invited={data?.invited}
-              declined={data?.declined}
-            />
-          </Col>
-        </Row>
-      ) : (
-        <>
-          {' '}
-          {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-        </>
+      {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
+      {(!loading && data) && (
+        <EventContext.Provider value={contextProvider}>
+          {/* banner for signed in non-members */}
+          {!isMember && !errorMsg
+            && (
+              <Alert className="d-flex justify-content-between">
+                You are not a part of this group yet!
+                You can take a look around, or join the event to start planning!
+                <Button variant="outline-primary fw-bold btn-sm" onClick={handleJoin}>Join Event</Button>
+              </Alert>
+            )}
+          <Row>
+            {/* Left Column */}
+            <Col xs={8}>
+              <span className="text-uppercase text-secondary fw-bold">{data?.time || 'TIME TBA'}</span>
+              <h2 className="fs-3 fw-bold mt-1 mb-1">{data?.name}</h2>
+              <span className="text-muted">
+                Hosted by
+                {' '}
+                {data?.owner?.username}
+              </span>
+              <p className="mt-3">{data?.description}</p>
+              <AvailabilitySection />
+              <PollSection />
+              <hr className="mt-4" />
+              <p className="mt-3 fs-6 text-muted">
+                Created on
+                {' '}
+                {format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
+              </p>
+            </Col>
+            <Col>
+              {isMember && (
+                <InviteBox
+                  handleInvite={handleInvite}
+                  inviteField={inviteField}
+                  handleChange={handleChange}
+                  eventURL={id || ''}
+                />
+              )}
+              <EventMembers
+                coming={data?.coming}
+                members={data?.members}
+                invited={data?.invited}
+                declined={data?.declined}
+              />
+            </Col>
+          </Row>
+        </EventContext.Provider>
       )}
     </Container>
   );
 }
-
-EventMembers.propTypes = {
-  coming: PropTypes.arrayOf(PropTypes.object).isRequired,
-  invited: PropTypes.arrayOf(PropTypes.object).isRequired,
-  declined: PropTypes.arrayOf(PropTypes.object).isRequired,
-};
-
-UserList.propTypes = {
-  users: PropTypes.arrayOf(PropTypes.object).isRequired,
-};
 
 export default EventPage;
