@@ -27,7 +27,7 @@ const dummyData = {
 };
 
 function EventPage() {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const { id } = useParams();
   const [data, setData] = useState();
 
@@ -42,6 +42,8 @@ function EventPage() {
     getEvent(id)
       .then((res) => {
         const eventData = res.data;
+        console.log(eventData);
+        console.log(user);
         setData({
           ...eventData,
           coming: [{ id: '2', username: 'StrawberryEater' }],
@@ -50,10 +52,15 @@ function EventPage() {
         setIsMember(eventData.members.some((member) => member._id === user.userId));
       })
       .catch((err) => {
-        console.log(err);
-        navigate('/404');
+        if (err.response.status === 401) {
+          setUser(null);
+          navigate('/login');
+        } else {
+          console.log(err);
+          navigate('/404');
+        }
       }).finally(() => setLoading(false));
-  }, [id, user, navigate]);
+  }, [id, user, setUser, navigate]);
 
   useEffect(() => {
     getEventInvites(id).then((res) => {
@@ -73,6 +80,8 @@ function EventPage() {
     joinEvent(id)
       .then(() => {
         setIsMember(true);
+        const updatedInvites = invited.filter((invite) => invite._id !== user.userId);
+        setInvited(updatedInvites);
       })
       .catch((err) => {
         setErrorMsg(err.response.data);

@@ -7,7 +7,7 @@ import { EventContext } from '../utils/context';
 
 export function UserList({ users }) {
   const listItems = users.map((user) => (
-    <li key={user.id}>
+    <li key={user._id}>
       {user.username}
     </li>
   ));

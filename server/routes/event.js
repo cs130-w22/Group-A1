@@ -77,21 +77,23 @@ router.get(
 // join event
 router.post(
   '/:id/members',
-  (req, res) => {
-    const { userId } = req.session;
-    if (userId == null) return res.sendStatus(401);
-    Event.findById(req.params.id)
-      .then((event) => {
-        if (!event.members.includes(userId)) {
-          event.members.push({ _id: userId });
-          event.save();
-          return res.status(200).send(event);
-        }
-        return res.status(400).send("You're already a member of this event!");
-      }).catch((err) => {
-        console.log(err);
-        res.sendStatus(500);
-      });
+  async (req, res) => {
+    try {
+      const { userId } = req.session;
+      if (userId == null) return res.sendStatus(401);
+      const event = await Event.findById(req.params.id);
+      if (!event.members.includes(userId)) {
+        // delete any existing invite
+        await EventInvite.deleteMany({ recipient: userId, target: event._id });
+        event.members.push({ _id: userId });
+        await event.save();
+        return res.status(200).send(event);
+      }
+      return res.status(400).send("You're already a member of this event!");
+    } catch (err) {
+      console.log(err);
+      res.sendStatus(500);
+    }
   },
 );
 
