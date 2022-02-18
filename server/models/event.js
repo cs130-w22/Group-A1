@@ -12,7 +12,10 @@ const EventSchema = new Schema({
   finalTime: [{ type: Number }],
   owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  invitees: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
+
+
 
 const Event = mongoose.model('event', EventSchema);
 module.exports = Event;
