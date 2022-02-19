@@ -23,8 +23,8 @@ router.get('/', (req, res) => {
   if (userId == null) return res.sendStatus(401);
   Event.find({ owner: userId, members: userId })
     .then((myevents) => {
-      owned = myevents.filter((event) => event.owner == userId);
-      memberTo = myevents.filter((event) => event.owner != userId);
+      const owned = myevents.filter((event) => event.owner === userId);
+      const memberTo = myevents.filter((event) => event.owner !== userId);
       console.log(myevents);
       res.status(200).json({ owned, memberOnly: memberTo });
     })
