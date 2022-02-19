@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, {
   useContext, useEffect, useMemo, useState,
 } from 'react';
@@ -35,6 +36,7 @@ function EventPage() {
   const [isMember, setIsMember] = useState(false);
   const navigate = useNavigate();
 
+ 
   useEffect(() => {
     setLoading(true);
     getEvent(id)
@@ -46,6 +48,9 @@ function EventPage() {
           coming: [{ id: '2', username: 'StrawberryEater' }],
           declined: [{ id: '3', username: 'PartyPooper' }],
         });
+        //var allData =[].concat(eventData);
+        localStorage.setItem("event_id",JSON.stringify(id));
+        localStorage.setItem("event_data",JSON.stringify(eventData));
         setIsMember(eventData.members.some((member) => member._id === user.userId));
       })
       .catch((err) => {

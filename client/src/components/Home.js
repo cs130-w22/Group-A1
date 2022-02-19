@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
@@ -54,7 +55,7 @@ function Home() {
                   </LinkContainer></div>
             </div>
           </div>
-          
+          <EventList props = {user?.username}/>
           {loading && (
             <Watch
               heigth="100"

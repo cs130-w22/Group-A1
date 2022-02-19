@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');

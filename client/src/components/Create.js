@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 import React, { useState, useContext } from 'react';
 import {Alert, Button, Dropdown, Form,} from 'react-bootstrap';
@@ -8,6 +9,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { createEvent } from '../api/event';
 import { UserContext } from '../utils/context';
 import EventList from './EventList';
+import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+
 
 function Create() 
 {
@@ -19,12 +23,14 @@ function Create()
   const [description, setDescription] = useState('');
   const [timeZone, setTimeZone] = useState();
   const hoursInDay = Array.from({ length: 24 }, (x, i) => i);
-
+  const { id } = useParams();
   const hoursDisplayFormat = (hour) => {
     if (hour % 24 === 0) return '12:00 AM';
     return hour < 13 ? `${hour}:00 AM` : `${hour % 12}:00 PM`;
   };
 
+  
+  //var created = false;
   const {
     handleSubmit,
     control,
@@ -42,12 +48,12 @@ function Create()
       dates,
       timeZone,
     };
-    //const createString = JSON.stringify(body);
+   
     return createEvent(body)
       .then((res) => {
         navigate(`/event/${res.data}`);
-    //this is probably is temp way to retrieve the data for list of events
-     // localStorage.setItem("persist_data",createString);
+        //created = true;
+        //localStorage.setItem("created",JSON.stringify(created));
       }).catch((error) => {
         console.log(error);
         if (error.response.status === 500) {
@@ -76,7 +82,7 @@ function Create()
         }
       });
   };
-
+  
   
 
   return (
