@@ -11,6 +11,15 @@ export function createEvent(body) {
     });
 }
 
+export function getEventList() {
+  const url = `${BASE}/`;
+  return apiInstance.get(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
 export function getEvent(id) {
   const url = `${BASE}/${id}`;
   return apiInstance.get(url)
