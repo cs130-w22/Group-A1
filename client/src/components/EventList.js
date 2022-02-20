@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable no-const-assign */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
@@ -29,16 +30,14 @@ function EventList (props)
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [datas, setDatas] = useState([]);
-  //get get the event id as local storage
-  let getId = localStorage.getItem("event_id");
-  getId = JSON.parse(getId);
-  //this indicated that we created an event
-  //let getbool = localStorage.getItem("created");
-  //getbool = JSON.parse(getbool);
+  const [dataSorted, setDataSorted] = useState([]);
+  const [sortItem, setSortItem] = useState('name');
+  const [pressed,setPressed] = useState(false);
+  
+  //gets the name of the event/progile owner
   const ownerName = props.props;
- //this suppose to work to get list of events
+ //getting owned and invited events seperately from api
  useEffect(() => {
-  setLoading(true);
   getEventList()
     .then((res) => {
       setOwnedEvents(res.data.owned);
@@ -46,49 +45,35 @@ function EventList (props)
     })
     .catch((error) => {
       console.error(error);
-      setErrorMsg('Error fetching polls, please try again later!');
+      setErrorMsg('Error fetching Events, please try again later!');
     });
 }, [user]);
 
-  //sort
-  const [data, setData] = useState([]);
-  //let getData = localStorage.getItem("event_data");
-  //getData = JSON.parse([getData]);
-  /*
-  useEffect(() => {
-    setLoading(true);
-    const finalData = 
-      {
-        name: getData.name,
-        description: getData.description,
-        owner: props.props
-      };
-    setEventList([...datas].concat(finalData));
-    
-  },[0]);
-*/
-  //console.log(datas._id);
-  //console.log(getId);
-  //sorts items by date name and alphabetically
-  const [sortItem, setSortItem] = useState('albums');
-
-  useEffect(() => {
-    const sortArray = type => {
-      const types = {
-        name: 'name',
-        date: 'date',
-      };
-      const sortProp = types[type];
-      const sorted = [...eventList].sort((a, b) => b[sortProp] - a[sortProp]);
-      setData(sorted);
+  //handle the dropdown sorting
+  const sortArray = (e) => {
+      const sorted = [...ownedEvents].sort((a, b) => a[e].localeCompare(b[e]));
+      setOwnedEvents(sorted); 
     };
-    sortArray(sortItem);
-  }, [sortItem]); 
+  //handles the alphabetical sorting
+  const handleSort=(e)=>{
+    //this is a to z
+    if(!pressed)
+    {const sorted = [...ownedEvents].sort((a, b) => a.name.localeCompare(b.name))
+      setOwnedEvents(sorted)
+      setPressed(true)}
+    //this is z to a
+    else
+    {const sorted = [...ownedEvents].sort((a, b) => b.name.localeCompare(a.name))
+      setOwnedEvents(sorted)
+      setPressed(false);}}
 
-  const displayEvents = (events) => {
+  //console.log(ownedEvents,[ownedEvents]);
+
+  const displayEvents = (events) => 
+  {
     return (events.map((event) => 
         <div key={event._id}>
-          <Card className="d-flex mb-3 px-3">
+          <Card className="border py-4 px-4 mb-3">
             <div>
               <div className="fw-bold text-primary px-4 mt-4">
                 Event Name <span className="text-black">{ event.name }</span>
@@ -122,21 +107,22 @@ function EventList (props)
             </div>
           </Card>
         </div>
-    ))
+  ))
   }
 
   return (
     <>
       <div  variant="outline-primary" className ='d-flex flex-row-reverse fw-bold' >
-        <select variant="outline-primary" onChange={(e) => setSortItem(e.target.value)}> 
+        <select variant="outline-primary" onChange={(e) => sortArray(e.target.value)} > 
           <option >sort by</option>
-          <option value="name">name</option>
-          <option value="date">date</option>
+          <option >my events</option>
+          <option >owner</option>
+          <option value="createdAt">date</option>
         </select>
         <br></br>
         <Button  
-          onClick={(e) => setSortItem(e.target.value)} 
-          value="alpha" 
+          onClick={(e)=>handleSort(e.target.value)}
+          value="name" 
           variant="outline-primary" 
           size="sm" 
           className="fw-bold text-black mx-3 px-3">A-Z
@@ -145,7 +131,7 @@ function EventList (props)
       <br></br>
       <div id="all-events">
         My Events: <br/>
-        { displayEvents(ownedEvents) }
+         { displayEvents(ownedEvents)}
         Membered Events: <br/>
         { displayEvents(memberedEvents) }
       </div>
