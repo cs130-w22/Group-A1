@@ -43,8 +43,6 @@ function EventList (props)
     .then((res) => {
       setOwnedEvents(res.data.owned);
       setMemberedEvents(res.data.memberOnly);
-      setEventList(ownedEvents.concat(memberedEvents));
-      console.log(eventList);
     })
     .catch((error) => {
       console.error(error);
