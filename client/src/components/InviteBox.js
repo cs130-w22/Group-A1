@@ -1,14 +1,63 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Container, Form, FormControl, InputGroup,
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { SectionTitle } from './styled/headers';
+import { sendEventInvite } from '../api/invite';
+import { EventContext } from '../utils/context';
 
 function InviteBox({
-  handleInvite, handleChange, inviteField, eventURL,
+  eventURL,
+  onInvite,
 }) {
+  const { eventId } = useContext(EventContext);
+  const [inviteField, setInviteField] = useState('');
+  const [errorMsg, setErrorMsg] = useState();
+  const [successMsg, setSuccessMsg] = useState();
+  const [invalid, setInvalid] = useState(false);
+
+  const resetMessages = () => {
+    setErrorMsg();
+    setSuccessMsg();
+    setInvalid(false);
+  };
+
+  const handleInvite = (e) => {
+    e.preventDefault();
+    resetMessages();
+    if (!inviteField || inviteField.length === 0) {
+      setErrorMsg('You must enter a username to invite someone!');
+      setInvalid(true);
+    } else {
+      sendEventInvite(eventId, inviteField)
+        .then((res) => {
+          setSuccessMsg('Invite sent!');
+          onInvite({ username: inviteField, _id: res.recipient });
+          setInviteField('');
+        }).catch((err) => {
+          const validationErrors = err.response.data?.errors;
+          if (validationErrors?.length > 0) {
+            setErrorMsg(validationErrors[0].msg);
+          } else {
+            setErrorMsg(err.response.data);
+          }
+          setInvalid(true);
+        });
+    }
+  };
+
+  useEffect(() => {
+
+  });
+
+  const handleChange = (e) => {
+    resetMessages();
+    setInviteField(e.target.value);
+  };
+
   return (
+
     <Container>
       <SectionTitle>Invite Friends 💌</SectionTitle>
       <p>Invite people by username, or share the link below!</p>
@@ -21,7 +70,16 @@ function InviteBox({
             aria-describedby="basic-addon1"
             value={inviteField}
             onChange={handleChange}
+            isInvalid={invalid}
           />
+          <Form.Control.Feedback className="w-100" type="invalid">
+            {errorMsg}
+            {' '}
+          </Form.Control.Feedback>
+          <span className="w-100 text-primary" type="valid">
+            {successMsg}
+            {' '}
+          </span>
         </InputGroup>
       </Form>
       <span className="mt-0 text-muted">
@@ -33,10 +91,8 @@ function InviteBox({
 }
 
 InviteBox.propTypes = {
-  handleInvite: PropTypes.func.isRequired,
-  handleChange: PropTypes.func.isRequired,
-  inviteField: PropTypes.string.isRequired,
   eventURL: PropTypes.string.isRequired,
+  onInvite: PropTypes.func.isRequired,
 };
 
 export default InviteBox;

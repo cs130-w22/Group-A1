@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUser } from '../api/users';
 import { UserContext } from '../utils/context';
+import InviteList from './InviteList';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);
@@ -33,22 +34,31 @@ function Home() {
     <div>
       {user?.username ? (
         <div>
-          <h2 className="fs-3">
-            Hi
-            {' '}
-            <span className="fw-bold">
-              {user.username}
-              !
-            </span>
-          </h2>
-          <LinkContainer to="/event/create">
-            <Button
-              variant="outline-primary"
-              className="ms-1 fw-bold"
-            >
-              create event +
-            </Button>
-          </LinkContainer>
+          <Row>
+            <Col xs={8}>
+              <h2 className="fs-3">
+                Hi
+                {' '}
+                <span className="fw-bold">
+                  {user.username}
+                  !
+                </span>
+              </h2>
+
+              {' '}
+              <LinkContainer to="/event/create">
+                <Button
+                  variant="outline-primary"
+                  className="ms-1 fw-bold"
+                >
+                  create event +
+                </Button>
+              </LinkContainer>
+            </Col>
+            <Col>
+              <InviteList />
+            </Col>
+          </Row>
           {loading && (
             <Watch
               heigth="100"
