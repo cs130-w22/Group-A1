@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Card } from 'react-bootstrap';
+import { Button, Card, Row, Col } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUser } from '../api/users';
 import { UserContext } from '../utils/context';
 import EventList from './EventList';
 import EventSection from './EventSection';
+import InviteList from './InviteList';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);
@@ -56,6 +57,31 @@ function Home() {
             </div>
           </div>
           <EventList props = {user?.username}/>
+          <Row>
+            <Col xs={8}>
+              <h2 className="fs-3">
+                Hi
+                {' '}
+                <span className="fw-bold">
+                  {user.username}
+                  !
+                </span>
+              </h2>
+
+              {' '}
+              <LinkContainer to="/event/create">
+                <Button
+                  variant="outline-primary"
+                  className="ms-1 fw-bold"
+                >
+                  create event +
+                </Button>
+              </LinkContainer>
+            </Col>
+            <Col>
+              <InviteList />
+            </Col>
+          </Row>
           {loading && (
             <Watch
               heigth="100"

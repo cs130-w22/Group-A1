@@ -31,7 +31,7 @@ export function ProtectedNav() {
             example
           </Nav.Link>
         </LinkContainer>
-        <LinkContainer to="/event/62098bce59b677377499a563">
+        <LinkContainer to="/event/62102347497eed54e4d0d76f">
           <Nav.Link className="fw-bold text-primary">
             example event
           </Nav.Link>
@@ -46,6 +46,9 @@ export function TopNav({ onLogout }) {
   const navigate = useNavigate();
   const logout = () => {
     onLogout().then(() => {
+      navigate('/');
+    }).catch((err) => {
+      console.log(err);
       navigate('/');
     });
   };
