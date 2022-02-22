@@ -22,7 +22,7 @@ router.get('/all', (req, res) => {
 router.get('/', (req, res) => {
   const { userId } = req.session;
   if (userId == null) return res.sendStatus(401);
-  Event.find({ owner: userId, members: userId })
+  Event.find({ $or: [ {owner: userId}, {members: userId} ] })
     .then((myevents) => {
       const owned = myevents.filter((event) => event.owner == userId);
       const memberTo = myevents.filter((event) => event.owner != userId);
