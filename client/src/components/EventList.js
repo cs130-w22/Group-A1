@@ -31,8 +31,9 @@ function EventList (props)
   const [loading, setLoading] = useState(false);
   const [datas, setDatas] = useState([]);
   const [dataSorted, setDataSorted] = useState([]);
-  const [sortItem, setSortItem] = useState('name');
+  const [sortItem, setSortItem] = useState('');
   const [pressed,setPressed] = useState(false);
+  const [dropped,setDropped] = useState(false);
   
   //gets the name of the event/progile owner
   const ownerName = props.props;
@@ -49,13 +50,9 @@ function EventList (props)
     });
 }, [user]);
 
-  //handle the dropdown sorting
-  const sortArray = (e) => {
-      const sorted = [...ownedEvents].sort((a, b) => a[e].localeCompare(b[e]));
-      setOwnedEvents(sorted); 
-    };
   //handles the alphabetical sorting
-  const handleSort=(e)=>{
+  console.log()
+  const handleSort=()=>{
     //this is a to z
     if(!pressed)
     {const sorted = [...ownedEvents].sort((a, b) => a.name.localeCompare(b.name))
@@ -66,11 +63,28 @@ function EventList (props)
     {const sorted = [...ownedEvents].sort((a, b) => b.name.localeCompare(a.name))
       setOwnedEvents(sorted)
       setPressed(false);}}
-
-  //console.log(ownedEvents,[ownedEvents]);
-
+    //for debugging
+  //console.log(ownedEvents);
   const displayEvents = (events) => 
-  {
+  { //displays archived events
+    if(sortItem === 'archived')
+    {events = ownedEvents.filter((item)=>item.archived === true)}
+    //displays non archived events
+    if(sortItem === 'notArchived')
+    {events = ownedEvents.filter((item)=>item.archived === false)}
+    //this part is just to show filtering works
+    //can be changed when we have going/notgoing function added
+    if(sortItem === 'going')
+    {events =  ownedEvents.filter((item)=>item.name.includes("1"));}
+    //notgoing
+    if(sortItem === 'notGoing')
+    {events =  ownedEvents.filter((item)=>item.name.includes("t"));}
+    //when none of the option is selected  display all the events
+    if(sortItem === '' )
+    {events =  [ownedEvents,memberedEvents];}
+    //only show the event i created
+    if(sortItem === 'owner')
+    {events =  ownedEvents;}
     return (events.map((event) => 
         <div key={event._id}>
           <Card className="border py-4 px-4 mb-3">
@@ -107,21 +121,21 @@ function EventList (props)
             </div>
           </Card>
         </div>
-  ))
-  }
-
+  ))}
   return (
     <>
       <div  variant="outline-primary" className ='d-flex flex-row-reverse fw-bold' >
-        <select variant="outline-primary" onChange={(e) => sortArray(e.target.value)} > 
-          <option >sort by</option>
-          <option >my events</option>
-          <option >owner</option>
-          <option value="createdAt">date</option>
+        <select variant="outline-primary"  onChange={(e) => setSortItem(e.target.value)} > 
+          <option value = "" >sort by</option>
+          <option value="owner"> created by me </option>
+          <option value="going"> going </option>
+          <option value="notGoing"> not going </option>
+          <option value="archived" > archived </option>
+          <option value="notArchived"> not archived </option>
         </select>
         <br></br>
         <Button  
-          onClick={(e)=>handleSort(e.target.value)}
+          onClick={()=>handleSort()}
           value="name" 
           variant="outline-primary" 
           size="sm" 
@@ -132,21 +146,9 @@ function EventList (props)
       <div id="all-events">
         My Events: <br/>
          { displayEvents(ownedEvents)}
-        Membered Events: <br/>
-        { displayEvents(memberedEvents) }
+        { displayEvents(memberedEvents)}
       </div>
     </>
   );
 }
-
-/*
-EventMembers.propTypes = {
-  coming: PropTypes.arrayOf(PropTypes.object).isRequired,
-  invited: PropTypes.arrayOf(PropTypes.object).isRequired,
-  declined: PropTypes.arrayOf(PropTypes.object).isRequired,
-};
-UserList.propTypes = {
-  users: PropTypes.arrayOf(PropTypes.object).isRequired,
-};
-*/
 export default EventList;
