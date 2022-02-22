@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Card, Row, Col, ListGroup, Button, Alert, Modal, Form} from 'react-bootstrap';
 import { joinEvent, getEvent, getEventList } from '../api/event';
-import { getUserByUsername } from '../api/users';
+import { getUser } from '../api/users';
 import { UserContext } from '../utils/context';
 import {Create} from './Create'
 import PropTypes from 'prop-types';
@@ -80,7 +80,7 @@ function EventList (props)
                 <div className='text-black'>
                   hosted by {" "} 
                   <span className="text-muted px-3"> 
-                    {ownerName}
+                    {event.owner.username}
                   </span>
                 </div>
               </div>

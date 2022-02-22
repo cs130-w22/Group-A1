@@ -23,9 +23,10 @@ router.get('/', (req, res) => {
   const { userId } = req.session;
   if (userId == null) return res.sendStatus(401);
   Event.find({ $or: [ {owner: userId}, {members: userId} ] })
+    .populate('owner', '_id username')
     .then((myevents) => {
-      const owned = myevents.filter((event) => event.owner == userId);
-      const memberTo = myevents.filter((event) => event.owner != userId);
+      const owned = myevents.filter((event) => event.owner._id == userId);
+      const memberTo = myevents.filter((event) => event.owner._id != userId);
       console.log(myevents);
       res.status(200).json({ owned: owned, memberOnly: memberTo });
     })
