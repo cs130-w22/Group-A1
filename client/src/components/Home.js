@@ -37,26 +37,6 @@ function Home() {
     <div>
       {user?.username ? (
         <div>
-          <h2 className="fs-3">
-            Hi
-            {' '}
-            <span className="fw-bold">
-              {user.username}
-              !
-            </span>
-          </h2>
-          <div className="col-md-12 mt-5 mb-3">
-            <div className="row py-1">
-                <div className="h3 fw-bold col-md-2 text-secondary">my events</div>
-                <div className="col">
-                  <LinkContainer to="/event/create"> 
-                    <Button variant="outline-primary" className="ms-1 fw-bold">
-                        create event +
-                    </Button>
-                  </LinkContainer></div>
-            </div>
-          </div>
-          <EventList props = {user?.username}/>
           <Row>
             <Col xs={8}>
               <h2 className="fs-3">
@@ -77,6 +57,7 @@ function Home() {
                   create event +
                 </Button>
               </LinkContainer>
+              <EventList props = {user?.username}/>
             </Col>
             <Col>
               <InviteList />

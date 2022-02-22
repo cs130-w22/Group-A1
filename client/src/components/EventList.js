@@ -130,9 +130,9 @@ function EventList (props)
       </div>
       <br></br>
       <div id="all-events">
-        My Events: <br/>
-         { displayEvents(ownedEvents)}
-        Membered Events: <br/>
+        <h2 className="h3 fw-bold text-secondary">created events</h2><br/>
+        { displayEvents(ownedEvents)}
+        <h2 className="h3 fw-bold text-secondary">my events</h2>
         { displayEvents(memberedEvents) }
       </div>
     </>
