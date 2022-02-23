@@ -11,6 +11,24 @@ export function createEvent(body) {
     });
 }
 
+export function deleteEvent(id) {
+  const url = `${BASE}/${id}`;
+  return apiInstance.delete(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function editEvent(id, body) {
+  const url = `${BASE}/${id}`;
+  return apiInstance.post(url, body)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
 export function getEvent(id) {
   const url = `${BASE}/${id}`;
   return apiInstance.get(url)
