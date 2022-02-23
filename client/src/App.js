@@ -42,6 +42,9 @@ function App() {
         setIsLoading(false);
         resolve();
       }).catch((err) => {
+        setUser(null);
+        localStorage.clear();
+        setIsLoading(false);
         console.log(err);
         reject();
       });

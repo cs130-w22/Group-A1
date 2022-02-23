@@ -7,5 +7,6 @@ router.get('/:id', userController.getUser);
 router.get('/username/:username', userController.getUserByUsername);
 router.get('/email/:email', userController.getUserByEmail);
 router.get('/:id/groups', userController.getUserGroups);
+router.get('/:id/invites', userController.getUserInvites);
 
 module.exports = router;

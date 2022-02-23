@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { CategoryTitle, SectionTitle } from './styled/headers';
+import { getEventInvites } from '../api/invite';
+import { EventContext } from '../utils/context';
 
 export function UserList({ users }) {
   const listItems = users.map((user) => (
-    <li key={user.id}>
+    <li key={user._id}>
       {user.username}
     </li>
   ));
@@ -18,19 +20,19 @@ export function EventMembers({
     <Container className="mt-4">
       <SectionTitle className="mb-3">Who&apos;s Coming?</SectionTitle>
       <Row>
-        <Col>
+        <Col xs={6}>
           <CategoryTitle count={coming.length}>Coming</CategoryTitle>
           <UserList users={coming} />
         </Col>
-        <Col>
+        <Col xs={6}>
           <CategoryTitle count={members.length}>Members</CategoryTitle>
           <UserList users={members} />
         </Col>
-        <Col>
+        <Col xs={6}>
           <CategoryTitle count={invited.length}>Invited</CategoryTitle>
           <UserList users={invited} />
         </Col>
-        <Col>
+        <Col xs={6}>
           <CategoryTitle count={declined.length}>Not Coming</CategoryTitle>
           <UserList users={declined} />
         </Col>
