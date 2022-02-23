@@ -5,7 +5,8 @@
     "start": "cd server && node server.js",
     "start-watch": "cd server && nodemon server.js",
     "dev": "concurrently \"npm run start-watch\" \"cd client && npm start\"",
-    "postinstall": "concurrently \"cd client && npm install\" \"cd server && npm install\""
+    "postinstall": "concurrently \"cd client && npm install\" \"cd server && npm install\"",
+    "test": "concurrently \"cd client && npm test\" \"cd server && npm test\""
   },
   "devDependencies": {
     "concurrently": "^7.0.0",
