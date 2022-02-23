@@ -14,12 +14,14 @@ exports.sendInvite = async (req, res) => {
   try {
     // get recipient
     const recipient = await User.findOne({ username: req.body.recipient });
-    if (recipient == null)
+    if (recipient == null) {
       return res.status(400).send('Recipient does not exist');
+    }
 
     // check if inviting self
-    if (req.session.userId === recipient._id)
+    if (req.session.userId === recipient._id) {
       return res.status(400).send("You can't invite yourself!");
+    }
 
     // craft body
     const inviteBody = {
@@ -38,13 +40,16 @@ exports.sendInvite = async (req, res) => {
     if (type === 'EventInvite') {
       target = await Event.findById(req.body.id);
       if (target === null) return res.status(404).send('Event does not exist');
-      if (!target.members.includes(req.session.userId))
+      if (!target.members.includes(req.session.userId)) {
         return res.status(400).send("You're not a member of this event");
-      if (target.members.includes(recipient._id))
+      }
+      if (target.members.includes(recipient._id)) {
         return res.status(400).send('Recipient is already a member');
+      }
       if (target.archived) return res.status(400).send('Event is archived');
-      if (target.kicked.includes(recipient._id))
+      if (target.kicked.includes(recipient._id)) {
         return res.status(400).send('Recipient is kicked from this event');
+      }
     }
 
     // create invite
@@ -71,7 +76,7 @@ exports.acceptInvite = async (req, res) => {
 
     // add user to event
     const event = await Event.findById(invite.target);
-    event.members.push({ _id: userId });
+    if (!event.members.includes(userId)) event.members.push({ _id: userId });
     await event.save();
 
     // delete invite

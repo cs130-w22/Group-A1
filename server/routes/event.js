@@ -73,7 +73,7 @@ router.post('/:id/members', async (req, res) => {
     if (!event.members.includes(userId)) {
       // delete any existing invite
       await EventInvite.deleteMany({ recipient: userId, target: event._id });
-      event.members.push({ _id: userId });
+      if (!event.members.includes(userId)) event.members.push({ _id: userId });
       await event.save();
       return res.status(200).send(event);
     }
