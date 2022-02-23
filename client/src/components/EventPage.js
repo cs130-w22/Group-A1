@@ -1,9 +1,5 @@
-import React, {
-  useContext, useEffect, useMemo, useState,
-} from 'react';
-import {
-  Col, Container, Row, Alert, Button,
-} from 'react-bootstrap';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { Col, Container, Row, Alert, Button } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import PropTypes from 'prop-types';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -49,7 +45,9 @@ function EventPage() {
           coming: [{ id: '2', username: 'StrawberryEater' }],
           declined: [{ id: '3', username: 'PartyPooper' }],
         });
-        setIsMember(eventData.members.some((member) => member._id === user.userId));
+        setIsMember(
+          eventData.members.some((member) => member._id === user.userId)
+        );
       })
       .catch((err) => {
         if (err.response.status === 401) {
@@ -59,20 +57,23 @@ function EventPage() {
           console.log(err);
           navigate('/404');
         }
-      }).finally(() => setLoading(false));
+      })
+      .finally(() => setLoading(false));
   }, [id, user, setUser, navigate]);
 
   useEffect(() => {
-    getEventInvites(id).then((res) => {
-      const invitedUsers = [];
-      const invites = res.data;
-      for (let i = 0; i < invites.length; i += 1) {
-        invitedUsers.push(invites[i].recipient);
-      }
-      setInvited(invitedUsers);
-    }).catch((err) => {
-      console.log(err);
-    });
+    getEventInvites(id)
+      .then((res) => {
+        const invitedUsers = [];
+        const invites = res.data;
+        for (let i = 0; i < invites.length; i += 1) {
+          invitedUsers.push(invites[i].recipient);
+        }
+        setInvited(invitedUsers);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, [id]);
   // useEffect(() => console.log(data), [data]);
 
@@ -80,7 +81,9 @@ function EventPage() {
     joinEvent(id)
       .then(() => {
         setIsMember(true);
-        const updatedInvites = invited.filter((invite) => invite._id !== user.userId);
+        const updatedInvites = invited.filter(
+          (invite) => invite._id !== user.userId
+        );
         setInvited(updatedInvites);
       })
       .catch((err) => {
@@ -89,8 +92,8 @@ function EventPage() {
   };
 
   const contextProvider = useMemo(
-    () => ({ readOnly: !isMember, eventId: id }),
-    [isMember, id],
+    () => ({ readOnly: !isMember || data.archived, eventId: id }),
+    [isMember, id, data]
   );
 
   const onInvite = (invite) => {
@@ -98,53 +101,46 @@ function EventPage() {
   };
   return (
     <Container fluid className="px-0 pt-4">
-
       {loading && (
-        <Watch
-          heigth="100"
-          width="100"
-          color="grey"
-          ariaLabel="loading"
-        />
+        <Watch heigth="100" width="100" color="grey" ariaLabel="loading" />
       )}
       {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-      {(!loading && data) && (
+      {!loading && data && (
         <EventContext.Provider value={contextProvider}>
           {/* banner for signed in non-members */}
-          {!isMember && !errorMsg
-            && (
-              <Alert className="d-flex justify-content-between">
-                You are not a part of this group yet!
-                You can take a look around, or join the event to start planning!
-                <Button variant="outline-primary fw-bold btn-sm" onClick={handleJoin}>Join Event</Button>
-              </Alert>
-            )}
+          {!isMember && !errorMsg && (
+            <Alert className="d-flex justify-content-between">
+              You are not a part of this group yet! You can take a look around,
+              or join the event to start planning!
+              <Button
+                variant="outline-primary fw-bold btn-sm"
+                onClick={handleJoin}
+              >
+                Join Event
+              </Button>
+            </Alert>
+          )}
           <Row>
             {/* Left Column */}
             <Col xs={8}>
-              <span className="text-uppercase text-secondary fw-bold">{data?.time || 'TIME TBA'}</span>
+              <span className="text-uppercase text-secondary fw-bold">
+                {data?.time || 'TIME TBA'}
+              </span>
               <h2 className="fs-3 fw-bold mt-1 mb-1">{data?.name}</h2>
               <span className="text-muted">
-                Hosted by
-                {' '}
-                {data?.owner?.username}
+                Hosted by {data?.owner?.username}
               </span>
               <p className="mt-3">{data?.description}</p>
               <AvailabilitySection />
               <PollSection />
               <hr className="mt-4" />
               <p className="mt-3 fs-6 text-muted">
-                Created on
-                {' '}
-                {format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
+                Created on {format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
               </p>
             </Col>
             <Col>
               {isMember && (
-                <InviteBox
-                  eventURL={id || ''}
-                  onInvite={onInvite}
-                />
+                <InviteBox eventURL={id || ''} onInvite={onInvite} />
               )}
               <EventMembers
                 coming={data?.coming}
