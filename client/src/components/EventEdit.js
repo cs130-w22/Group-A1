@@ -1,7 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import {
-  Alert, Card, Form, Modal,
-} from 'react-bootstrap';
+import { Alert, Card, Form, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
 import PropTypes, { any } from 'prop-types';
@@ -28,22 +26,25 @@ function EventEdit(props) {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (bodyData) => {
+  const onSubmit = () => {
     const body = {
-      name: bodyData.eventName,
-      owner: bodyData.eventOwner,
+      name: eventName,
       description,
     };
     return editEvent(props.eventId, body)
       .then((res) => {
         navigate(`/event/${props.eventId}`);
-      }).catch((error) => {
+      })
+      .catch((error) => {
         console.log(error);
         if (error.response.status === 500) {
           setError(
             'form',
-            { type: 'api', message: "We're sorry! Something went wrong on our end." },
-            { shouldFocus: true },
+            {
+              type: 'api',
+              message: "We're sorry! Something went wrong on our end.",
+            },
+            { shouldFocus: true }
           );
         } else if (error.response.status === 401) {
           setUser(null);
@@ -57,7 +58,7 @@ function EventEdit(props) {
               setError(
                 errorParam,
                 { type: 'api', message: errorMsg },
-                { shouldFocus: true },
+                { shouldFocus: true }
               );
             }
           }
@@ -68,17 +69,19 @@ function EventEdit(props) {
   const handleDeletion = () => {
     deleteEvent(props.eventId)
       .then((res) => {
-        if(window.location.pathname !== '/')
-          navigate('/');
-        else
-          window.location.reload(false);
-      }).catch((error) => {
+        if (window.location.pathname !== '/') navigate('/');
+        else window.location.reload(false);
+      })
+      .catch((error) => {
         console.log(error);
         if (error.response.status === 500) {
           setError(
             'form',
-            { type: 'api', message: "We're sorry! Something went wrong on our end." },
-            { shouldFocus: true },
+            {
+              type: 'api',
+              message: "We're sorry! Something went wrong on our end.",
+            },
+            { shouldFocus: true }
           );
         } else if (error.response.status === 401) {
           setUser(null);
@@ -92,7 +95,7 @@ function EventEdit(props) {
               setError(
                 errorParam,
                 { type: 'api', message: errorMsg },
-                { shouldFocus: true },
+                { shouldFocus: true }
               );
             }
           }
@@ -109,39 +112,57 @@ function EventEdit(props) {
             <Modal.Title className="mt-5">Edit Event</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-              <Form.Group controlId="formName" className="mb-3">
-                <Form.Control
-                  type="text"
-                  onChange={(e) => setEventName(e.target.value)}
-                  value={eventName || ''}
-                  isInvalid={errors.eventName}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.eventName?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-              <Form.Group controlId="formDescription" className="mb-3">
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  name="descriptionTextArea"
-                  placeholder="Enter Event Description"
-                  defaultValue={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </Form.Group>
+            <Form.Group controlId="formName" className="mb-3">
+              <Form.Control
+                type="text"
+                onChange={(e) => setEventName(e.target.value)}
+                value={eventName || ''}
+                isInvalid={errors.eventName}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.eventName?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group controlId="formDescription" className="mb-3">
+              <Form.Control
+                as="textarea"
+                rows={3}
+                name="descriptionTextArea"
+                placeholder="Enter Event Description"
+                defaultValue={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <EventButton variant="success" className="ms-2 " type="submit" onClick={onSubmit}>save</EventButton>
-            <EventButton variant="danger" className="ms-2 " onClick={handleDeletion}>delete</EventButton>
-            <EventButton variant="outline-primary" className="ms-2 " onClick={() => props.closeEditor() }>cancel</EventButton>
+            <EventButton
+              variant="success"
+              className="ms-2 "
+              type="submit"
+              onClick={onSubmit}
+            >
+              save
+            </EventButton>
+            <EventButton
+              variant="danger"
+              className="ms-2 "
+              onClick={handleDeletion}
+            >
+              delete
+            </EventButton>
+            <EventButton
+              variant="outline-primary"
+              className="ms-2 "
+              onClick={() => props.closeEditor()}
+            >
+              cancel
+            </EventButton>
           </Modal.Footer>
         </Form>
       </Modal>
     </div>
   );
 }
-
 
 /*
 EventEdit.propTypes = {
@@ -154,6 +175,5 @@ EventEdit.propTypes = {
   }).isRequired,
 };
 */
-
 
 export default EventEdit;

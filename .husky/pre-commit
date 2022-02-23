@@ -1,0 +1,15 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "Unstaging .env files"
+git rm --cached */.env --ignore-unmatch
+
+echo "Running ESLint..."
+cd client && npx eslint *.js --fix  --no-error-on-unmatched-pattern
+cd ../server && npx eslint *.js --fix  --no-error-on-unmatched-pattern
+cd ..
+echo "Done."
+
+npx lint-staged
+
+npm test
