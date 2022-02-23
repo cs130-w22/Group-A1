@@ -35,22 +35,12 @@ function Home() {
       {user?.username ? (
         <div>
           <Row>
-            <Col xs={8}>
+            <Col xs={7}>
               <h2 className="fs-3">
-                Hi
-                {' '}
-                <span className="fw-bold">
-                  {user.username}
-                  !
-                </span>
-              </h2>
-
-              {' '}
+                Hi <span className="fw-bold">{user.username}!</span>
+              </h2>{' '}
               <LinkContainer to="/event/create">
-                <Button
-                  variant="outline-primary"
-                  className="ms-1 fw-bold"
-                >
+                <Button variant="outline-primary" className="ms-1 fw-bold">
                   create event +
                 </Button>
               </LinkContainer>
@@ -60,15 +50,12 @@ function Home() {
             </Col>
           </Row>
           {loading && (
-            <Watch
-              heigth="100"
-              width="100"
-              color="grey"
-              ariaLabel="loading"
-            />
+            <Watch heigth="100" width="100" color="grey" ariaLabel="loading" />
           )}
         </div>
-      ) : <div>placeholder</div>}
+      ) : (
+        <div>placeholder</div>
+      )}
     </div>
   );
 }
