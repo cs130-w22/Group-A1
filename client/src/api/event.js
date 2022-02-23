@@ -23,6 +23,15 @@ export function deleteEvent(id) {
 export function editEvent(id, body) {
   const url = `${BASE}/${id}`;
   return apiInstance.post(url, body)
+  .then((res) => res)
+  .catch((err) => {
+    throw err;
+  });
+}
+
+export function getEventList() {
+  const url = `${BASE}/`;
+  return apiInstance.get(url)
     .then((res) => res)
     .catch((err) => {
       throw err;
