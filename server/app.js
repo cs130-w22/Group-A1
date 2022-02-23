@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const session = require('express-session');
 
 // routers
 const loginRouter = require('./routes/login');
@@ -21,7 +20,8 @@ const createServer = (middleware) => {
   app.use(express.urlencoded({ extended: true }));
 
   // other middleware
-  if (middleware != null && Array.isArray(middleware)) middleware.forEach((m) => app.use(m));
+  if (middleware != null && Array.isArray(middleware))
+    middleware.forEach((m) => app.use(m));
 
   // routes
   app.use('/login', loginRouter);

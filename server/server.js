@@ -1,7 +1,6 @@
 const session = require('express-session');
 const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo');
-const app = require('./app');
 const createServer = require('./app');
 // const cookieParser = require('cookie-parser');
 require('dotenv').config();
@@ -11,10 +10,12 @@ const port = process.env.PORT || 5000;
 
 // db connection
 mongoose.Promise = Promise;
-const mongooseClient = mongoose.connect(
-  process.env.DB_URI,
-  { useFindAndModify: false, useNewUrlParser: true, useUnifiedTopology: true },
-)
+const mongooseClient = mongoose
+  .connect(process.env.DB_URI, {
+    useFindAndModify: false,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then((c) => {
     console.log('Database connected succesfully');
     return c.connection.getClient();
