@@ -43,7 +43,10 @@ router.get('/:id', (req, res) => {
   Event.findById(req.params.id)
     .populate('owner')
     .populate('members')
-    .then((result) => res.send(result))
+    .then((result) => {
+      if (result === null) return res.sendStatus(404);
+      res.send(result);
+    })
     .catch((err) => {
       console.log(err);
       res.sendStatus(500);
@@ -64,7 +67,7 @@ router.get('/:id/polls', (req, res) => {
 });
 
 // join event
-router.post('/:id/members', async (req, res) => {
+router.post('/:id/join', async (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   try {
     const { userId } = req.session;
@@ -73,11 +76,29 @@ router.post('/:id/members', async (req, res) => {
     if (!event.members.includes(userId)) {
       // delete any existing invite
       await EventInvite.deleteMany({ recipient: userId, target: event._id });
-      if (!event.members.includes(userId)) event.members.push({ _id: userId });
+      event.members.push({ _id: userId });
       await event.save();
       return res.status(200).send(event);
     }
     return res.status(400).send("You're already a member of this event!");
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
+router.post('/:id/leave', async (req, res) => {
+  if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
+  try {
+    const { userId } = req.session;
+    if (userId == null) return res.sendStatus(401);
+    const event = await Event.findById(req.params.id);
+    if (event.members.includes(userId)) {
+      event.members.pull({ _id: userId });
+      await event.save();
+      return res.status(200).send(event);
+    }
+    return res.status(400).send("You're not a member of this event!");
   } catch (err) {
     console.log(err);
     res.sendStatus(500);

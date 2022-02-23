@@ -8,7 +8,7 @@ import InviteList from './InviteList';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);
-  const [setData] = useState();
+  const [data, setData] = useState();
   const [loading, setLoading] = useState();
   useEffect(() => {
     setLoading(true);
@@ -28,7 +28,7 @@ function Home() {
       setLoading(false);
       setData(null);
     }
-  }, [user, setUser, setData]);
+  }, [user, setUser]);
 
   return (
     <div>

@@ -123,7 +123,9 @@ function EventPage() {
               <PollSection />
               <hr className="mt-4" />
               <p className="mt-3 fs-6 text-muted">
-                Created on {format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
+                Created on{' '}
+                {data?.createdAt &&
+                  format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
               </p>
             </Col>
             <Col>
