@@ -76,10 +76,10 @@ function InviteBox({
             {errorMsg}
             {' '}
           </Form.Control.Feedback>
-          <Form.Control.Feedback className="w-100 text-success">
+          <span className="w-100 text-primary" type="valid">
             {successMsg}
             {' '}
-          </Form.Control.Feedback>
+          </span>
         </InputGroup>
       </Form>
       <span className="mt-0 text-muted">
