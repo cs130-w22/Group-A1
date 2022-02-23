@@ -126,7 +126,7 @@ router.post(
       .then((result) => res.send(result))
       .catch((err) => {
         console.log(err);
-        if(error === 'Forbidden')
+        if(err === 'Forbidden')
           res.sendStatus(403)
         else
           res.sendStatus(500);
@@ -153,7 +153,7 @@ router.delete(
       .then((result) => res.send(result))
       .catch((err) => {
         console.log(err);
-        if(error === 'Forbidden')
+        if(err === 'Forbidden')
           res.sendStatus(403)
         else
           res.sendStatus(500);

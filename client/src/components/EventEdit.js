@@ -1,22 +1,25 @@
 import React, { useState, useContext, useEffect } from 'react';
 import {
-  Alert, Button, Card, Form, Modal,
+  Alert, Card, Form, Modal,
 } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
-import PropTypes from 'prop-types';
+import PropTypes, { any } from 'prop-types';
 import { editEvent, deleteEvent } from '../api/event';
 import { UserContext } from '../utils/context';
 import { EventButton } from './EventButton';
 
-function EventEdit(eventData) {
+function EventEdit(props) {
   const { user, setUser } = useContext(UserContext);
-  const [data, setData] = useState();
-  const [eventName, setEventName] = useState({ eventData }?.name);
-  const [description, setDescription] = useState({ eventData }?.description);
-  const [editing, setEditing] = useState(true);
-  const eventId = { eventData }?._id;
+  const [eventName, setEventName] = useState(props.editName);
+  const [description, setDescription] = useState(props.editDescription);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(eventName);
+    console.log(description);
+    console.log(props.eventId);
+  }, [eventName, description, props.eventId]);
 
   const {
     handleSubmit,
@@ -31,9 +34,9 @@ function EventEdit(eventData) {
       owner: bodyData.eventOwner,
       description,
     };
-    return editEvent(eventId, body)
+    return editEvent(props.eventId, body)
       .then((res) => {
-        navigate(`/event/${eventId}`);
+        navigate(`/event/${props.eventId}`);
       }).catch((error) => {
         console.log(error);
         if (error.response.status === 500) {
@@ -62,14 +65,13 @@ function EventEdit(eventData) {
       });
   };
 
-  const closeEditingWindow = () => {
-    setEditing(false);
-  };
-
-  const handleDeletion = (e) => {
-    deleteEvent(eventId)
+  const handleDeletion = () => {
+    deleteEvent(props.eventId)
       .then((res) => {
-        navigate('/');
+        if(window.location.pathname !== '/')
+          navigate('/');
+        else
+          window.location.reload(false);
       }).catch((error) => {
         console.log(error);
         if (error.response.status === 500) {
@@ -101,37 +103,18 @@ function EventEdit(eventData) {
   return (
     <div>
       {errors.form && <Alert variant="danger">{errors.form}</Alert>}
-      <Modal show={editing} onHide={closeEditingWindow()} centered>
-        <Form className="w-50" onSubmit={handleSubmit(onSubmit)}>
+      <Modal show={props.editing} onHide={props.closeEditor} centered>
+        <Form onSubmit={handleSubmit(onSubmit)}>
           <Modal.Header closeButton>
             <Modal.Title className="mt-5">Edit Event</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Card id={eventId} className="border py-4 px-4 mb-3">
               <Form.Group controlId="formName" className="mb-3">
-                <Controller
-                  control={control}
-                  name="eventName"
-                  defaultValue={eventName}
-                  placeholder="Enter Event Name"
-                  reules={{
-                    required: {
-                      value: true,
-                      message: 'Event name required',
-                    },
-                  }}
-                  render={({
-                    field: {
-                      onChange, value, ref,
-                    },
-                  }) => (
-                    <Form.Control
-                      onChange={onChange}
-                      ref={ref}
-                      value={value}
-                      isInvalid={errors.eventName}
-                    />
-                  )}
+                <Form.Control
+                  type="text"
+                  onChange={(e) => setEventName(e.target.value)}
+                  value={eventName || ''}
+                  isInvalid={errors.eventName}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.eventName?.message}
@@ -147,13 +130,11 @@ function EventEdit(eventData) {
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </Form.Group>
-              <hr className="mt-4" />
-              <EventButton variant="warning" className="ms-2 " onClick={handleDeletion()}>delete</EventButton>
-            </Card>
           </Modal.Body>
           <Modal.Footer>
-            <EventButton variant="success" className="ms-2 " type="submit">save</EventButton>
-            <EventButton variant="outline-secondary" className="ms-2 " onClick={closeEditingWindow()}>cancel</EventButton>
+            <EventButton variant="success" className="ms-2 " type="submit" onClick={onSubmit}>save</EventButton>
+            <EventButton variant="danger" className="ms-2 " onClick={handleDeletion}>delete</EventButton>
+            <EventButton variant="outline-primary" className="ms-2 " onClick={() => props.closeEditor() }>cancel</EventButton>
           </Modal.Footer>
         </Form>
       </Modal>
@@ -161,12 +142,18 @@ function EventEdit(eventData) {
   );
 }
 
+
+/*
 EventEdit.propTypes = {
+  editing: PropTypes.bool.isRequired, 
+  closeEditor: any,
   eventData: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
   }).isRequired,
 };
+*/
+
 
 export default EventEdit;

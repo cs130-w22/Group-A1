@@ -8,6 +8,7 @@ import { joinEvent, getEvent, getEventList } from '../api/event';
 import { getUser } from '../api/users';
 import { UserContext } from '../utils/context';
 import {Create} from './Create'
+import EventEdit from './EventEdit'
 import PropTypes from 'prop-types';
 import { useHref, useParams } from 'react-router-dom';
 import PollList from './PollList';
@@ -33,6 +34,8 @@ function EventList (props)
   const [dataSorted, setDataSorted] = useState([]);
   const [sortItem, setSortItem] = useState('name');
   const [pressed,setPressed] = useState(false);
+  const [editingStatus, setEditingStatus] = useState(false);
+  const [editingData, setEditingData] = useState();
   
   //gets the name of the event/progile owner
   const ownerName = props.props;
@@ -69,7 +72,27 @@ function EventList (props)
 
   //console.log(ownedEvents,[ownedEvents]);
 
-  const displayEvents = (events) => 
+  /*
+  const openEventEditor = (e, event) => {
+    setEditingData(event);
+    setEditingStatus(true);
+  };
+  */
+
+  const closeEventEditor = () => {
+    setEditingStatus(false);
+    setEditingData(undefined);
+  };
+
+  useEffect(() => {
+    if(editingData !== undefined){
+      setEditingStatus(() => true);
+      console.log(editingData);
+    }
+  }, [editingData]);
+
+
+  const displayEvents = (events, isOwned) => 
   {
     return (events.map((event) => 
         <div key={event._id}>
@@ -104,6 +127,14 @@ function EventList (props)
                   Where: {}
                 </Col>
               </Row>
+              <Button 
+                varient="btn btn-outline-secondary"
+                onClick={() => 
+                    setEditingData(event)
+                }
+              >
+                  edit
+              </Button>
             </div>
           </Card>
         </div>
@@ -131,13 +162,23 @@ function EventList (props)
       <br></br>
       <div id="all-events">
         <h2 className="h3 fw-bold text-secondary">created events</h2><br/>
-        { displayEvents(ownedEvents)}
+        { displayEvents(ownedEvents, true)}
         <h2 className="h3 fw-bold text-secondary">my events</h2>
-        { displayEvents(memberedEvents) }
+        { displayEvents(memberedEvents, false) }
       </div>
+      {editingStatus && (
+        <EventEdit 
+          editing={editingStatus} 
+          closeEditor={() => closeEventEditor()}
+          eventId={editingData._id}
+          editName={editingData.name}
+          editDescription={editingData.description}
+        ></EventEdit>
+      )}
     </>
   );
 }
+
 
 /*
 EventMembers.propTypes = {
