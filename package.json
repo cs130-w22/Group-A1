@@ -19,6 +19,7 @@
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1"
   },
+  "optionalDependencies": { "fsevents": "2.3.2" },
   "lint-staged": {
     "*.{js,css,md}": "prettier --write"
   },
