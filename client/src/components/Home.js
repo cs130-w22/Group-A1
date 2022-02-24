@@ -1,9 +1,12 @@
+/* eslint-disable no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Card, Row, Col } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUser } from '../api/users';
 import { UserContext } from '../utils/context';
+import EventList from './EventList';
+import EventSection from './EventSection';
 import InviteList from './InviteList';
 
 function Home() {
@@ -44,6 +47,7 @@ function Home() {
                   create event +
                 </Button>
               </LinkContainer>
+              <EventList props={user?.username} />
             </Col>
             <Col>
               <InviteList />

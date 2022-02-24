@@ -1,0 +1,35 @@
+[
+    {
+        "id": 1,
+        "owner": "user.owner",
+        "name": "a event",
+        "description": "event on the roof",
+        "timeEarliest": "today at 3pm",
+        "timeLatest" : "today at 6pm",
+        "dates": ["today","today"],
+        "timeZone": "pasific",
+        "members": ["member1","member2"]
+    },
+    {   
+        "id": 2,
+        "owner": "user.owner",
+        "name": "b event",
+        "description": "event on the moon",
+        "timeEarliest": "tuesday at 3pm",
+        "timeLatest": "wednesday at 6pm",
+        "dates": ["tuesday","wednesday"],
+        "timeZone": "pasific",
+        "members": ["member1","member2","member3","member4"]
+    }
+    ,{  
+        "id": 3,
+        "owner": "user.owner",
+        "name": "c event",
+        "description": "event on the mars",
+        "timeEarliest": "friday at 7am",
+        "timeLatest": "wednesday at 11pm",
+        "dates": ["friday","wednesday"],
+        "timeZone": "earthlink",
+        "members": ["member1","member2","member3"]
+    }
+]
