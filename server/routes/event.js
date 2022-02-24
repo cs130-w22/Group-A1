@@ -68,7 +68,7 @@ router.post(
 );
 
 router.get('/:id', (req, res) => {
-  if (!ObjectId.isValid(req.params.id)) return res.sendStatus(400);
+  if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   const { userId } = req.session;
   if (userId == null) return res.sendStatus(401);
   Event.findById(req.params.id)
@@ -101,14 +101,14 @@ router.post(
   '/:id',
   body('name').exists().notEmpty().withMessage('Event name cannot be empty'),
   (req, res) => {
-    if (!ObjectId.isValid(req.params.id)) return res.sendStatus(400);
+    if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
     Event.findById(req.params.id)
       .then((result) => {
         return new Promise((resolve, reject) => {
           if (result.owner == req.session.userId)
             resolve([req.body.name, req.body.description]);
           else reject('Forbidden');
-        });
+        })
       })
       .then((result) => {
         [name, description] = result;
@@ -129,7 +129,7 @@ router.post(
 );
 
 router.delete('/:id', (req, res) => {
-  if (!ObjectId.isValid(req.params.id)) return res.sendStatus(400);
+  if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   Event.findById(req.params.id)
     .then((result) => {
       return new Promise((resolve, reject) => {

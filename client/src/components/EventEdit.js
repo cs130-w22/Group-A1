@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Alert, Card, Form, Modal } from 'react-bootstrap';
+import { Alert, Button, Card, Form, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
 import PropTypes, { any } from 'prop-types';
@@ -9,15 +9,17 @@ import { EventButton } from './EventButton';
 
 function EventEdit(props) {
   const { user, setUser } = useContext(UserContext);
-  const [eventName, setEventName] = useState(props.editName);
+  //const [eventName, setEventName] = useState(props.editName);
   const [description, setDescription] = useState(props.editDescription);
   const navigate = useNavigate();
 
+  /*
   useEffect(() => {
     console.log(eventName);
     console.log(description);
     console.log(props.eventId);
   }, [eventName, description, props.eventId]);
+  */
 
   const {
     handleSubmit,
@@ -26,9 +28,9 @@ function EventEdit(props) {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = () => {
+  const onSubmit = (data) => {
     const body = {
-      name: eventName,
+      name: data.eventName,
       description,
     };
     return editEvent(props.eventId, body)
@@ -107,21 +109,47 @@ function EventEdit(props) {
       <Modal show={props.editing} onHide={props.closeEditor} centered>
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Modal.Header closeButton>
-            <Modal.Title className="mt-5">Edit Event</Modal.Title>
+            <Modal.Title className="h3 fw-bold text-secondary">Edit Event</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form.Group controlId="formName" className="mb-3">
+
+          <Form.Label className="fw-bold text-primary">
+            Event Name
+          </Form.Label>
+
+          <Controller
+            control={control}
+            name="eventName"
+            defaultValue={props.editName}
+            rules={{
+              required: {
+                value: true,
+                message: 'Event name required',
+              },
+            }}
+            render={({
+              field: {
+                onChange, value, ref,
+              },
+            }) => (
               <Form.Control
-                type="text"
-                onChange={(e) => setEventName(e.target.value)}
-                value={eventName || ''}
+                onChange={onChange}
+                ref={ref}
+                value={value}
                 isInvalid={errors.eventName}
               />
-              <Form.Control.Feedback type="invalid">
-                {errors.eventName?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
+            )}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.eventName?.message}
+          </Form.Control.Feedback>
+
+              <br></br>
+
             <Form.Group controlId="formDescription" className="mb-3">
+              <Form.Label className="fw-bold text-primary">
+              Event Description
+              </Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
@@ -133,14 +161,13 @@ function EventEdit(props) {
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <EventButton
+            <Button
               variant="success"
               className="ms-2 "
               type="submit"
-              onClick={onSubmit}
             >
               save
-            </EventButton>
+            </Button>
             <EventButton
               variant="danger"
               className="ms-2 "
