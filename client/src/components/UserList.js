@@ -5,7 +5,7 @@ import { CategoryTitle, SectionTitle } from './styled/headers';
 
 export function UserList({ users }) {
   const listItems = users.map((user) => (
-    <li key={user._id}>{user.username}</li>
+    <li key={user._id || 'x'}>{user.username}</li>
   ));
   return <ul className="list-unstyled mb-4">{listItems}</ul>;
 }

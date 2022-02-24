@@ -18,5 +18,8 @@
   },
   "lint-staged": {
     "*.{js,css,md}": "prettier --write"
+  },
+  "dependencies": {
+    "use-mouse-action": "^2.0.0"
   }
 }
