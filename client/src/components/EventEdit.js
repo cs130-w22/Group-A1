@@ -36,7 +36,6 @@ function EventEdit(props) {
         navigate(`/event/${props.eventId}`);
       })
       .catch((error) => {
-        console.log(error);
         if (error.response.status === 500) {
           setError(
             'form',
@@ -44,13 +43,13 @@ function EventEdit(props) {
               type: 'api',
               message: "We're sorry! Something went wrong on our end.",
             },
-            { shouldFocus: true }
+            { shouldFocus: true },
           );
         } else if (error.response.status === 401) {
           setUser(null);
           navigate('/login');
         } else {
-          const validationErrors = error.data?.errors;
+          const validationErrors = error.response.data?.errors;
           if (validationErrors?.length > 0) {
             for (let i = 0; i < validationErrors.length; i += 1) {
               const errorParam = validationErrors[i].param;
@@ -58,7 +57,7 @@ function EventEdit(props) {
               setError(
                 errorParam,
                 { type: 'api', message: errorMsg },
-                { shouldFocus: true }
+                { shouldFocus: true },
               );
             }
           }
@@ -73,7 +72,6 @@ function EventEdit(props) {
         else window.location.reload(false);
       })
       .catch((error) => {
-        console.log(error);
         if (error.response.status === 500) {
           setError(
             'form',
@@ -81,13 +79,13 @@ function EventEdit(props) {
               type: 'api',
               message: "We're sorry! Something went wrong on our end.",
             },
-            { shouldFocus: true }
+            { shouldFocus: true },
           );
         } else if (error.response.status === 401) {
           setUser(null);
           navigate('/login');
         } else {
-          const validationErrors = error.data?.errors;
+          const validationErrors = error.response.data?.errors;
           if (validationErrors?.length > 0) {
             for (let i = 0; i < validationErrors.length; i += 1) {
               const errorParam = validationErrors[i].param;
@@ -95,7 +93,7 @@ function EventEdit(props) {
               setError(
                 errorParam,
                 { type: 'api', message: errorMsg },
-                { shouldFocus: true }
+                { shouldFocus: true },
               );
             }
           }

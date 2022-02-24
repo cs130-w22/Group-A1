@@ -4,7 +4,8 @@ const BASE = '/event';
 
 export function createEvent(body) {
   const url = `${BASE}/`;
-  return apiInstance.post(url, body)
+  return apiInstance
+    .post(url, body)
     .then((res) => res)
     .catch((err) => {
       throw err;
@@ -13,7 +14,8 @@ export function createEvent(body) {
 
 export function deleteEvent(id) {
   const url = `${BASE}/${id}`;
-  return apiInstance.delete(url)
+  return apiInstance
+    .delete(url)
     .then((res) => res)
     .catch((err) => {
       throw err;
@@ -22,16 +24,18 @@ export function deleteEvent(id) {
 
 export function editEvent(id, body) {
   const url = `${BASE}/${id}`;
-  return apiInstance.post(url, body)
-  .then((res) => res)
-  .catch((err) => {
-    throw err;
-  });
+  return apiInstance
+    .post(url, body)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
 }
 
 export function getEventList() {
   const url = `${BASE}/`;
-  return apiInstance.get(url)
+  return apiInstance
+    .get(url)
     .then((res) => res)
     .catch((err) => {
       throw err;
@@ -40,7 +44,8 @@ export function getEventList() {
 
 export function getEvent(id) {
   const url = `${BASE}/${id}`;
-  return apiInstance.get(url)
+  return apiInstance
+    .get(url)
     .then((res) => res)
     .catch((err) => {
       throw err;
@@ -49,7 +54,8 @@ export function getEvent(id) {
 
 export function getEventPolls(id) {
   const url = `${BASE}/${id}/polls`;
-  return apiInstance.get(url)
+  return apiInstance
+    .get(url)
     .then((res) => res)
     .catch((err) => {
       throw err;
@@ -57,8 +63,19 @@ export function getEventPolls(id) {
 }
 
 export function joinEvent(id) {
-  const url = `${BASE}/${id}/members`;
-  return apiInstance.post(url)
+  const url = `${BASE}/${id}/join`;
+  return apiInstance
+    .post(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function leaveEvent(id) {
+  const url = `${BASE}/${id}/leave`;
+  return apiInstance
+    .post(url)
     .then((res) => res)
     .catch((err) => {
       throw err;
