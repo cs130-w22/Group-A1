@@ -29,3 +29,21 @@ export function sendEventInvite(eventId, recipientUsername) {
       throw err;
     });
 }
+
+export function acceptEventInvite(inviteId) {
+  const url = `/invite/${inviteId}/accept`;
+  return apiInstance.post(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function declineEventInvite(inviteId) {
+  const url = `/invite/${inviteId}/decline`;
+  return apiInstance.post(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
