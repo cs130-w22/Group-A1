@@ -127,14 +127,16 @@ function EventList (props)
                   Where: {}
                 </Col>
               </Row>
-              <Button 
-                varient="btn btn-outline-secondary"
-                onClick={() => 
-                    setEditingData(event)
-                }
-              >
-                  edit
-              </Button>
+              {isOwned &&
+                <Button 
+                  varient="btn btn-outline-secondary"
+                  onClick={() => 
+                      setEditingData(event)
+                  }
+                >
+                    edit
+                </Button>
+              }
             </div>
           </Card>
         </div>
