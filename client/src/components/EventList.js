@@ -34,6 +34,8 @@ function EventList (props)
   const [sortItem, setSortItem] = useState('');
   const [pressed,setPressed] = useState(false);
   const [dropped,setDropped] = useState(false);
+
+  let isGoing = JSON.parse(localStorage.getItem('test'))
   
   //gets the name of the event/progile owner
   const ownerName = props.props;
@@ -49,6 +51,7 @@ function EventList (props)
       setErrorMsg('Error fetching Events, please try again later!');
     });
 }, [user]);
+
 
   //handles the alphabetical sorting
   console.log()
@@ -75,10 +78,10 @@ function EventList (props)
     //this part is just to show filtering works
     //can be changed when we have going/notgoing function added
     if(sortItem === 'going')
-    {events =  ownedEvents.filter((item)=>item.name.includes("1"));}
+    {events =  ownedEvents.filter(()=>isGoing);}
     //notgoing
     if(sortItem === 'notGoing')
-    {events =  ownedEvents.filter((item)=>item.name.includes("t"));}
+    {events =  ownedEvents.filter(()=>!isGoing);}
     //when none of the option is selected  display all the events
     if(sortItem === '' )
     {events =  [ownedEvents,memberedEvents];}

@@ -78,7 +78,7 @@ function EventPage() {
         setErrorMsg(err.response.data);
       });
   };
-
+  localStorage.setItem("going", JSON.stringify(isMember));
   const contextProvider = useMemo(
     () => ({ readOnly: !isMember, eventId: id }),
     [isMember, id],
