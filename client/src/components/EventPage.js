@@ -1,5 +1,9 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { Col, Container, Row, Alert, Button, Modal } from 'react-bootstrap';
+import React, {
+  useContext, useEffect, useMemo, useState,
+} from 'react';
+import {
+  Col, Container, Row, Alert, Button, Modal,
+} from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
@@ -166,16 +170,23 @@ function EventPage() {
               </span>
               <h2 className="fs-3 fw-bold mt-1 mb-1">{data?.name}</h2>
               <span className="text-muted">
-                Hosted by {data?.owner?.username}
+                Hosted by
+                {' '}
+                {data?.owner?.username}
               </span>
               <p className="mt-3">{data?.description}</p>
-              <AvailabilitySection />
+              <AvailabilitySection
+                dates={data?.dates}
+                timeEarliest={data?.timeEarliest}
+                timeLatest={data?.timeLatest}
+              />
               <PollSection />
               <hr className="mt-4" />
               <p className="mt-3 fs-6 text-muted">
-                Created on{' '}
-                {data?.createdAt &&
-                  format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
+                Created on
+                {' '}
+                {data?.createdAt
+                  && format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
               </p>
             </Col>
             <Col>

@@ -10,6 +10,6 @@ cd ../server && npx eslint *.js --fix
 cd ..
 echo "Done."
 
-npx lint-staged
+# npx lint-staged
 
 npm test

@@ -110,7 +110,7 @@ function Poll({
   return (
     <>
       {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-      <Card id={pollId} className="border py-4 px-4 mb-3">
+      <Card id={pollId} key={pollId} className="border py-4 px-4 mb-3">
         {!editMode && (
 
           <h3 className="fs-5 mb-0 fw-bold">{pollTitle}</h3>

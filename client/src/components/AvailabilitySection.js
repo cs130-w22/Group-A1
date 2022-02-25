@@ -1,12 +1,15 @@
-import React, {useContext, useEffect, useRef, useState, createRef} from 'react';
-import {Col, Row} from 'react-bootstrap';
-import Selecto from 'selecto';
-import styled from 'styled-components';
-import {EventContext} from '../utils/context';
-import {Schedule, ScheduleTime, SelectBox} from './styled/availability.styled';
-import {SectionTitle} from './styled/headers';
+import { format, parseISO } from 'date-fns';
+import React, {
+  useContext, useEffect, useState, createRef,
+} from 'react';
+import { Col, Row } from 'react-bootstrap';
+import { EventContext } from '../utils/context';
+import { Schedule, ScheduleTime, SelectBox } from './styled/availability.styled';
+import { SectionTitle } from './styled/headers';
 
-function TimeSelectBlock({hour, selected, selecting, append, innerRef}) {
+function TimeSelectBlock({
+  hour, selected, selecting, append, innerRef, x,
+}) {
   const [selectedClass, setSelectedClass] = useState();
   useEffect(() => {
     if (append && (selecting || selected)) setSelectedClass('selected');
@@ -15,37 +18,32 @@ function TimeSelectBlock({hour, selected, selecting, append, innerRef}) {
         setSelectedClass('selected');
       } else setSelectedClass('');
     } else setSelectedClass('');
-  }, [selecting, selected, setSelectedClass]);
-  return <Schedule ref={innerRef} className={`mt-2 ${selectedClass}`} />;
+  }, [selecting, selected, setSelectedClass, append]);
+  return <Schedule ref={innerRef} className={`mt-1 ${selectedClass}`} />;
 }
 
 // referenced from https://github.com/pablofierro/react-drag-select/blob/master/lib/Selection.js
 function intersects(a, b) {
   if (
-    a.left <= b.left + b.width &&
-    a.left + a.width >= b.left &&
-    a.top <= b.top + b.height &&
-    a.top + a.height >= b.top
+    a.left <= b.left + b.width
+    && a.left + a.width >= b.left
+    && a.top <= b.top + b.height
+    && a.top + a.height >= b.top
   ) {
     return true;
   }
   return false;
 }
 
-function Selector({children}) {
+function Selector({ dates, timeEarliest, timeLatest }) {
   const [mouseDown, setMouseDown] = useState(false);
-  const containerRef = createRef();
   const [start, setStart] = useState();
-  const [end, setEnd] = useState();
   const [append, setAppend] = useState(null);
   const [selected, setSelected] = useState([]);
   const [selection, setSelection] = useState({});
   const [tempSelecting, setTempSelecting] = useState([]);
   const [selecting, setSelecting] = useState([]);
   const selectableItems = new Map();
-
-  const blocks = [1, 2, 3];
-  const days = 7;
 
   const updateSelection = (ref, e) => {
     const left = Math.min(ref.x, e.pageX);
@@ -61,37 +59,21 @@ function Selector({children}) {
   };
 
   const downRef = React.useRef(mouseDown);
-  const setDownRef = data => {
+  const setDownRef = (data) => {
     downRef.current = data;
     setMouseDown(data);
   };
 
   const startRef = React.useRef(start);
-  const setStartRef = data => {
+  const setStartRef = (data) => {
     startRef.current = data;
     setStart(data);
   };
 
-  const endRef = React.useRef(end);
-  const setEndRef = data => {
-    endRef.current = data;
-    setEnd(data);
-  };
-
-  const onMouseMove = e => {
+  const onMouseMove = (e) => {
     if (!downRef.current) return;
     e.preventDefault();
-    setEndRef({x: e.pageX, y: e.pageY});
-    const left = Math.min(startRef.current.x, e.pageX);
-    const top = Math.min(startRef.current.y, e.pageY);
-    const width = Math.abs(startRef.current.x - e.pageX);
-    const height = Math.abs(startRef.current.y - e.pageY);
-    setSelection({
-      left,
-      top,
-      width,
-      height,
-    });
+    updateSelection(startRef.current, e);
   };
 
   useEffect(() => {
@@ -105,7 +87,6 @@ function Selector({children}) {
           width: value.current.offsetWidth,
           height: value.current.offsetHeight,
         };
-        // console.log(itemCoords);
         if (intersects(itemCoords, selection)) {
           temp.add(key);
         } else temp.delete(key);
@@ -121,9 +102,8 @@ function Selector({children}) {
   // set final selected values
   useEffect(() => {
     const temp = new Set(selected);
-    tempSelecting.forEach(item => {
+    tempSelecting.forEach((item) => {
       if (append && !temp.has(item)) {
-        console.log('appending');
         temp.add(item);
       } else if (!append && temp.has(item)) temp.delete(item);
     });
@@ -132,12 +112,9 @@ function Selector({children}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tempSelecting]);
 
-  const disableSelect = e => e.preventDefault();
-
-  const onMouseUp = e => {
+  const onMouseUp = (e) => {
     if (downRef.current) {
       setDownRef(false);
-      setEndRef({x: e.pageX, y: e.pageY});
       setSelection({
         left: 0,
         top: 0,
@@ -145,101 +122,104 @@ function Selector({children}) {
         height: 0,
       });
       setSelecting([]);
-      setEndRef(null);
       setStartRef(null);
       window.document.removeEventListener('mousemove', onMouseMove);
       window.document.removeEventListener('mouseup', onMouseUp);
-      window.document.removeEventListener('selectstart', disableSelect);
     }
   };
 
-  const onMouseDown = async e => {
-    // TODO check if already selected and setMode('append') otherwise
+  const onMouseDown = async (e) => {
     setDownRef(true);
-    setStartRef({x: e.pageX, y: e.pageY});
-    setEndRef({x: e.pageX, y: e.pageY});
+    setStartRef({ x: e.pageX, y: e.pageY });
     updateSelection(startRef.current, e);
     window.document.addEventListener('mousemove', onMouseMove);
     window.document.addEventListener('mouseup', onMouseUp);
-    window.document.addEventListener('selectstart', disableSelect);
   };
 
-  const cols = [];
-  const hours = Array.from(Array(24).keys());
-  for (let i = 0; i < days; i += 1) {
-    const col = [];
-
-    console.log(hours);
-    hours.forEach(h => {
-      const r = createRef();
-      const key = `${i}${h}`;
-      selectableItems.set(key, r);
-      col.push({
-        key,
-        day: i,
-        hour: h,
-        ref: r,
-      });
-    });
-    cols.push(col);
+  const rows = [];
+  const earliest = Math.max(0, timeEarliest);
+  const range = (rangeStart, rangeStop, step) => Array.from(
+    { length: (rangeStop - rangeStart) / step + 1 },
+    (_, i) => `${rangeStart + (i * step)}:00`,
+  );
+  const hours = range(earliest, timeLatest, 1);
+  for (let i = 0; i < dates.length; i += 7) {
+    const cols = [];
+    for (let j = i; j < i + 7 && j < dates.length; j += 1) {
+      const date = parseISO(dates[j]);
+      const col = [];
+      for (let h = earliest; h <= timeLatest; h += 1) {
+        const r = createRef();
+        const key = `${j}.${h}`;
+        selectableItems.set(key, r);
+        col.push({
+          key,
+          day: date,
+          hour: h,
+          ref: r,
+        });
+      }
+      cols.push({ date, col });
+    }
+    rows.push(cols);
   }
-
-  useEffect(() => {
-    if (append) console.log('Select mode');
-    else if (append === false) console.log('Deselect mode');
-  }, [append]);
 
   return (
     <>
       {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-      <div id="select-container" ref={containerRef} onMouseDown={onMouseDown}>
-        <Row>
-          <Col xs={1} />
-          {cols.map(col => (
-            <Col>
-              <div className="d-flex justify-content-center align-items-center me-2">Monday</div>
-            </Col>
-          ))}
-        </Row>
-        <Row>
-          <Col xs={1}>
-            {hours.map(h => (
-              <Row>
-                <ScheduleTime className="mt-2 d-flex justify-content-center align-items-center text-center w-100">
-                  {h}
-                </ScheduleTime>
-              </Row>
-            ))}
-          </Col>
-          {cols.map(col => (
-            <Col>
-              {col.map(time => (
-                <Row>
-                  <TimeSelectBlock
-                    hour={time.hour}
-                    key={time.key}
-                    innerRef={time.ref}
-                    append={append}
-                    selected={selected.includes(time.key)}
-                    selecting={selecting.includes(time.key)}
-                  />
-                </Row>
+      <div id="select-container" onMouseDown={onMouseDown}>
+        {rows.map((row) => (
+          <>
+            <Row>
+              <Col xs={1} />
+              {row.map((col) => (
+                <Col className="fw-bold text-secondary me-2">
+                  <div className="d-flex justify-content-center align-items-center no-select">{format(col.date, 'ccc MM/dd')}</div>
+                </Col>
               ))}
-            </Col>
-          ))}
-        </Row>
+            </Row>
+            <Row className="mb-5">
+              <Col xs={1}>
+                {hours.map((h) => (
+                  <Row>
+                    <ScheduleTime className="mt-1 d-flex justify-content-center align-items-center text-center w-100">
+                      {h}
+                    </ScheduleTime>
+                  </Row>
+                ))}
+              </Col>
+              {row.map((col) => (
+                <Col className="me-2">
+                  {col.col.map((time) => (
+                    <Row>
+                      <TimeSelectBlock
+                        hour={time.hour}
+                        key={time.key}
+                        x={time.key}
+                        innerRef={time.ref}
+                        append={append}
+                        selected={selected.includes(time.key)}
+                        selecting={selecting.includes(time.key)}
+                      />
+                    </Row>
+                  ))}
+                </Col>
+              ))}
+            </Row>
+          </>
+        ))}
       </div>
       <SelectBox style={selection} />
     </>
   );
 }
-function AvailabilitySection() {
-  const {eventId, readOnly} = useContext(EventContext);
+function AvailabilitySection({ dates, timeEarliest, timeLatest }) {
+  const { eventId, readOnly } = useContext(EventContext);
   return (
     <div>
       <SectionTitle className="mt-5">Availability ⏰</SectionTitle>
-      <p>Availability picker goes here</p>
-      <Selector />
+      {!readOnly ? <Selector dates={dates} timeEarliest={timeEarliest} timeLatest={timeLatest} />
+        : (<p>You must be a member of this event to select your availability.</p>)}
     </div>
   );
 }
