@@ -19,6 +19,7 @@ function Create() {
   const [description, setDescription] = useState('');
   const [timeZone, setTimeZone] = useState();
   const hoursInDay = Array.from({ length: 24 }, (x, i) => i);
+  const [dateError, setDateError] = useState();
 
   const hoursDisplayFormat = (hour) => {
     if (hour % 24 === 0) return '12:00 AM';
@@ -33,6 +34,9 @@ function Create() {
   } = useForm();
 
   const onSubmit = (data) => {
+    if (dates == null || dates.length === 0) {
+      return setDateError('Please select at least one date');
+    }
     const body = {
       name: data.eventName,
       description,
@@ -41,6 +45,7 @@ function Create() {
       dates,
       timeZone,
     };
+    setDateError(null);
     return createEvent(body)
       .then((res) => {
         navigate(`/event/${res.data}`);
@@ -56,16 +61,22 @@ function Create() {
           setUser(null);
           navigate('/login');
         } else {
-          const validationErrors = error.data?.errors;
+          const validationErrors = error.response.data?.errors;
           if (validationErrors?.length > 0) {
+            console.log(validationErrors);
             for (let i = 0; i < validationErrors.length; i += 1) {
               const errorParam = validationErrors[i].param;
               const errorMsg = validationErrors[i].msg;
-              setError(
-                errorParam,
-                { type: 'api', message: errorMsg },
-                { shouldFocus: true },
-              );
+              if (errorParam === 'dates') {
+                console.log('wat');
+                setDateError(errorMsg);
+              } else {
+                setError(
+                  errorParam,
+                  { type: 'api', message: errorMsg },
+                  { shouldFocus: true },
+                );
+              }
             }
           }
         }
@@ -76,6 +87,7 @@ function Create() {
     <div>
       {errors.form && <Alert variant="danger">{errors.form}</Alert>}
       <h2 className="mb-3">Create Event</h2>
+
       <Calendar
         value={dates}
         onChange={setDates}
@@ -85,6 +97,7 @@ function Create() {
         calendarPosition="bottom-center"
         plugins={[<DatePanel />]}
       />
+      {dateError !== null && <p className="text-danger mb-1 mt-1">{dateError}</p>}
       <br />
       <Form className="w-50" onSubmit={handleSubmit(onSubmit)}>
         <Form.Group controlId="formName" className="mb-3">

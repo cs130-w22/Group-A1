@@ -13,15 +13,15 @@ const inviteRouter = require('./routes/invite');
 
 // app setup
 
-const createServer = middleware => {
+const createServer = (middleware) => {
   const app = express();
   app.use(cors());
   app.use(express.json());
-  app.use(express.urlencoded({extended: true}));
+  app.use(express.urlencoded({ extended: true }));
 
   // other middleware
   if (middleware != null && Array.isArray(middleware)) {
-    middleware.forEach(m => app.use(m));
+    middleware.forEach((m) => app.use(m));
   }
 
   // routes
