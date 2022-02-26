@@ -3,7 +3,8 @@ import React, {
   useContext, useEffect, useState, createRef,
 } from 'react';
 import { Col, Row } from 'react-bootstrap';
-import { EventContext } from '../utils/context';
+import { changeAvailability, getAvailability, getUserAvailability } from '../api/event';
+import { EventContext, UserContext } from '../utils/context';
 import { Schedule, ScheduleTime, SelectBox } from './styled/availability.styled';
 import { SectionTitle } from './styled/headers';
 
@@ -36,14 +37,30 @@ function intersects(a, b) {
 }
 
 function Selector({ dates, timeEarliest, timeLatest }) {
+  const { eventId } = useContext(EventContext);
+  const { user } = useContext(UserContext);
   const [mouseDown, setMouseDown] = useState(false);
   const [start, setStart] = useState();
   const [append, setAppend] = useState(null);
+  const [origSelected, setOrigSelected] = useState([]);
   const [selected, setSelected] = useState([]);
   const [selection, setSelection] = useState({});
   const [tempSelecting, setTempSelecting] = useState([]);
   const [selecting, setSelecting] = useState([]);
+  const [blocks, setBlocks] = useState([]);
   const selectableItems = new Map();
+
+  // get original availability
+  useEffect(() => {
+    getAvailability(eventId, user.userId).then((res) => {
+      console.log('beep');
+      setBlocks(res.data);
+      console.log(res.data);
+      res.data.forEach((s) => {
+        console.log(s._id);
+      });
+    });
+  }, [eventId, user]);
 
   const updateSelection = (ref, e) => {
     const left = Math.min(ref.x, e.pageX);
@@ -112,6 +129,15 @@ function Selector({ dates, timeEarliest, timeLatest }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tempSelecting]);
 
+  useEffect(() => {
+    if (origSelected.length === 0 && selected.length === 0) return;
+    const deselect = origSelected.filter((s) => !selected.includes(s));
+    const select = selected.filter((s) => !origSelected.includes(s));
+    changeAvailability(eventId, select, deselect).then((res) => {
+      console.log('yay');
+    }).catch((err) => console.log(err));
+  }, [selected]);
+
   const onMouseUp = (e) => {
     if (downRef.current) {
       setDownRef(false);
@@ -136,39 +162,39 @@ function Selector({ dates, timeEarliest, timeLatest }) {
     window.document.addEventListener('mouseup', onMouseUp);
   };
 
-  const rows = [];
-  const earliest = Math.max(0, timeEarliest);
-  const range = (rangeStart, rangeStop, step) => Array.from(
-    { length: (rangeStop - rangeStart) / step + 1 },
-    (_, i) => `${rangeStart + (i * step)}:00`,
-  );
-  const hours = range(earliest, timeLatest, 1);
-  for (let i = 0; i < dates.length; i += 7) {
-    const cols = [];
-    for (let j = i; j < i + 7 && j < dates.length; j += 1) {
-      const date = parseISO(dates[j]);
-      const col = [];
-      for (let h = earliest; h <= timeLatest; h += 1) {
-        const r = createRef();
-        const key = `${j}.${h}`;
-        selectableItems.set(key, r);
-        col.push({
-          key,
-          day: date,
-          hour: h,
-          ref: r,
-        });
-      }
-      cols.push({ date, col });
-    }
-    rows.push(cols);
-  }
+  // const rows = [];
+  // const earliest = Math.max(0, timeEarliest);
+  // const range = (rangeStart, rangeStop, step) => Array.from(
+  //   { length: (rangeStop - rangeStart) / step + 1 },
+  //   (_, i) => `${rangeStart + (i * step)}:00`,
+  // );
+  // const hours = range(earliest, timeLatest, 1);
+  // for (let i = 0; i < dates.length; i += 7) {
+  //   const cols = [];
+  //   for (let j = i; j < i + 7 && j < dates.length; j += 1) {
+  //     const date = parseISO(dates[j]);
+  //     const col = [];
+  //     for (let h = earliest; h <= timeLatest; h += 1) {
+  //       const r = createRef();
+  //       const key = `${j}.${h}`;
+  //       selectableItems.set(key, r);
+  //       col.push({
+  //         key,
+  //         day: date,
+  //         hour: h,
+  //         ref: r,
+  //       });
+  //     }
+  //     cols.push({ date, col });
+  //   }
+  //   rows.push(cols);
+  // }
 
   return (
     <>
       {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
       <div id="select-container" onMouseDown={onMouseDown}>
-        {rows.map((row) => (
+        {/* {rows.map((row) => (
           <>
             <Row>
               <Col xs={1} />
@@ -207,7 +233,7 @@ function Selector({ dates, timeEarliest, timeLatest }) {
               ))}
             </Row>
           </>
-        ))}
+        ))} */}
       </div>
       <SelectBox style={selection} />
     </>

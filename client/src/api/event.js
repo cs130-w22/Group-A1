@@ -51,3 +51,34 @@ export function leaveEvent(id) {
       throw err;
     });
 }
+
+export function getAvailability(id) {
+  const url = `${BASE}/${id}/availability`;
+  return apiInstance
+    .get(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function getUserAvailability(id, userId) {
+  const url = `${BASE}/${id}/availability/${userId}`;
+  console.log(url);
+  return apiInstance
+    .get(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function changeAvailability(id, selected, deselected) {
+  const url = `${BASE}/${id}/availability`;
+  return apiInstance
+    .post(url, { selected, deselected })
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}

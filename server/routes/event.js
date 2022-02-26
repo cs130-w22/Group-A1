@@ -5,6 +5,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const { ObjectId } = require('mongodb');
 const { isValidObjectId } = require('mongoose');
+const mongoose = require('mongoose');
 const Availability = require('../models/availability');
 const Event = require('../models/event');
 const { EventInvite } = require('../models/invite');
@@ -56,6 +57,19 @@ router.post(
   },
 );
 
+// get event availability
+router.get('/:id/availability/', async (req, res) => {
+  if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
+  try {
+    const agg = await Availability.find({ event: req.params.id });
+    console.log(agg);
+    return res.send(agg);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
 router.get('/:id', (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   Event.findById(req.params.id)
@@ -84,44 +98,48 @@ router.get('/:id/polls', (req, res) => {
     });
 });
 
-// get event availability
-router.get('/:id/availability/', (req, res) => {
-  if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
-  Availability.find({
-    event: req.params.id,
-  })
-    .then((result) => {
-      if (result == null) res.sendStatus(404);
-      else res.send(result);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
-    });
-});
-
 // get event availability for user
 router.get('/:id/availability/:userId', async (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   if (!isValidObjectId(req.params.userId)) return res.sendStatus(400);
   try {
-    const avail = await Availability.find({
-      event: req.params.id,
-      users: req.session.userId,
-    }, 'time');
-    return res.send(avail);
+    const agg = await Availability.aggregate([
+      {
+        $match: {
+          event: mongoose.Types.ObjectId(req.params.id),
+          users: ObjectId(req.params.userId),
+        },
+      },
+      {
+        $project:
+        {
+          hour: { $hour: '$time' },
+          day: { $dayOfYear: '$time' },
+        },
+      },
+      {
+        $group: {
+          _id: '$day',
+          hours: { $push: '$hour' },
+        },
+      },
+    ]);
+    // console.log(avail);
+    return res.send(agg);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
   }
 });
 
+// set availability
 router.post('/:id/availability/', async (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   const { userId } = req.session;
   try {
     const { selected, deselected } = req.body;
-    await Availability.updateMany(
+    console.log(selected);
+    const selectedUpdate = await Availability.updateMany(
       {
         event: req.params.id,
         _id: {
@@ -130,6 +148,7 @@ router.post('/:id/availability/', async (req, res) => {
       },
       { $push: { users: userId } },
     );
+    console.log(selectedUpdate);
     await Availability.updateMany(
       {
         event: req.params.id,
