@@ -8,7 +8,7 @@ import Selector from './Selector';
 import { SectionTitle } from './styled/headers';
 import Availability from './Availability';
 
-function AvailabilitySection({ timeEarliest, timeLatest }) {
+function AvailabilitySection({ members, timeEarliest, timeLatest }) {
   const { readOnly } = useContext(EventContext);
   const [view, setView] = useState('view');
   const handleSelect = (e) => {
@@ -17,13 +17,13 @@ function AvailabilitySection({ timeEarliest, timeLatest }) {
 
   const viewMode = () => (
     <div style={{ display: view !== 'view' ? 'none' : 'inherit' }}>
-      <Availability timeEarliest={timeEarliest} timeLatest={timeLatest} />
+      <Availability timeEarliest={timeEarliest} timeLatest={timeLatest} members={members} />
     </div>
   );
   const editMode = () => (
     <div style={{ display: view === 'view' ? 'none' : 'inherit' }}>
       <Selector timeEarliest={timeEarliest} timeLatest={timeLatest} />
-      <p>You must be a member of this event to select your availability.</p>
+      {readOnly && <p>You must be a member of this event to select your availability.</p>}
     </div>
   );
   return (
@@ -49,11 +49,13 @@ function AvailabilitySection({ timeEarliest, timeLatest }) {
 }
 
 AvailabilitySection.propTypes = {
+  members: PropTypes.arrayOf(PropTypes.object),
   timeEarliest: PropTypes.number,
   timeLatest: PropTypes.number,
 };
 
 AvailabilitySection.defaultProps = {
+  members: [],
   timeEarliest: 0,
   timeLatest: 23,
 };

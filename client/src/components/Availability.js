@@ -12,7 +12,7 @@ import TimeBlock from './TimeBlock';
 
 // referenced from https://github.com/pablofierro/react-drag-select/blob/master/lib/Selection.js
 
-function Availability({ timeEarliest, timeLatest }) {
+function Availability({ timeEarliest, timeLatest, members }) {
   const { eventId } = useContext(EventContext);
   const { user } = useContext(UserContext);
   const [rows, setRows] = useState([]);
@@ -71,7 +71,6 @@ function Availability({ timeEarliest, timeLatest }) {
       {loading && <LoadingIndicator />}
       {!loading && rows.length > 0 && (
       <div>
-        hi me a placeholder
         {rows.map((row) => (
           <Row className="mb-5">
             <Col xs={1}>
@@ -94,7 +93,7 @@ function Availability({ timeEarliest, timeLatest }) {
                     hour={block.hour}
                     key={block._id}
                     users={block.users}
-                    maxUsers={5}
+                    members={members}
                   />
                 ))}
               </Col>
@@ -108,6 +107,7 @@ function Availability({ timeEarliest, timeLatest }) {
 }
 
 Availability.propTypes = {
+  members: PropTypes.arrayOf(PropTypes.object).isRequired,
   timeEarliest: PropTypes.number.isRequired,
   timeLatest: PropTypes.number.isRequired,
 };

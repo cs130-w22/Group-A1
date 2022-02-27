@@ -11,6 +11,7 @@ const Availability = require('../models/availability');
 const Event = require('../models/event');
 const { EventInvite } = require('../models/invite');
 const Poll = require('../models/poll');
+const PollOption = require('../models/pollOption');
 
 router.post(
   '/',
@@ -100,13 +101,44 @@ router.post('/:id/leave', async (req, res) => {
   try {
     const { userId } = req.session;
     if (userId == null) return res.sendStatus(401);
-    const event = await Event.findById(req.params.id);
-    if (event.members.includes(userId)) {
-      event.members.pull({ _id: userId });
-      await event.save();
-      return res.status(200).send(event);
-    }
-    return res.status(400).send("You're not a member of this event!");
+    const eventUpdate = await Event.updateMany(
+      {
+        _id: req.params.id,
+      },
+      {
+        $pull: {
+          members: userId,
+        },
+      },
+    );
+    if (eventUpdate.nModified === 0) { return res.status(400).send("You're not a member of this event!"); }
+    await Availability.updateMany(
+      {
+        event: req.params.id,
+      },
+      {
+        $pull: {
+          users: userId,
+        },
+      },
+    );
+    const polls = await Poll.find({
+      event: req.params.id,
+    });
+    polls.forEach(async (poll) => {
+      await PollOption.updateMany(
+        {
+          poll: poll._id,
+        },
+        {
+          $pull: {
+            voters: userId,
+          },
+        },
+      );
+    });
+
+    return res.sendStatus(200);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);

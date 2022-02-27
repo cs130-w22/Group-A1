@@ -176,7 +176,7 @@ function EventPage() {
               </span>
               <p className="mt-3">{data?.description}</p>
               <AvailabilitySection
-                dates={data?.dates}
+                members={members}
                 timeEarliest={data?.timeEarliest}
                 timeLatest={data?.timeLatest}
               />
