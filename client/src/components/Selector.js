@@ -58,7 +58,7 @@ function Selector({ timeEarliest, timeLatest }) {
     const selectedData = [];
     sortedTimes.forEach((time) => {
       timeblocks.push(createTimeBlock(time));
-      if (time.userList.includes(user.userId)) {
+      if (time.userList.find((u) => u._id === user.userId)) {
         selectedData.push(time._id);
       }
     });
@@ -199,46 +199,14 @@ function Selector({ timeEarliest, timeLatest }) {
     window.document.addEventListener('mouseup', onMouseUp);
   };
 
-  // const rows = [];
+  // TODO move this together
   const earliest = Math.max(0, timeEarliest);
   const range = (rangeStart, rangeStop, step) => Array.from(
     { length: (rangeStop - rangeStart) / step + 1 },
     (_, i) => `${rangeStart + (i * step)}:00`,
   );
-
-  // useEffect(()=>{
-  //   rows.map((row) => {
-  //     row.map((day) => {
-  //       Array.from(day.timeblocks.keys()).map(key => {
-  //         console.log(key);
-  //       });
-  //     })
-  //   })
-  // })
   const hours = range(earliest, timeLatest, 1);
-  // for (let i = 0; i < dates.length; i += 7) {
-  //   const cols = [];
-  //   for (let j = i; j < i + 7 && j < dates.length; j += 1) {
-  //     const date = parseISO(dates[j]);
-  //     const col = [];
-  //     for (let h = earliest; h <= timeLatest; h += 1) {
-  //       const r = createRef();
-  //       const key = `${j}.${h}`;
-  //       selectableItems.set(key, r);
-  //       col.push({
-  //         key,
-  //         day: date,
-  //         hour: h,
-  //         ref: r,
-  //       });
-  //     }
-  //     cols.push({ date, col });
-  //   }
-  //   rows.push(cols);
-  // }
-  useEffect(() => {
-    console.log(rows);
-  }, [rows]);
+
   return (
     <>
       {loading && <LoadingIndicator />}
