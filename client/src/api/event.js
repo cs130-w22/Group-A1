@@ -74,7 +74,8 @@ export function getUserAvailability(id, userId) {
 }
 
 export function changeAvailability(id, selected, deselected) {
-  const url = `${BASE}/${id}/availability`;
+  const url = `${BASE}/${id}/availability/update`;
+
   return apiInstance
     .post(url, { selected, deselected })
     .then((res) => res)
