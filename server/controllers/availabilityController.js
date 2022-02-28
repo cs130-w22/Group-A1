@@ -36,7 +36,10 @@ exports.getAvailability = async (req, res) => {
   try {
     // initialize availability if uninitialized/incorrect format
     const event = await Event.findById(req.params.id);
-    if (event.blocks == null) { this.initializeAvailability(event); }
+    if (event.blocks == null || event.blocks.length === 0) {
+      console.log('initializing');
+      await this.initializeAvailability(event);
+    }
     const agg = await Availability.aggregate([
       { $match: { event: ObjectId(req.params.id) } },
       {
