@@ -75,6 +75,7 @@ function EventPage() {
     joinEvent(id)
       .then(() => {
         setIsMember(true);
+        //localStorage.setItem('going', JSON.stringify(isMember));
         const updatedInvites = invited.filter(
           (invite) => invite._id !== user.userId,
         );
