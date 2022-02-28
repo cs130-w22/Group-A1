@@ -1,20 +1,18 @@
 import { format, parse } from 'date-fns';
 import React, {
-  useContext, useEffect, useState, createRef,
+  useEffect, useState,
 } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { changeAvailability, getAvailability } from '../api/event';
-import { EventContext, UserContext } from '../utils/context';
 import LoadingIndicator from './LoadingIndicator';
-import { ScheduleTime, SelectBox } from './styled/availability.styled';
+import { ScheduleTime } from './styled/availability.styled';
 import TimeBlock from './TimeBlock';
 
 // referenced from https://github.com/pablofierro/react-drag-select/blob/master/lib/Selection.js
 
-function Availability({ timeEarliest, timeLatest, members }) {
-  const { eventId } = useContext(EventContext);
-  const { user } = useContext(UserContext);
+function Availability({
+  availability, timeEarliest, timeLatest, members,
+}) {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,26 +36,26 @@ function Availability({ timeEarliest, timeLatest, members }) {
   // get original availability
   useEffect(() => {
     setLoading(true);
-    getAvailability(eventId, user.userId).then((res) => {
-      let days = [];
-      res.data.forEach((day) => {
-        const d = createDayBlock(day);
-        days.push(d);
-      });
-      days = days.sort((a, b) => a.day - b.day);
-      const tempRows = [];
-      for (let i = 0; i < days.length; i += 7) {
-        const d = [];
-        for (let j = i; j < i + 7 && j < days.length; j += 1) {
-          d.push(days[j]);
-        }
-        tempRows.push(d);
-      }
-      setRows(tempRows);
-      setLoading(false);
+
+    let days = [];
+    availability.forEach((day) => {
+      const d = createDayBlock(day);
+      days.push(d);
     });
+    days = days.sort((a, b) => a.day - b.day);
+    const tempRows = [];
+    for (let i = 0; i < days.length; i += 7) {
+      const d = [];
+      for (let j = i; j < i + 7 && j < days.length; j += 1) {
+        d.push(days[j]);
+      }
+      tempRows.push(d);
+    }
+    setRows(tempRows);
+    setLoading(false);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventId, user]);
+  }, [availability]);
 
   const earliest = Math.max(0, timeEarliest);
   const range = (rangeStart, rangeStop, step) => Array.from(
@@ -107,6 +105,7 @@ function Availability({ timeEarliest, timeLatest, members }) {
 }
 
 Availability.propTypes = {
+  availability: PropTypes.arrayOf(PropTypes.object).isRequired,
   members: PropTypes.arrayOf(PropTypes.object).isRequired,
   timeEarliest: PropTypes.number.isRequired,
   timeLatest: PropTypes.number.isRequired,

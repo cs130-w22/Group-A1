@@ -4,7 +4,7 @@ import React, {
 } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { changeAvailability, getAvailability } from '../api/event';
+import { changeAvailability } from '../api/event';
 import { EventContext, UserContext } from '../utils/context';
 import LoadingIndicator from './LoadingIndicator';
 import { ScheduleTime, SelectBox } from './styled/availability.styled';
@@ -20,7 +20,9 @@ function intersects(a, b) {
   }
   return false;
 }
-function Selector({ timeEarliest, timeLatest }) {
+function Selector({
+  availability, timeEarliest, timeLatest, onSelect,
+}) {
   const { eventId } = useContext(EventContext);
   const { user } = useContext(UserContext);
 
@@ -72,31 +74,28 @@ function Selector({ timeEarliest, timeLatest }) {
   };
   // get original availability
   useEffect(() => {
-    console.log('Grabbing original data');
+    let days = [];
     setLoading(true);
-    getAvailability(eventId, user.userId).then((res) => {
-      let days = [];
-      const selectedData = [];
-      res.data.forEach((day) => {
-        const d = createDayBlock(day);
-        selectedData.push(...d.selectedData);
-        days.push(d.block);
-      });
-      setSelected(selectedData);
-      days = days.sort((a, b) => a.day - b.day);
-      const tempRows = [];
-      for (let i = 0; i < days.length; i += 7) {
-        const d = [];
-        for (let j = i; j < i + 7 && j < days.length; j += 1) {
-          d.push(days[j]);
-        }
-        tempRows.push(d);
-      }
-      setRows(tempRows);
-      setLoading(false);
+    const selectedData = [];
+    availability.forEach((day) => {
+      const d = createDayBlock(day);
+      selectedData.push(...d.selectedData);
+      days.push(d.block);
     });
+    setSelected(selectedData);
+    days = days.sort((a, b) => a.day - b.day);
+    const tempRows = [];
+    for (let i = 0; i < days.length; i += 7) {
+      const d = [];
+      for (let j = i; j < i + 7 && j < days.length; j += 1) {
+        d.push(days[j]);
+      }
+      tempRows.push(d);
+    }
+    setRows(tempRows);
+    setLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventId, user]);
+  }, [availability]);
 
   const updateSelection = (ref, e) => {
     const left = Math.min(ref.x, e.pageX);
@@ -170,6 +169,7 @@ function Selector({ timeEarliest, timeLatest }) {
     setAppend(null);
     if (select.length > 0 || deselect.length > 0) {
       changeAvailability(eventId, select, deselect).then(() => {
+        onSelect();
       }).catch((err) => console.log(err));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -254,6 +254,8 @@ function Selector({ timeEarliest, timeLatest }) {
 }
 
 Selector.propTypes = {
+  onSelect: PropTypes.func.isRequired,
+  availability: PropTypes.arrayOf(PropTypes.object).isRequired,
   timeEarliest: PropTypes.number.isRequired,
   timeLatest: PropTypes.number.isRequired,
 };
