@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Alert, Button, Dropdown, Form,
 } from 'react-bootstrap';
@@ -9,9 +9,10 @@ import { useNavigate } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
 import { createEvent } from '../api/event';
 import { UserContext } from '../utils/context';
+import { TITLE } from '../assets/constants';
 
 function Create() {
-  const { user, setUser } = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [dates, setDates] = useState();
   const [earlistTime, setEarliestTime] = useState(-1);
@@ -20,6 +21,10 @@ function Create() {
   const [timeZone, setTimeZone] = useState();
   const hoursInDay = Array.from({ length: 24 }, (x, i) => i);
   const [dateError, setDateError] = useState();
+
+  useEffect(() => {
+    document.title = `${TITLE} - create`;
+  }, []);
 
   const hoursDisplayFormat = (hour) => {
     if (hour % 24 === 0) return '12:00 AM';

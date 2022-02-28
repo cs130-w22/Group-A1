@@ -3,6 +3,7 @@ import { Button, Row, Col } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getUser } from '../api/users';
+import { TITLE } from '../assets/constants';
 import { UserContext } from '../utils/context';
 import InviteList from './InviteList';
 
@@ -10,6 +11,10 @@ function Home() {
   const { user, setUser } = useContext(UserContext);
   const [data, setData] = useState();
   const [loading, setLoading] = useState();
+
+  useEffect(() => {
+    document.title = `${TITLE}`;
+  }, []);
   useEffect(() => {
     setLoading(true);
     if (user?.userId) {
@@ -37,8 +42,14 @@ function Home() {
           <Row>
             <Col xs={7}>
               <h2 className="fs-3">
-                Hi <span className="fw-bold">{user.username}!</span>
-              </h2>{' '}
+                Hi
+                {' '}
+                <span className="fw-bold">
+                  {user.username}
+                  !
+                </span>
+              </h2>
+              {' '}
               <LinkContainer to="/event/create">
                 <Button variant="outline-primary" className="ms-1 fw-bold">
                   create event +

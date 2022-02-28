@@ -1,9 +1,11 @@
-const { ObjectId } = require('mongodb');
 const { isValidObjectId } = require('mongoose');
 const { validationResult } = require('express-validator');
-const { set } = require('date-fns');
 const Event = require('../models/event');
 const Availability = require('../models/availability');
+const { EventInvite } = require('../models/invite');
+const Poll = require('../models/poll');
+const PollOption = require('../models/pollOption');
+const { initializeAvailability } = require('./availabilityController');
 
 exports.createEvent = async (req, res) => {
   try {
@@ -29,23 +31,14 @@ exports.createEvent = async (req, res) => {
       members: [userId],
     });
 
-    req.body.dates.forEach((date) => {
-      const d = date;
-      for (let i = timeEarliest; i <= timeLatest; i += 1) {
-        const datetime = set(d, { hours: i });
-        const availability = new Availability({ event: event._id, time: datetime });
-        availability.save();
-        event.blocks.push(availability);
-      }
-    });
-    await event.save();
-    res.send(event._id);
+    await initializeAvailability(event);
+
+    res.status(201).send(event._id);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
   }
 };
-
 exports.getEvent = (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   Event.findById(req.params.id)
@@ -60,77 +53,69 @@ exports.getEvent = (req, res) => {
       res.sendStatus(500);
     });
 };
-exports.getUserAvailability = async (req, res) => {
+
+exports.joinEvent = async (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
-  if (!isValidObjectId(req.params.userId)) return res.sendStatus(400);
   try {
-    res.sendStatus(501);
+    const { userId } = req.session;
+    if (userId == null) return res.sendStatus(401);
+    const event = await Event.findById(req.params.id);
+    if (!event.members.includes(userId)) {
+      // delete any existing invite
+      await EventInvite.deleteMany({ recipient: userId, target: event._id });
+      event.members.push({ _id: userId });
+      await event.save();
+      return res.status(200).send(event);
+    }
+    return res.status(400).send("You're already a member of this event!");
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
   }
 };
-
-exports.getAvailability = async (req, res) => {
+exports.leaveEvent = async (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   try {
-    const agg = await Availability.aggregate([
+    const { userId } = req.session;
+    if (userId == null) return res.sendStatus(401);
+    const eventUpdate = await Event.updateMany(
       {
-        $match: {
-          event: ObjectId(req.params.id),
+        _id: req.params.id,
+      },
+      {
+        $pull: {
+          members: userId,
         },
       },
+    );
+    if (eventUpdate.nModified === 0) { return res.status(400).send("You're not a member of this event!"); }
+    await Availability.updateMany(
       {
-        $project:
-                {
-                  time: '$time',
-                  // TODO change these to timezone var
-                  hour: { $hour: { date: '$time', timezone: 'America/Los_Angeles' } },
-                  day: { $dayOfYear: { date: '$time', timezone: 'America/Los_Angeles' } },
-                  users: 1,
-                },
+        event: req.params.id,
       },
       {
-        $lookup: {
-          from: 'users',
-          localField: 'users',
-          foreignField: '_id',
-          as: 'users',
+        $pull: {
+          users: userId,
         },
       },
-      {
-        $set: {
-          'users.password': '$$REMOVE',
-          'users.groups': '$$REMOVE',
-          'users.email': '$$REMOVE',
-          'users.invites': '$$REMOVE',
-          __v: '$$REMOVE',
+    );
+    const polls = await Poll.find({
+      event: req.params.id,
+    });
+    polls.forEach(async (poll) => {
+      await PollOption.updateMany(
+        {
+          poll: poll._id,
         },
-      },
-      {
-        $group: {
-          _id: '$day',
-          times: {
-            $addToSet: {
-              _id: '$_id',
-              userList: '$users',
-              hour: '$hour',
-            },
+        {
+          $pull: {
+            voters: userId,
           },
-          data: { $push: '$$ROOT' },
         },
-      },
-      {
-        $addFields: { day: '$_id' },
-      },
-      {
-        $project: { _id: 0 },
-      },
-      {
-        $sort: { day: -1 },
-      },
-    ]);
-    return res.send(agg);
+      );
+    });
+
+    return res.sendStatus(200);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);

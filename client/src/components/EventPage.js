@@ -14,6 +14,7 @@ import PollSection from './PollSection';
 import { getEvent, joinEvent, leaveEvent } from '../api/event';
 import { EventMembers } from './UserList';
 import { getEventInvites } from '../api/invite';
+import { TITLE } from '../assets/constants';
 
 function EventPage() {
   const { user, setUser } = useContext(UserContext);
@@ -32,6 +33,7 @@ function EventPage() {
     getEvent(id)
       .then((res) => {
         const eventData = res.data;
+        document.title = `${TITLE} - ${eventData.name}`;
         console.log(eventData);
         setData({
           ...eventData,
