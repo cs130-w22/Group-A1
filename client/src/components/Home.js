@@ -8,6 +8,7 @@ import { UserContext } from '../utils/context';
 import EventList from './EventList';
 import EventSection from './EventSection';
 import InviteList from './InviteList';
+import Gcalender from './Gcalender';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);

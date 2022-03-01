@@ -25,8 +25,10 @@ import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import EventPage from './EventPage';
 import { bn } from 'date-fns/locale';
+import Gcalender from './Gcalender';
+import { propTypes } from 'react-bootstrap/esm/Image';
 
-function EventList(props) {
+function EventList(thisprops) {
   //const [createdEvent,setCreatedEvent] =useState(false);
   const { id } = useParams();
   const { user } = useContext(UserContext);
@@ -43,6 +45,8 @@ function EventList(props) {
   const [pressed, setPressed] = useState(false);
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingData, setEditingData] = useState();
+  const [GcalActivate, setGcalActivate] = useState(false);
+  const [calenderInfo, setCalenderInfo] = useState();
 
   //gets event information about going or not
   const saved = localStorage.getItem('going');
@@ -52,7 +56,7 @@ function EventList(props) {
   const eventdata = JSON.parse(savedEvent);
 
   //gets the name of the event/progile owner
-  const ownerName = props.props;
+  const ownerName = thisprops.props;
   //getting owned and invited events seperately from api
   useEffect(() => {
     getEventList()
@@ -98,7 +102,20 @@ function EventList(props) {
     }
   }, [editingData]);
 
+  const handleGcalender = (e) => {
+    setGcalActivate(true);
+    setCalenderInfo(e);
+  };
+
+  useEffect(() => {
+    if (calenderInfo !== undefined) {
+      setGcalActivate(() => true);
+      console.log('this is the calenderinfo ', calenderInfo);
+    }
+  }, [calenderInfo]);
+
   const displayEvents = (events, isOwned) => {
+    //let props ={event:events, GcalActivate:GcalActivate}
     //displays archived events
     if (sortItem === 'archived') {
       events = events.filter((item) => item.archived === true);
@@ -146,14 +163,28 @@ function EventList(props) {
               <Col className=" fw-bold text-secondary ">Who:</Col>
               <Col className=" fw-bold text-secondary ">Where: {}</Col>
             </Row>
-            {isOwned && (
-              <Button
-                varient="btn btn-outline-secondary"
-                onClick={() => setEditingData(event)}
-              >
-                edit
-              </Button>
-            )}
+            <hr className="bg-secondary" />
+            <Row>
+              <Col>
+                {' '}
+                {isOwned && (
+                  <Button
+                    varient="btn btn-outline-secondary"
+                    onClick={() => setEditingData(event)}
+                  >
+                    edit
+                  </Button>
+                )}
+              </Col>
+              <Col className="col-4">
+                <Button
+                  varient="btn btn-outline-secondary"
+                  onClick={() => handleGcalender(event)}
+                >
+                  add to Google
+                </Button>
+              </Col>
+            </Row>
           </div>
         </Card>
       </div>
@@ -162,35 +193,36 @@ function EventList(props) {
 
   return (
     <>
-      <div
-        variant="outline-primary"
-        className="d-flex flex-row-reverse fw-bold"
-      >
-        <select
-          variant="outline-primary"
-          onChange={(e) => setSortItem(e.target.value)}
-        >
-          <option value="">sort by</option>
-          <option value="owner"> created by me </option>
-          <option value="going"> going </option>
-          <option value="notGoing"> not going </option>
-          <option value="archived"> archived </option>
-          <option value="notArchived"> not archived </option>
-        </select>
-        <br></br>
-        <Button
-          onClick={(e) => handleSort(e.target.value)}
-          value="name"
-          variant="outline-primary"
-          size="sm"
-          className="fw-bold text-black mx-3 px-3"
-        >
-          A-Z
-        </Button>
-      </div>
       <br></br>
       <div id="all-events">
-        <h2 className="h3 fw-bold text-secondary">created events</h2>
+        <h2 className="h3 fw-bold text-secondary mt-3">created events</h2>
+        <div
+          variant="outline-primary"
+          className="d-flex flex-row-reverse fw-bold ml-auto"
+        >
+          <select
+            variant="outline-primary"
+            onChange={(e) => setSortItem(e.target.value)}
+          >
+            <option value="">sort by</option>
+            <option value="owner"> created by me </option>
+            <option value="going"> going </option>
+            <option value="notGoing"> not going </option>
+            <option value="archived"> archived </option>
+            <option value="notArchived"> not archived </option>
+          </select>
+          <br></br>
+          <Button
+            onClick={(e) => handleSort(e.target.value)}
+            value="name"
+            variant="outline-primary"
+            size="sm"
+            className="fw-bold text-black mx-3 px-3"
+          >
+            A-Z
+          </Button>
+        </div>
+
         <br />
         {displayEvents(ownedEvents, true)}
         <h2 className="h3 fw-bold text-secondary">my events</h2>
@@ -204,6 +236,16 @@ function EventList(props) {
           editName={editingData.name}
           editDescription={editingData.description}
         ></EventEdit>
+      )}
+      {GcalActivate && (
+        <Gcalender
+          showCalender={GcalActivate}
+          eventId={calenderInfo._id}
+          editName={calenderInfo.name}
+          editDescription={calenderInfo.description}
+          wholeEvent={calenderInfo}
+          eventTime={calenderInfo.dates}
+        ></Gcalender>
       )}
     </>
   );
