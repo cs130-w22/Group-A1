@@ -28,6 +28,10 @@ function Gcalender({
   const [ownedEvents, setOwnedEvents] = useState([]);
   const [memberedEvents, setMemberedEvents] = useState([]);
   const [eventList, setEventList] = useState([]);
+
+  const savedEvent = localStorage.getItem('event_data');
+  const eventdata = JSON.parse(savedEvent);
+
   var CLIENT_ID =
     '271241013760-q6dhrc67dh68h322jgp6736uv1jll2qs.apps.googleusercontent.com';
   var API_KEY = 'AIzaSyBOB_QJ5v_g5jxNiR8PEo9TEBEtSo5hL5o';
@@ -69,7 +73,16 @@ function Gcalender({
     });
     //console.log("we got the gapi")
   };
-  //has the event style and details, inserts event in the GCalender
+  //TODO: connect this to the event to show attendees
+  const attendPeople = () => {
+    return (
+      <ul>
+        {eventdata.invitees.map((person) => {
+          return <li>username:{person.email}</li>;
+        })}
+      </ul>
+    );
+  };
   const eventDetails = () => {
     var event = {
       summary: editName,
@@ -84,11 +97,10 @@ function Gcalender({
         timeZone: 'America/Los_Angeles',
       },
       //TODO:when invitees part is done, we can add those here
-      attendees: [
-        { email: 'lpage@example.com' },
-        { email: 'sbrin@example.com' },
-      ],
+
+      attendees: [attendPeople()],
     };
+
     var request = window.gapi.client.calendar.events.insert({
       calendarId: 'primary',
       resource: event,
@@ -100,6 +112,7 @@ function Gcalender({
     });
   };
   //get events from calender
+  console.log('this is the event ', attendPeople());
   return <div className="App"></div>;
 }
 export default Gcalender;

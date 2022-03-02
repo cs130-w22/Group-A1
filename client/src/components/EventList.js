@@ -160,7 +160,9 @@ function EventList(thisprops) {
               <Col className=" fw-bold text-secondary ">What: {}</Col>
             </Row>
             <Row className="fw-bold text-secondary px-4 mb-4">
-              <Col className=" fw-bold text-secondary ">Who:</Col>
+              <Col className=" fw-bold text-secondary ">
+                Who:{eventdata.coming}
+              </Col>
               <Col className=" fw-bold text-secondary ">Where: {}</Col>
             </Row>
             <hr className="bg-secondary" />

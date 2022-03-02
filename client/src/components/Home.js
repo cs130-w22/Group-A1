@@ -6,7 +6,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { getUser } from '../api/users';
 import { UserContext } from '../utils/context';
 import EventList from './EventList';
-import EventSection from './EventSection';
 import InviteList from './InviteList';
 import Gcalender from './Gcalender';
 
