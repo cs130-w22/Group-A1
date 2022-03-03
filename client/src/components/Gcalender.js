@@ -2,7 +2,7 @@
 import { joinEvent, getEvent, getEventList } from '../api/event';
 import React, { useState, useEffect, useContext } from 'react';
 import { getUser } from '../api/users';
-import { UserContext } from '../utils/context';
+import { UserContext, EventContext } from '../utils/context';
 import {
   Card,
   Row,
@@ -28,9 +28,10 @@ function Gcalender({
   const [ownedEvents, setOwnedEvents] = useState([]);
   const [memberedEvents, setMemberedEvents] = useState([]);
   const [eventList, setEventList] = useState([]);
-
+  //const { readOnly } = useContext(EventContext);
   const savedEvent = localStorage.getItem('event_data');
   const eventdata = JSON.parse(savedEvent);
+  const [isMember, setIsMember] = useState(false);
 
   var CLIENT_ID =
     '271241013760-q6dhrc67dh68h322jgp6736uv1jll2qs.apps.googleusercontent.com';
@@ -39,6 +40,7 @@ function Gcalender({
     'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest',
   ];
   const SCOPES = 'https://www.googleapis.com/auth/calendar.events';
+
   //create script for gapi
   useEffect(() => {
     const doc = document.createElement('script');
@@ -86,7 +88,7 @@ function Gcalender({
   const eventDetails = () => {
     var event = {
       summary: editName,
-      location: 'NA ',
+      location: '',
       description: editDescription,
       start: {
         dateTime: eventTime[0],

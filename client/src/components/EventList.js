@@ -15,7 +15,7 @@ import {
 } from 'react-bootstrap';
 import { joinEvent, getEvent, getEventList } from '../api/event';
 import { getUser } from '../api/users';
-import { UserContext } from '../utils/context';
+import { UserContext, EventContext } from '../utils/context';
 import { Create } from './Create';
 import EventEdit from './EventEdit';
 import PropTypes from 'prop-types';
@@ -31,15 +31,14 @@ import { propTypes } from 'react-bootstrap/esm/Image';
 function EventList(thisprops) {
   //const [createdEvent,setCreatedEvent] =useState(false);
   const { id } = useParams();
-  const { user } = useContext(UserContext);
   const [ownedEvents, setOwnedEvents] = useState([]);
   const [memberedEvents, setMemberedEvents] = useState([]);
   const [eventList, setEventList] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [event, setEvent] = useState();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [datas, setDatas] = useState([]);
+  const [IsMem, setIsMem] = useState(false);
+  const [members, setMembers] = useState([]);
   const [dataSorted, setDataSorted] = useState([]);
   const [sortItem, setSortItem] = useState('name');
   const [pressed, setPressed] = useState(false);
@@ -47,10 +46,9 @@ function EventList(thisprops) {
   const [editingData, setEditingData] = useState();
   const [GcalActivate, setGcalActivate] = useState(false);
   const [calenderInfo, setCalenderInfo] = useState();
+  const { user, setUser } = useContext(UserContext);
 
   //gets event information about going or not
-  const saved = localStorage.getItem('going');
-  const isGoing = JSON.parse(saved);
 
   const savedEvent = localStorage.getItem('event_data');
   const eventdata = JSON.parse(savedEvent);
@@ -63,6 +61,7 @@ function EventList(thisprops) {
       .then((res) => {
         setOwnedEvents(res.data.owned);
         setMemberedEvents(res.data.memberOnly);
+        //console.log(ownedEvents)
       })
       .catch((error) => {
         console.error(error);
@@ -121,25 +120,24 @@ function EventList(thisprops) {
       events = events.filter((item) => item.archived === true);
     }
     //displays non archived events
-    if (sortItem === 'notArchived') {
+    else if (sortItem === 'notArchived') {
       events = events.filter((item) => item.archived === false);
     }
     //this part is just to show filtering works
     //can be changed when we have going/notgoing function added
-    if (sortItem === 'going') {
+    else if (sortItem === 'going') {
       events = events.filter((item) => item.isGoing);
     }
     //notgoing
-    if (sortItem === 'notGoing') {
+    else if (sortItem === 'notGoing') {
       events = events.filter((item) => !item.isGoing);
     }
     //when none of the option is selected  display all the events
-    if (sortItem === '') {
-      events = [events, memberedEvents];
-    }
     //only show the event i created
-    if (sortItem === 'owner') {
+    else if (sortItem === 'owner' && isOwned) {
       events = ownedEvents;
+    } else {
+      events = [...ownedEvents, ...memberedEvents];
     }
     return events.map((event) => (
       <div key={event._id}>
@@ -148,7 +146,8 @@ function EventList(thisprops) {
             <div className="fw-bold text-primary px-4 mt-4">
               Event Name <span className="text-black">{event.name}</span>
               <div className="text-black">
-                hosted by <span className="text-muted px-3">{ownerName}</span>
+                hosted by{' '}
+                <span className="text-muted px-3">{event.owner.username}</span>
               </div>
             </div>
             <div className="text-muted  px-4">
@@ -156,14 +155,32 @@ function EventList(thisprops) {
             </div>
             <br></br>
             <Row className="fw-bold text-secondary px-4 mb-2">
-              <Col className=" fw-bold text-secondary ">When:</Col>
+              <Col className=" fw-bold text-secondary ">
+                When:
+                {
+                  event.finaltime //TODO:fix time
+                }
+              </Col>
               <Col className=" fw-bold text-secondary ">What: {}</Col>
             </Row>
             <Row className="fw-bold text-secondary px-4 mb-4">
               <Col className=" fw-bold text-secondary ">
-                Who:{eventdata.coming}
+                Who:
+                {
+                  //TODO:fix this when member part is integrated
+                  event.members.map((e) => (
+                    <div className="text-black mx-1" key={e._id}>
+                      {e.username}
+                    </div>
+                  ))
+                }
               </Col>
-              <Col className=" fw-bold text-secondary ">Where: {}</Col>
+              <Col className=" fw-bold text-secondary ">
+                Where:{' '}
+                {
+                  //TODO: fix location
+                }
+              </Col>
             </Row>
             <hr className="bg-secondary" />
             <Row>
@@ -179,12 +196,19 @@ function EventList(thisprops) {
                 )}
               </Col>
               <Col className="col-4">
-                <Button
-                  varient="btn btn-outline-secondary"
-                  onClick={() => handleGcalender(event)}
-                >
-                  add to Google
-                </Button>
+                {
+                  //TODO:add non finalized variable to complete
+                  !IsMem ? (
+                    <Button
+                      varient="btn btn-outline-secondary"
+                      onClick={() => handleGcalender(event)}
+                    >
+                      add to Google
+                    </Button>
+                  ) : (
+                    ''
+                  )
+                }
               </Col>
             </Row>
           </div>
@@ -206,7 +230,7 @@ function EventList(thisprops) {
             variant="outline-primary"
             onChange={(e) => setSortItem(e.target.value)}
           >
-            <option value="">sort by</option>
+            <option value="sortby">sort by</option>
             <option value="owner"> created by me </option>
             <option value="going"> going </option>
             <option value="notGoing"> not going </option>
@@ -227,7 +251,6 @@ function EventList(thisprops) {
 
         <br />
         {displayEvents(ownedEvents, true)}
-        <h2 className="h3 fw-bold text-secondary">my events</h2>
         {displayEvents(memberedEvents, false)}
       </div>
       {editingStatus && (

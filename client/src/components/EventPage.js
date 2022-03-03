@@ -36,12 +36,13 @@ function EventPage() {
           declined: [{ id: '3', username: 'PartyPooper' }],
         });
         //var allData =[].concat(eventData);
-        localStorage.setItem('event_id', JSON.stringify(id));
-        localStorage.setItem('event_data', JSON.stringify(eventData));
+
         setIsMember(
           eventData.members.some((member) => member._id === user.userId),
         );
         setMembers(eventData.members);
+        localStorage.setItem('event_id', JSON.stringify(id));
+        localStorage.setItem('event_data', JSON.stringify(eventData));
       })
       .catch((err) => {
         if (err.response.status === 401) {
