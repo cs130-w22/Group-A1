@@ -81,3 +81,23 @@ export function leaveEvent(id) {
       throw err;
     });
 }
+
+export function archiveEvent(id) {
+  const url = `${BASE}/${id}/archive`;
+  return apiInstance
+    .post(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function unarchiveEvent(id) {
+  const url = `${BASE}/${id}/unarchive`;
+  return apiInstance
+    .post(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}

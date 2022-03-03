@@ -95,7 +95,6 @@ router.get('/:id/polls', (req, res) => {
     });
 });
 
-// TODO: Block if archived
 router.post(
   '/:id',
   body('name').exists().notEmpty().withMessage('Event name cannot be empty'),
