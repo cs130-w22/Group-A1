@@ -257,9 +257,11 @@ router.post('/:id/archive', (req, res) => {
       } else {
         const filter = { _id: id };
         const update = { archived: true };
-        result.findOneAndUpdate(filter, update);
-        res.status(200).send('Archived the event');
+        return Event.findOneAndUpdate(filter, update);
       }
+    })
+    .then(() => {
+      res.status(200).send('Archived the event');
     })
     .catch((err) => console.log(err));
 });
@@ -277,9 +279,11 @@ router.post('/:id/unarchive', (req, res) => {
       } else {
         const filter = { _id: id };
         const update = { archived: false };
-        result.findOneAndUpdate(filter, update);
-        res.status(200).send('Unarchived the event');
+        return Event.findOneAndUpdate(filter, update);
       }
+    })
+    .then(() => {
+      res.status(200).send('Unarchived the event');
     })
     .catch((err) => console.log(err));
 });
