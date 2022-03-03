@@ -97,8 +97,8 @@ function EventPage() {
   };
 
   const contextProvider = useMemo(
-    () => ({ readOnly: !isMember || data.archived, eventId: id }),
-    [isMember, id, data],
+    () => ({ readOnly: !isMember || archived, eventId: id }),
+    [isMember, archived, id, data],
   );
 
   const onInvite = (invite) => {
@@ -128,12 +128,12 @@ function EventPage() {
     archiveEvent(id)
       .then(() => {
         setArchived(true);
-        // navigate(`/event/${id}`);
+        navigate(`/event/${id}`);
       })
       .catch((err) => {
         if (err.response.status === 401) {
           setUser(null);
-          navigate('/login');
+          // navigate('/login');
         } else {
           console.log(err);
         }
@@ -144,12 +144,12 @@ function EventPage() {
     unarchiveEvent(id)
       .then(() => {
         setArchived(false);
-        // navigate(`/event/${id}`);
+        navigate(`/event/${id}`);
       })
       .catch((err) => {
         if (err.response.status === 401) {
           setUser(null);
-          navigate('/login');
+          // navigate('/login');
         } else {
           console.log(err);
         }
