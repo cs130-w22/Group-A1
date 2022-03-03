@@ -15,6 +15,7 @@ const mongooseClient = mongoose
     useFindAndModify: false,
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
   })
   .then((c) => {
     console.log('Database connected succesfully');

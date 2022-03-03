@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const InviteSchema = new Schema({
-  sender: { type: Schema.Types.ObjectId, ref: 'User' },
-  recipient: { type: Schema.Types.ObjectId, ref: 'User' },
-  status: { type: String, enum: ['accepted', 'declined', 'active'] },
-}, { timestamps: true });
+const InviteSchema = new Schema(
+  {
+    sender: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    recipient: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  },
+  { timestamps: true },
+);
 
 const EventInviteSchema = new Schema({
   target: { type: Schema.Types.ObjectId, ref: 'event' },

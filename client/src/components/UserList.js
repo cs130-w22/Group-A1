@@ -1,21 +1,15 @@
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { CategoryTitle, SectionTitle } from './styled/headers';
-import { getEventInvites } from '../api/invite';
-import { EventContext } from '../utils/context';
 
 export function UserList({ users }) {
   const listItems = users.map((user) => (
-    <li key={user._id}>
-      {user.username}
-    </li>
+    <li key={user._id}>{user.username}</li>
   ));
   return <ul className="list-unstyled mb-4">{listItems}</ul>;
 }
-export function EventMembers({
-  coming, invited, declined, members,
-}) {
+export function EventMembers({ coming, invited, declined, members }) {
   return (
     <Container className="mt-4">
       <SectionTitle className="mb-3">Who&apos;s Coming?</SectionTitle>
@@ -37,7 +31,6 @@ export function EventMembers({
           <UserList users={declined} />
         </Col>
       </Row>
-
     </Container>
   );
 }
