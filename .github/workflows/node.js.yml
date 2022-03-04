@@ -30,16 +30,11 @@ jobs:
         directory: client
     - name: Make server envfile
       uses: SpicyPizza/create-envfile@v1.3.0
-      env:
-        DB_URI: ${{ secrets.DB_URI }}
-        TESTDB_URI: ${{ secrets.TESTDB_URI }}
-        SESSION_URI: ${{ secrets.SESSION_URI }}
-        SECRET: ${{ secrets.SECRET }}
       with:
-        envkey_DB_URI: ${{ env.DB_URI }}
-        envkey_TESTDB_URI: ${{ env.TESTDB_URI }}
-        envkey_SESSION_URI: ${{ env.SESSION_URI }}
-        envkey_SECRET: ${{ env.SECRET }}
+        envkey_DB_URI: ${{ secrets.DB_URI }}
+        envkey_TESTDB_URI: ${{ secrets.TESTDB_URI }}
+        envkey_SESSION_URI: ${{ secrets.SESSION_URI }}
+        envkey_SECRET: ${{ secrets.SECRET }}
         envkey_PORT: 5000
         envkey_ESLINT_NO_DEV_ERRORS: true
         envkey_CI: false
