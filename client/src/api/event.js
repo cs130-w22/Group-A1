@@ -12,6 +12,36 @@ export function createEvent(body) {
     });
 }
 
+export function deleteEvent(id) {
+  const url = `${BASE}/${id}`;
+  return apiInstance
+    .delete(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function editEvent(id, body) {
+  const url = `${BASE}/${id}`;
+  return apiInstance
+    .post(url, body)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function getEventList() {
+  const url = `${BASE}/`;
+  return apiInstance
+    .get(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
 export function getEvent(id) {
   const url = `${BASE}/${id}`;
   return apiInstance
@@ -52,6 +82,7 @@ export function leaveEvent(id) {
     });
 }
 
+
 export function getAvailability(id) {
   const url = `${BASE}/${id}/availability`;
   return apiInstance
@@ -62,9 +93,19 @@ export function getAvailability(id) {
     });
 }
 
+
+export function archiveEvent(id) {
+  const url = `${BASE}/${id}/archive`;
+  return apiInstance
+    .post(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
 export function getUserAvailability(id, userId) {
   const url = `${BASE}/${id}/availability/${userId}`;
-  console.log(url);
   return apiInstance
     .get(url)
     .then((res) => res)
@@ -75,9 +116,18 @@ export function getUserAvailability(id, userId) {
 
 export function changeAvailability(id, selected, deselected) {
   const url = `${BASE}/${id}/availability/update`;
-
   return apiInstance
     .post(url, { selected, deselected })
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function unarchiveEvent(id) {
+  const url = `${BASE}/${id}/unarchive`;
+  return apiInstance
+    .post(url)
     .then((res) => res)
     .catch((err) => {
       throw err;

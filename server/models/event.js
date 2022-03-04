@@ -14,6 +14,8 @@ const EventSchema = new Schema({
   members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   kicked: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   blocks: [{ type: Schema.Types.ObjectId, ref: 'Availability' }],
+  invitees: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  kicked: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
 
 const Event = mongoose.model('event', EventSchema);

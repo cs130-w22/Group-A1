@@ -1,18 +1,23 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useState, useEffect, useContext } from 'react';
 import {
   Alert, Button, Dropdown, Form,
 } from 'react-bootstrap';
+
 import { Calendar, DateObject } from 'react-multi-date-picker';
 import DatePanel from 'react-multi-date-picker/plugins/date_panel';
 import { useNavigate } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
 import { createEvent } from '../api/event';
 import { UserContext } from '../utils/context';
-import { TITLE } from '../assets/constants';
 
+import { TITLE } from '../assets/constants';
+import EventList from './EventList';
+import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 function Create() {
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [dates, setDates] = useState();
   const [earlistTime, setEarliestTime] = useState(-1);
@@ -26,16 +31,20 @@ function Create() {
     document.title = `${TITLE} - create`;
   }, []);
 
+  const { id } = useParams();
   const hoursDisplayFormat = (hour) => {
     if (hour % 24 === 0) return '12:00 AM';
     return hour < 13 ? `${hour}:00 AM` : `${hour % 12}:00 PM`;
   };
 
+  
+  //var created = false;
   const {
     handleSubmit,
     control,
     setError,
     formState: { errors },
+    
   } = useForm();
 
   const onSubmit = (data) => {
@@ -51,9 +60,12 @@ function Create() {
       timeZone,
     };
     setDateError(null);
+
     return createEvent(body)
       .then((res) => {
         navigate(`/event/${res.data}`);
+        //created = true;
+        //localStorage.setItem("created",JSON.stringify(created));
       }).catch((error) => {
         console.log(error);
         if (error.response.status === 500) {
@@ -84,9 +96,12 @@ function Create() {
               }
             }
           }
+          
         }
       });
   };
+  
+  
 
   return (
     <div>
@@ -103,6 +118,7 @@ function Create() {
         plugins={[<DatePanel />]}
       />
       {dateError !== null && <p className="text-danger mb-1 mt-1">{dateError}</p>}
+
       <br />
       <Form className="w-50" onSubmit={handleSubmit(onSubmit)}>
         <Form.Group controlId="formName" className="mb-3">
@@ -146,7 +162,8 @@ function Create() {
             name="descriptionTextArea"
             placeholder="Enter Event Description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)
+            }
           />
         </Form.Group>
         <Form.Group controlId="formEarliest" className="mb-3">
@@ -194,8 +211,10 @@ function Create() {
 
         </Form.Group>
         <Button variant="outline-primary" className="fw-bold" type="submit">
+          
           create event
         </Button>
+        
       </Form>
     </div>
   );

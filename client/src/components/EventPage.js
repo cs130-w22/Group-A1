@@ -1,9 +1,6 @@
-import React, {
-  useContext, useEffect, useMemo, useState,
-} from 'react';
-import {
-  Col, Container, Row, Alert, Button, Modal,
-} from 'react-bootstrap';
+/* eslint-disable no-unused-vars */
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { Col, Container, Row, Alert, Button, Modal } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
@@ -11,7 +8,13 @@ import { UserContext, EventContext } from '../utils/context';
 import AvailabilitySection from './AvailabilitySection';
 import InviteBox from './InviteBox';
 import PollSection from './PollSection';
-import { getEvent, joinEvent, leaveEvent } from '../api/event';
+import {
+  getEvent,
+  joinEvent,
+  leaveEvent,
+  archiveEvent,
+  unarchiveEvent,
+} from '../api/event';
 import { EventMembers } from './UserList';
 import { getEventInvites } from '../api/invite';
 import { TITLE } from '../assets/constants';
@@ -21,10 +24,12 @@ function EventPage() {
   const { id } = useParams();
   const [data, setData] = useState();
   const [members, setMembers] = useState();
+  const [archived, setArchived] = useState();
   const [loading, setLoading] = useState();
   const [errorMsg, setErrorMsg] = useState();
   const [invited, setInvited] = useState([]);
   const [isMember, setIsMember] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
@@ -40,10 +45,15 @@ function EventPage() {
           coming: [{ id: '2', username: 'StrawberryEater' }],
           declined: [{ id: '3', username: 'PartyPooper' }],
         });
+        //var allData =[].concat(eventData);
+        localStorage.setItem('event_id', JSON.stringify(id));
+        localStorage.setItem('event_data', JSON.stringify(eventData));
         setIsMember(
           eventData.members.some((member) => member._id === user.userId),
         );
         setMembers(eventData.members);
+        setIsOwner(eventData.owner._id === user.userId);
+        setArchived(eventData.archived);
       })
       .catch((err) => {
         if (err.response.status === 401) {
@@ -89,8 +99,8 @@ function EventPage() {
   };
 
   const contextProvider = useMemo(
-    () => ({ readOnly: !isMember, eventId: id }),
-    [isMember, id],
+    () => ({ readOnly: !isMember || archived, eventId: id, archived: archived}),
+    [isMember, archived, id, data],
   );
 
   const onInvite = (invite) => {
@@ -110,6 +120,38 @@ function EventPage() {
         if (err.response.status === 401) {
           setUser(null);
           navigate('/login');
+        } else {
+          console.log(err);
+        }
+      });
+  };
+
+  const onArchive = () => {
+    archiveEvent(id)
+      .then(() => {
+        setArchived(true);
+        navigate(`/event/${id}`);
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setUser(null);
+          // navigate('/login');
+        } else {
+          console.log(err);
+        }
+      });
+  };
+
+  const onUnarchive = () => {
+    unarchiveEvent(id)
+      .then(() => {
+        setArchived(false);
+        navigate(`/event/${id}`);
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setUser(null);
+          // navigate('/login');
         } else {
           console.log(err);
         }
@@ -168,7 +210,7 @@ function EventPage() {
             {/* Left Column */}
             <Col xs={8}>
               <span className="text-uppercase text-secondary fw-bold">
-                {data?.time || 'TIME TBA'}
+                {data?.time || 'TIME TBA'} {archived && '(finalized)'}
               </span>
               <h2 className="fs-3 fw-bold mt-1 mb-1">{data?.name}</h2>
               <span className="text-muted">
@@ -201,6 +243,18 @@ function EventPage() {
                 invited={invited}
                 declined={data?.declined}
               />
+              {isMember && isOwner && (
+                <div className="d-grid gap-2 mx-4">
+                  <Button
+                    variant="primary"
+                    className="fw-bold text-white"
+                    onClick={archived ? onUnarchive : onArchive}
+                  >
+                    {archived ? 'un' : ''}archive event
+                  </Button>
+                </div>
+              )}
+              <hr></hr>
               {isMember && (
                 <div className="d-grid gap-2 mx-4">
                   <Button
