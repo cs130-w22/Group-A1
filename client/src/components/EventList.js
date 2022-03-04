@@ -1,7 +1,3 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable no-const-assign */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useContext } from 'react';
 import {
   Card,
@@ -35,7 +31,7 @@ function EventList(thisprops) {
   const [memberedEvents, setMemberedEvents] = useState([]);
   const [eventList, setEventList] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
-  const [event, setEvent] = useState();
+  //const [event, setEvent] = useState();
   const navigate = useNavigate();
   const [IsMem, setIsMem] = useState(false);
   const [members, setMembers] = useState([]);
@@ -61,7 +57,6 @@ function EventList(thisprops) {
       .then((res) => {
         setOwnedEvents(res.data.owned);
         setMemberedEvents(res.data.memberOnly);
-        //console.log(ownedEvents)
       })
       .catch((error) => {
         console.error(error);
@@ -70,25 +65,23 @@ function EventList(thisprops) {
   }, [user]);
 
   //handles the alphabetical sorting
-  const handleSort = (e) => {
+  const handleSort = () => {
+    let o, m;
     //this is a to z
-    if (!pressed) {
-      const sorted = [...ownedEvents].sort((a, b) =>
-        a.name.localeCompare(b.name),
-      );
-      setOwnedEvents(sorted);
-      setPressed(true);
+    if (pressed) {
+      o = ownedEvents.sort((a, b) => a.name.localeCompare(b.name));
+      m = memberedEvents.sort((a, b) => a.name.localeCompare(b.name));
+      setPressed(false);
     }
     //this is z to a
     else {
-      const sorted = [...ownedEvents].sort((a, b) =>
-        b.name.localeCompare(a.name),
-      );
-      setOwnedEvents(sorted);
-      setPressed(false);
+      o = ownedEvents.sort((a, b) => b.name.localeCompare(a.name));
+      m = memberedEvents.sort((a, b) => b.name.localeCompare(a.name));
+      setPressed(true);
     }
+    setOwnedEvents(o);
+    setMemberedEvents(m);
   };
-
   const closeEventEditor = () => {
     setEditingStatus(false);
     setEditingData(undefined);
@@ -117,11 +110,11 @@ function EventList(thisprops) {
     //let props ={event:events, GcalActivate:GcalActivate}
     //displays archived events
     if (sortItem === 'archived') {
-      events = events.filter((item) => item.archived === true);
+      events = events.filter((item) => item.archived);
     }
     //displays non archived events
     else if (sortItem === 'notArchived') {
-      events = events.filter((item) => item.archived === false);
+      events = events.filter((item) => !item.archived);
     }
     //this part is just to show filtering works
     //can be changed when we have going/notgoing function added
@@ -134,24 +127,25 @@ function EventList(thisprops) {
     }
     //when none of the option is selected  display all the events
     //only show the event i created
-    else if (sortItem === 'owner' && isOwned) {
-      events = ownedEvents;
+    else if (sortItem === 'owner') {
+      events = events.filter((item) => item.owner._id === user.userId);
     } else {
-      events = [...ownedEvents, ...memberedEvents];
+      events = events;
     }
-    return events.map((event) => (
-      <div key={event._id}>
+    //console.log(events._id)
+    return events.map((event, i) => (
+      <div event={event} key={event._id}>
         <Card className="border py-4 px-4 mb-3">
           <div>
             <div className="fw-bold text-primary px-4 mt-4">
-              Event Name <span className="text-black">{event.name}</span>
+              Event Name <span className="text-black">{event?.name}</span>
               <div className="text-black">
                 hosted by{' '}
                 <span className="text-muted px-3">{event.owner.username}</span>
               </div>
             </div>
             <div className="text-muted  px-4">
-              Decription: {event.description}
+              Decription: {event?.description}
             </div>
             <br></br>
             <Row className="fw-bold text-secondary px-4 mb-2">
@@ -168,11 +162,11 @@ function EventList(thisprops) {
                 Who:
                 {
                   //TODO:fix this when member part is integrated
-                  event.members.map((e) => (
-                    <div key={e.id} className="text-black mx-1">
-                      {e.username}
-                    </div>
-                  ))
+                  //event.members.map((e) => (
+                  //  <div key={e} className="text-black mx-1">
+                  //    {e.username}
+                  //  </div>
+                  // ))
                 }
               </Col>
               <Col className=" fw-bold text-secondary ">
@@ -237,8 +231,10 @@ function EventList(thisprops) {
           </select>
           <br></br>
           <Button
-            onClick={(e) => handleSort(e.target.value)}
-            value="name"
+            onClick={() => {
+              setPressed(true), handleSort();
+            }}
+            value="alpha"
             variant="outline-primary"
             size="sm"
             className="fw-bold text-black mx-3 px-3"
@@ -247,8 +243,13 @@ function EventList(thisprops) {
           </Button>
         </div>
 
+        <br className="" />
+        <div className="text-secondary">
+          <h2 className="h3 fw-bold text-secondary">my events</h2>
+          {displayEvents(ownedEvents, true)}
+        </div>
         <br />
-        {displayEvents(ownedEvents, true)}
+        <h2 className="h3 fw-bold text-secondary mt-3">membered events</h2>
         {displayEvents(memberedEvents, false)}
       </div>
       {editingStatus && (

@@ -80,7 +80,7 @@ function Gcalender({
     return (
       <ul>
         {eventdata.invitees.map((person) => {
-          return <li>username:{person.email}</li>;
+          return <li>email:{person.email}</li>;
         })}
       </ul>
     );
@@ -100,7 +100,7 @@ function Gcalender({
       },
       //TODO:when invitees part is done, we can add those here
 
-      attendees: [attendPeople()],
+      attendees: attendPeople,
     };
 
     var request = window.gapi.client.calendar.events.insert({
