@@ -109,46 +109,41 @@ function EventEdit(props) {
       <Modal show={props.editing} onHide={props.closeEditor} centered>
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Modal.Header closeButton>
-            <Modal.Title className="h3 fw-bold text-secondary">Edit Event</Modal.Title>
+            <Modal.Title className="h3 fw-bold text-secondary">
+              Edit Event
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
+            <Form.Label className="fw-bold text-primary">Event Name</Form.Label>
 
-          <Form.Label className="fw-bold text-primary">
-            Event Name
-          </Form.Label>
+            <Controller
+              control={control}
+              name="eventName"
+              defaultValue={props.editName}
+              rules={{
+                required: {
+                  value: true,
+                  message: 'Event name required',
+                },
+              }}
+              render={({ field: { onChange, value, ref } }) => (
+                <Form.Control
+                  onChange={onChange}
+                  ref={ref}
+                  value={value}
+                  isInvalid={errors.eventName}
+                />
+              )}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.eventName?.message}
+            </Form.Control.Feedback>
 
-          <Controller
-            control={control}
-            name="eventName"
-            defaultValue={props.editName}
-            rules={{
-              required: {
-                value: true,
-                message: 'Event name required',
-              },
-            }}
-            render={({
-              field: {
-                onChange, value, ref,
-              },
-            }) => (
-              <Form.Control
-                onChange={onChange}
-                ref={ref}
-                value={value}
-                isInvalid={errors.eventName}
-              />
-            )}
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.eventName?.message}
-          </Form.Control.Feedback>
-
-              <br></br>
+            <br></br>
 
             <Form.Group controlId="formDescription" className="mb-3">
               <Form.Label className="fw-bold text-primary">
-              Event Description
+                Event Description
               </Form.Label>
               <Form.Control
                 as="textarea"
@@ -161,27 +156,19 @@ function EventEdit(props) {
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button
-              variant="success"
-              className="ms-2 "
-              type="submit"
-            >
+            <Button variant="success" className="ms-2 " type="submit">
               save
             </Button>
-            <EventButton
-              variant="danger"
-              className="ms-2 "
-              onClick={handleDeletion}
-            >
+            <Button variant="danger" className="ms-2 " onClick={handleDeletion}>
               delete
-            </EventButton>
-            <EventButton
+            </Button>
+            <Button
               variant="outline-primary"
               className="ms-2 "
               onClick={() => props.closeEditor()}
             >
               cancel
-            </EventButton>
+            </Button>
           </Modal.Footer>
         </Form>
       </Modal>

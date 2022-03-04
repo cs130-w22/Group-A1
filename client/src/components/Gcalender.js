@@ -69,7 +69,7 @@ function Gcalender({
       window.gapi.client.load('calendar', 'v3', () =>
         console.log('we have the gapi result'),
       );
-      gapi.auth2.getAuthInstance().signIn().then(eventDetails);
+      window.gapi.auth2.getAuthInstance().signIn().then(eventDetails);
     });
     //console.log("we got the gapi")
   };

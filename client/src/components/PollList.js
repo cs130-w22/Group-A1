@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
-  Card, ListGroup, Button, Alert, Modal, Form, OverlayTrigger, Tooltip,
+  Card,
+  ListGroup,
+  Button,
+  Alert,
+  Modal,
+  Form,
+  OverlayTrigger,
+  Tooltip,
 } from 'react-bootstrap';
 import { ThemeProvider } from 'styled-components';
 import { getEventPolls } from '../api/event';
@@ -10,7 +17,7 @@ import { EventButton } from './EventButton';
 import Poll from './Poll';
 
 function PollList() {
-  const { eventId, readOnly } = useContext(EventContext);
+  const { eventId, readOnly, archived } = useContext(EventContext);
   const [pollList, setPollList] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [creating, setCreating] = useState(false);
@@ -22,7 +29,7 @@ function PollList() {
   const handleClose = () => {
     setCreating(false);
   };
-  
+
   useEffect(() => {
     getEventPolls(eventId)
       .then((res) => {
@@ -83,6 +90,7 @@ function PollList() {
       <EventButton
         onClick={createNewPoll}
         readOnly={readOnly}
+        archived={archived}
       >
         + add poll
       </EventButton>
@@ -91,9 +99,7 @@ function PollList() {
           <h3>Create Poll</h3>
         </Modal.Header>
         <Modal.Body>
-          <Card>
-            {creatingPoll}
-          </Card>
+          <Card>{creatingPoll}</Card>
         </Modal.Body>
       </Modal>
     </div>
