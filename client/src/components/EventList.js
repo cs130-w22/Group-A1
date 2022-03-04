@@ -43,7 +43,7 @@ function EventList(thisprops) {
   const [GcalActivate, setGcalActivate] = useState(false);
   const [calenderInfo, setCalenderInfo] = useState();
   const { user, setUser } = useContext(UserContext);
-
+  const readOnly = useContext(EventContext);
   //gets event information about going or not
 
   const savedEvent = localStorage.getItem('event_data');
@@ -190,17 +190,17 @@ function EventList(thisprops) {
                 )}
               </Col>
               <Col className="col-4">
-                {
-                  //TODO:add non finalized variable to complete
-                  events.some((item) => item.members.includes(user.userId)) && (
-                    <Button
-                      varient="btn btn-outline-secondary"
-                      onClick={() => handleGcalender(event)}
-                    >
-                      add to Google
-                    </Button>
-                  )
-                }
+                {!readOnly &&
+                events.some((item) => item.members.includes(user.userId)) ? (
+                  <Button
+                    varient="btn btn-outline-secondary"
+                    onClick={() => handleGcalender(event)}
+                  >
+                    add to Google
+                  </Button>
+                ) : (
+                  ''
+                )}
               </Col>
             </Row>
           </div>

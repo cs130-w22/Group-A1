@@ -13,8 +13,6 @@ import {
   Modal,
   Form,
 } from 'react-bootstrap';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
 
 function Gcalender({
   showCalender,
@@ -75,8 +73,7 @@ function Gcalender({
     });
     //console.log("we got the gapi")
   };
-  //TODO: connect this to the event to show attendees
-  const attendPeople = () => {
+  /*const attendPeople = () => {
     return (
       <ul>
         {eventdata.invitees.map((person) => {
@@ -84,7 +81,7 @@ function Gcalender({
         })}
       </ul>
     );
-  };
+  };*/
   const eventDetails = () => {
     var event = {
       summary: editName,
@@ -98,9 +95,7 @@ function Gcalender({
         dateTime: eventTime[1],
         timeZone: 'America/Los_Angeles',
       },
-      //TODO:when invitees part is done, we can add those here
-
-      attendees: attendPeople,
+      //attendees: attendPeople,
     };
 
     var request = window.gapi.client.calendar.events.insert({
@@ -114,7 +109,7 @@ function Gcalender({
     });
   };
   //get events from calender
-  console.log('this is the event ', attendPeople());
+  //console.log('this is the event ', attendPeople());
   return <div className="App"></div>;
 }
 export default Gcalender;
