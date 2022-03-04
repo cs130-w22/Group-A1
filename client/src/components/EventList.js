@@ -21,7 +21,7 @@ import EventEdit from './EventEdit';
 import PropTypes from 'prop-types';
 import { useHref, useParams } from 'react-router-dom';
 import PollList from './PollList';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import EventPage from './EventPage';
 import { bn } from 'date-fns/locale';
@@ -109,40 +109,42 @@ function EventList(props) {
     console.log(events);
     return events.map((event) => (
       <div key={event._id}>
-        <Card className="border py-4 px-4 mb-3">
-          <div>
-            <div className="fw-bold text-primary px-4 mt-4">
-              Event Name <span className="text-black">{event.name}</span>
-              <div className="text-black">
-                hosted by{' '}
-                <span className="text-muted px-3">{event.owner.username}</span>
+        <Link to={`/event/${event._id}`} style={{ textDecoration: 'none'}} >
+          <Card className="border py-4 px-4 mb-3">
+            <div>
+              <div className="fw-bold text-primary px-4 mt-4">
+                Event Name <span className="text-black">{event.name}</span>
+                <div className="text-black">
+                  hosted by{' '}
+                  <span className="text-muted px-3">{event.owner.username}</span>
+                </div>
+                {event.archived && (
+                  <div className="fw-bold text-secondary">Finalized</div>
+                )}
               </div>
-              {event.archived && (
-                <div className="fw-bold text-secondary">Finalized</div>
+              <div className="text-muted  px-4">
+                Decription: {event.description}
+              </div>
+              <br></br>
+              <Row className="fw-bold text-secondary px-4 mb-2">
+                <Col className=" fw-bold text-secondary ">When:</Col>
+                <Col className=" fw-bold text-secondary ">What: {}</Col>
+              </Row>
+              <Row className="fw-bold text-secondary px-4 mb-4">
+                <Col className=" fw-bold text-secondary ">Who:</Col>
+                <Col className=" fw-bold text-secondary ">Where: {}</Col>
+              </Row>
+              { isOwned && !event.archived && (
+                <Button
+                  varient="btn btn-outline-secondary"
+                  onClick={() => setEditingData(event)}
+                >
+                  edit
+                </Button>
               )}
             </div>
-            <div className="text-muted  px-4">
-              Decription: {event.description}
-            </div>
-            <br></br>
-            <Row className="fw-bold text-secondary px-4 mb-2">
-              <Col className=" fw-bold text-secondary ">When:</Col>
-              <Col className=" fw-bold text-secondary ">What: {}</Col>
-            </Row>
-            <Row className="fw-bold text-secondary px-4 mb-4">
-              <Col className=" fw-bold text-secondary ">Who:</Col>
-              <Col className=" fw-bold text-secondary ">Where: {}</Col>
-            </Row>
-            { isOwned && !event.archived && (
-              <Button
-                varient="btn btn-outline-secondary"
-                onClick={() => setEditingData(event)}
-              >
-                edit
-              </Button>
-            )}
-          </div>
-        </Card>
+          </Card>
+        </Link>
       </div>
     ));
   };
