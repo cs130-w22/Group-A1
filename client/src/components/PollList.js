@@ -10,7 +10,7 @@ import { EventButton } from './EventButton';
 import Poll from './Poll';
 
 function PollList() {
-  const { eventId, readOnly } = useContext(EventContext);
+  const { eventId, readOnly, archived } = useContext(EventContext);
   const [pollList, setPollList] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [creating, setCreating] = useState(false);
@@ -83,6 +83,7 @@ function PollList() {
       <EventButton
         onClick={createNewPoll}
         readOnly={readOnly}
+        archived={archived}
       >
         + add poll
       </EventButton>
