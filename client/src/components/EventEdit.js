@@ -168,20 +168,20 @@ function EventEdit(props) {
             >
               save
             </Button>
-            <EventButton
+            <Button
               variant="danger"
               className="ms-2 "
               onClick={handleDeletion}
             >
               delete
-            </EventButton>
-            <EventButton
+            </Button>
+            <Button
               variant="outline-primary"
               className="ms-2 "
               onClick={() => props.closeEditor()}
             >
               cancel
-            </EventButton>
+            </Button>
           </Modal.Footer>
         </Form>
       </Modal>

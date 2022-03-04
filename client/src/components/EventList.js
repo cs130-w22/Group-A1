@@ -133,7 +133,7 @@ function EventList(props) {
               <Col className=" fw-bold text-secondary ">Who:</Col>
               <Col className=" fw-bold text-secondary ">Where: {}</Col>
             </Row>
-            {isOwned && (
+            { isOwned && !event.archived && (
               <Button
                 varient="btn btn-outline-secondary"
                 onClick={() => setEditingData(event)}

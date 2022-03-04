@@ -97,7 +97,7 @@ function EventPage() {
   };
 
   const contextProvider = useMemo(
-    () => ({ readOnly: !isMember || archived, eventId: id }),
+    () => ({ readOnly: !isMember || archived, eventId: id, archived: archived}),
     [isMember, archived, id, data],
   );
 
