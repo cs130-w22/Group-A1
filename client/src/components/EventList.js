@@ -169,7 +169,7 @@ function EventList(thisprops) {
                 {
                   //TODO:fix this when member part is integrated
                   event.members.map((e) => (
-                    <div className="text-black mx-1" key={e._id}>
+                    <div key={e.id} className="text-black mx-1">
                       {e.username}
                     </div>
                   ))
@@ -198,15 +198,13 @@ function EventList(thisprops) {
               <Col className="col-4">
                 {
                   //TODO:add non finalized variable to complete
-                  !IsMem ? (
+                  events.some((item) => item.members.includes(user.userId)) && (
                     <Button
                       varient="btn btn-outline-secondary"
                       onClick={() => handleGcalender(event)}
                     >
                       add to Google
                     </Button>
-                  ) : (
-                    ''
                   )
                 }
               </Col>
