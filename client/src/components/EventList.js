@@ -231,7 +231,10 @@ function EventList(thisprops) {
           </select>
           <br></br>
           <Button
-            onClick={() => setPressed(true)}
+            onClick={() => {
+              setPressed(true);
+              handleSort();
+            }}
             value="alpha"
             variant="outline-primary"
             size="sm"
