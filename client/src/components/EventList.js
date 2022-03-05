@@ -109,8 +109,8 @@ function EventList(props) {
     console.log(events);
     return events.map((event) => (
       <div key={event._id}>
-        <Link to={`/event/${event._id}`} style={{ textDecoration: 'none'}} >
           <Card className="border py-4 px-4 mb-3">
+          <Link to={`/event/${event._id}`} style={{ textDecoration: 'none', zIndex:1}} >
             <div>
               <div className="fw-bold text-primary px-4 mt-4">
                 Event Name <span className="text-black">{event.name}</span>
@@ -134,17 +134,22 @@ function EventList(props) {
                 <Col className=" fw-bold text-secondary ">Who:</Col>
                 <Col className=" fw-bold text-secondary ">Where: {}</Col>
               </Row>
-              { isOwned && !event.archived && (
+
+            </div>
+            </Link>
+            <div>
+            { isOwned && !event.archived && (
                 <Button
-                  varient="btn btn-outline-secondary"
+                  variant="outline-primary"
                   onClick={() => setEditingData(event)}
+                  style={{zIndex:2, position: 'absolute', right:50, top:50}}
                 >
                   edit
                 </Button>
               )}
-            </div>
+              </div>
           </Card>
-        </Link>
+       
       </div>
     ));
   };
