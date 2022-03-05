@@ -17,6 +17,7 @@ import {
 } from '../api/event';
 import { EventMembers } from './UserList';
 import { getEventInvites } from '../api/invite';
+import { TITLE } from '../assets/constants';
 
 function EventPage() {
   const { user, setUser } = useContext(UserContext);
@@ -37,7 +38,7 @@ function EventPage() {
     getEvent(id)
       .then((res) => {
         const eventData = res.data;
-        console.log(eventData);
+        document.title = `${TITLE} - ${eventData.name}`;
         setData({
           ...eventData,
           coming: [{ id: '2', username: 'StrawberryEater' }],
@@ -97,7 +98,7 @@ function EventPage() {
   };
 
   const contextProvider = useMemo(
-    () => ({ readOnly: !isMember || archived, eventId: id, archived: archived}),
+    () => ({ readOnly: !isMember || archived, eventId: id, archived: archived }),
     [isMember, archived, id, data],
   );
 
@@ -208,20 +209,27 @@ function EventPage() {
             {/* Left Column */}
             <Col xs={8}>
               <span className="text-uppercase text-secondary fw-bold">
-                {data?.time || 'TIME TBA'} {archived && '(finalized)'}
+                {data?.time || 'TIME TBA'}
               </span>
-              <h2 className="fs-3 fw-bold mt-1 mb-1">{data?.name}</h2>
+              <h2 className="fs-3 fw-bold mt-1 mb-1">{data?.name} <span className="text-muted">{archived && '(archived)'}</span></h2>
               <span className="text-muted">
-                Hosted by {data?.owner?.username}
+                Hosted by
+                {' '}
+                {data?.owner?.username}
               </span>
               <p className="mt-3">{data?.description}</p>
-              <AvailabilitySection />
+              <AvailabilitySection
+                members={members}
+                timeEarliest={data?.timeEarliest}
+                timeLatest={data?.timeLatest}
+              />
               <PollSection />
               <hr className="mt-4" />
               <p className="mt-3 fs-6 text-muted">
-                Created on{' '}
-                {data?.createdAt &&
-                  format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
+                Created on
+                {' '}
+                {data?.createdAt
+                  && format(parseISO(data?.createdAt), 'MM/dd/yyyy')}
               </p>
             </Col>
             <Col>

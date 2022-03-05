@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Container } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { TITLE } from '../assets/constants';
 
 function NotFound() {
+  useEffect(() => {
+    document.title = `${TITLE} - 404`;
+  }, []);
   return (
     <Container className="text-center h-100 justify-content-center d-flex flex-col">
       <div>

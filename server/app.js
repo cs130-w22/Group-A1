@@ -20,8 +20,9 @@ const createServer = (middleware) => {
   app.use(express.urlencoded({ extended: true }));
 
   // other middleware
-  if (middleware != null && Array.isArray(middleware))
+  if (middleware != null && Array.isArray(middleware)) {
     middleware.forEach((m) => app.use(m));
+  }
 
   // routes
   app.use('/login', loginRouter);

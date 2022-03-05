@@ -28,7 +28,9 @@ let inviteId = null;
 let eventId = null;
 
 const setup = async () => {
-  await mongoose.connect(process.env.TESTDB_URI, {
+  let cnx = process.env.TESTDB_URI;
+  cnx = `${cnx.substring(0, cnx.lastIndexOf('/') + 1)}inviteTest`;
+  await mongoose.connect((cnx), {
     useFindAndModify: false,
     useNewUrlParser: true,
     useUnifiedTopology: true,

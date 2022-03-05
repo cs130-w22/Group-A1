@@ -1,5 +1,5 @@
 import '../assets/custom.scss';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   Link, Navigate, useLocation, useNavigate,
 } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { Form, Button, Container } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import { UserContext } from '../utils/context';
 import loginFacade from '../utils/loginFacade';
+import { TITLE } from '../assets/constants';
 
 function Login() {
   // use react hook form to handle form navigation
@@ -20,6 +21,9 @@ function Login() {
   const navigate = useNavigate();
   // get login and user from context
   const { user, setUser } = useContext(UserContext);
+  useEffect(() => {
+    document.title = `${TITLE} - login`;
+  }, []);
   // handles the input
   const onSubmit = (data) => {
     console.log(redirect);
@@ -107,7 +111,7 @@ function Login() {
               type="submit"
               className="ms-1 fw-bold w-100 mt-1"
             >
-              Sign in
+              login
             </Button>
             <div className="text-center mt-3">
               Need an account?

@@ -26,12 +26,19 @@ export function ProtectedNav() {
   if (user) {
     return (
       <>
+        <LinkContainer to="/">
+          <Nav.Link
+            className="text-secondary"
+          >
+            home
+          </Nav.Link>
+        </LinkContainer>
         <LinkContainer to="/example">
           <Nav.Link className="fw-bold text-primary">
             example
           </Nav.Link>
         </LinkContainer>
-        <LinkContainer to="/event/62102347497eed54e4d0d76f">
+        <LinkContainer to="/event/621b30264a3a292df2944362">
           <Nav.Link className="fw-bold text-primary">
             example event
           </Nav.Link>
@@ -69,17 +76,10 @@ export function TopNav({ onLogout }) {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto fw-bold">
-            <LinkContainer to="/">
-              <Nav.Link
-                className="text-secondary"
-              >
-                home
-              </Nav.Link>
-            </LinkContainer>
+
             <ProtectedNav />
           </Nav>
         </Navbar.Collapse>
-
         {user
           // <LinkContainer to="/logout">
           ? (
