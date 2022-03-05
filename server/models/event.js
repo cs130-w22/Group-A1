@@ -12,8 +12,9 @@ const EventSchema = new Schema({
   finalTime: [{ type: Number }],
   owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  kicked: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  blocks: [{ type: Schema.Types.ObjectId, ref: 'Availability' }],
   invitees: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  kicked: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
 
 const Event = mongoose.model('event', EventSchema);

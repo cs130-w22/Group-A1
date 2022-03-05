@@ -1,20 +1,22 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useState, useContext } from 'react';
-import {Alert, Button, Dropdown, Form,} from 'react-bootstrap';
+import React, { useState, useEffect, useContext } from 'react';
+import {
+  Alert, Button, Dropdown, Form,
+} from 'react-bootstrap';
+
 import { Calendar, DateObject } from 'react-multi-date-picker';
 import DatePanel from 'react-multi-date-picker/plugins/date_panel';
 import { useNavigate } from 'react-router-dom';
 import { Controller, useForm } from 'react-hook-form';
 import { createEvent } from '../api/event';
 import { UserContext } from '../utils/context';
-import EventList from './EventList';
+
+import { TITLE } from '../assets/constants';
 import { useParams } from 'react-router-dom';
-import { useEffect } from 'react';
+import EventList from './EventList';
 
-
-function Create() 
-{
+function Create() {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [dates, setDates] = useState();
@@ -23,23 +25,32 @@ function Create()
   const [description, setDescription] = useState('');
   const [timeZone, setTimeZone] = useState();
   const hoursInDay = Array.from({ length: 24 }, (x, i) => i);
+  const [dateError, setDateError] = useState();
+
+  useEffect(() => {
+    document.title = `${TITLE} - create`;
+  }, []);
+
   const { id } = useParams();
   const hoursDisplayFormat = (hour) => {
     if (hour % 24 === 0) return '12:00 AM';
     return hour < 13 ? `${hour}:00 AM` : `${hour % 12}:00 PM`;
   };
 
-  
+
   //var created = false;
   const {
     handleSubmit,
     control,
     setError,
     formState: { errors },
-    
+
   } = useForm();
 
   const onSubmit = (data) => {
+    if (dates == null || dates.length === 0) {
+      return setDateError('Please select at least one date');
+    }
     const body = {
       name: data.eventName,
       description,
@@ -48,7 +59,8 @@ function Create()
       dates,
       timeZone,
     };
-   
+    setDateError(null);
+
     return createEvent(body)
       .then((res) => {
         navigate(`/event/${res.data}`);
@@ -66,29 +78,36 @@ function Create()
           setUser(null);
           navigate('/login');
         } else {
-          const validationErrors = error.data?.errors;
+          const validationErrors = error.response.data?.errors;
           if (validationErrors?.length > 0) {
+            console.log(validationErrors);
             for (let i = 0; i < validationErrors.length; i += 1) {
               const errorParam = validationErrors[i].param;
               const errorMsg = validationErrors[i].msg;
-              setError(
-                errorParam,
-                { type: 'api', message: errorMsg },
-                { shouldFocus: true },
-              );
+              if (errorParam === 'dates') {
+                console.log('wat');
+                setDateError(errorMsg);
+              } else {
+                setError(
+                  errorParam,
+                  { type: 'api', message: errorMsg },
+                  { shouldFocus: true },
+                );
+              }
             }
           }
-          
+
         }
       });
   };
-  
-  
+
+
 
   return (
     <div>
       {errors.form && <Alert variant="danger">{errors.form}</Alert>}
       <h2 className="mb-3">Create Event</h2>
+
       <Calendar
         value={dates}
         onChange={setDates}
@@ -98,7 +117,8 @@ function Create()
         calendarPosition="bottom-center"
         plugins={[<DatePanel />]}
       />
-      
+      {dateError !== null && <p className="text-danger mb-1 mt-1">{dateError}</p>}
+
       <br />
       <Form className="w-50" onSubmit={handleSubmit(onSubmit)}>
         <Form.Group controlId="formName" className="mb-3">
@@ -191,10 +211,10 @@ function Create()
 
         </Form.Group>
         <Button variant="outline-primary" className="fw-bold" type="submit">
-          
+
           create event
         </Button>
-        
+
       </Form>
     </div>
   );

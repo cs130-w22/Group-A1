@@ -10,7 +10,7 @@ cd ../server && npx eslint *.js --fix  --no-error-on-unmatched-pattern
 cd ..
 echo "Done."
 
-npx lint-staged
+# npx lint-staged
 
 npm run build --if-present
 

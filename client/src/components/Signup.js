@@ -1,10 +1,11 @@
 import '../assets/custom.scss';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
 import { Controller, useForm } from 'react-hook-form';
 import { signup } from '../api/auth';
 import { UserContext } from '../utils/context';
+import { TITLE } from '../assets/constants';
 
 function Signup() {
   const navigate = useNavigate();
@@ -13,6 +14,9 @@ function Signup() {
   } = useForm();
   const { user, setUser } = useContext(UserContext);
 
+  useEffect(() => {
+    document.title = `${TITLE} - signup`;
+  }, []);
   // handles the input
   const onSubmit = (data) => {
     signup(data.email, data.username, data.password)

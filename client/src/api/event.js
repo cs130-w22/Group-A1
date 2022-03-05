@@ -82,10 +82,42 @@ export function leaveEvent(id) {
     });
 }
 
+
+export function getAvailability(id) {
+  const url = `${BASE}/${id}/availability`;
+  return apiInstance
+    .get(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+
 export function archiveEvent(id) {
   const url = `${BASE}/${id}/archive`;
   return apiInstance
     .post(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function getUserAvailability(id, userId) {
+  const url = `${BASE}/${id}/availability/${userId}`;
+  return apiInstance
+    .get(url)
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
+export function changeAvailability(id, selected, deselected) {
+  const url = `${BASE}/${id}/availability/update`;
+  return apiInstance
+    .post(url, { selected, deselected })
     .then((res) => res)
     .catch((err) => {
       throw err;

@@ -25,6 +25,7 @@
     "*.{js,css,md}": "prettier --write"
   },
   "dependencies": {
+    "use-mouse-action": "^2.0.0",
     "eslint": "^7.32.0",
     "typescript": "^4.5.5"
   }
