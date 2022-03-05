@@ -91,10 +91,9 @@ router.delete('/:id', (req, res) => {
   Event.findById(req.params.id)
     .then((result) => new Promise((resolve, reject) => {
       // eslint-disable-next-line eqeqeq
-      if (result.owner == req.session.userId) resolve();
+      if (result.owner == req.session.userId) resolve(Poll.findByIdAndDelete(result.goingPoll));
       else reject('Forbidden');
     }))
-    .then(() => Poll.findByIdAndDelete(result.goingPoll))
     .then(() => Event.findByIdAndDelete(req.params.id))
     .then((result) => res.send(result))
     .catch((err) => {
