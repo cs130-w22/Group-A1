@@ -39,7 +39,6 @@ function EventPage() {
       .then((res) => {
         const eventData = res.data;
         document.title = `${TITLE} - ${eventData.name}`;
-        console.log(eventData);
         setData({
           ...eventData,
           coming: [{ id: '2', username: 'StrawberryEater' }],
@@ -99,7 +98,7 @@ function EventPage() {
   };
 
   const contextProvider = useMemo(
-    () => ({ readOnly: !isMember || archived, eventId: id, archived: archived}),
+    () => ({ readOnly: !isMember || archived, eventId: id, archived: archived }),
     [isMember, archived, id, data],
   );
 
@@ -210,9 +209,9 @@ function EventPage() {
             {/* Left Column */}
             <Col xs={8}>
               <span className="text-uppercase text-secondary fw-bold">
-                {data?.time || 'TIME TBA'} {archived && '(finalized)'}
+                {data?.time || 'TIME TBA'}
               </span>
-              <h2 className="fs-3 fw-bold mt-1 mb-1">{data?.name}</h2>
+              <h2 className="fs-3 fw-bold mt-1 mb-1">{data?.name} <span className="text-muted">{archived && '(archived)'}</span></h2>
               <span className="text-muted">
                 Hosted by
                 {' '}

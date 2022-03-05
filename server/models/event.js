@@ -9,6 +9,7 @@ const EventSchema = new Schema({
   timeEarliest: { type: Number, required: true },
   timeLatest: { type: Number, required: true },
   archived: { type: Boolean, required: true },
+  finalized: { type: Boolean, default: false },
   finalTime: [{ type: Number }],
   owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   members: [{ type: Schema.Types.ObjectId, ref: 'User' }],

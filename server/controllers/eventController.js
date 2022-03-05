@@ -13,12 +13,8 @@ exports.getEvents = (req, res) => {
   Event.find({ $or: [{ owner: userId }, { members: userId }] })
     .populate('owner', '_id username')
     .populate('members', '_id username')
-    .then((myevents) => {
-      // eslint-disable-next-line eqeqeq
-      const owned = myevents.filter((event) => event.owner._id == userId);
-      // eslint-disable-next-line eqeqeq
-      const memberTo = myevents.filter((event) => event.owner._id != userId);
-      res.status(200).json({ owned, memberOnly: memberTo });
+    .then((events) => {
+      res.status(200).json({ events });
     })
     .catch((err) => {
       console.log(err);

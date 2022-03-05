@@ -12,6 +12,8 @@ import {
   Alert,
   Modal,
   Form,
+  ToggleButton,
+  FormSelect,
 } from 'react-bootstrap';
 import { joinEvent, getEvent, getEventList } from '../api/event';
 import { getUser } from '../api/users';
@@ -25,24 +27,23 @@ import { NavLink, Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import EventPage from './EventPage';
 import { bn } from 'date-fns/locale';
+import { LinkContainer } from 'react-router-bootstrap';
+import { format, parseISO } from 'date-fns';
 
 function EventList(props) {
   //const [createdEvent,setCreatedEvent] =useState(false);
   const { id } = useParams();
   const { user } = useContext(UserContext);
-  const [ownedEvents, setOwnedEvents] = useState([]);
-  const [memberedEvents, setMemberedEvents] = useState([]);
-  const [eventList, setEventList] = useState([]);
+  const [events, setEvents] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
-  const [event, setEvent] = useState();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [datas, setDatas] = useState([]);
-  const [dataSorted, setDataSorted] = useState([]);
-  const [sortItem, setSortItem] = useState('name');
   const [pressed, setPressed] = useState(false);
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingData, setEditingData] = useState();
+  const [filterArchived, setFilterArchived] = useState(false);
+  const [filterUnarchived, setFilterUnarchived] = useState(false);
+  const [filterOwned, setFilterOwned] = useState(false);
+  const [filterJoined, setFilterJoined] = useState(false);
 
   //gets the name of the event/progile owner
   const ownerName = props.props;
@@ -51,8 +52,7 @@ function EventList(props) {
     getEventList()
       .then((res) => {
         console.log(res);
-        setOwnedEvents(res.data.owned);
-        setMemberedEvents(res.data.memberOnly);
+        setEvents(res.data.events);
       })
       .catch((error) => {
         console.error(error);
@@ -62,26 +62,15 @@ function EventList(props) {
 
   //handle the dropdown sorting
   const sortArray = (e) => {
-    const sorted = [...ownedEvents].sort((a, b) => a[e].localeCompare(b[e]));
-    setOwnedEvents(sorted);
-  };
-  //handles the alphabetical sorting
-  const handleSort = (e) => {
-    //this is a to z
-    if (!pressed) {
-      const sorted = [...ownedEvents].sort((a, b) =>
-        a.name.localeCompare(b.name),
-      );
-      setOwnedEvents(sorted);
-      setPressed(true);
-    }
-    //this is z to a
-    else {
-      const sorted = [...ownedEvents].sort((a, b) =>
-        b.name.localeCompare(a.name),
-      );
-      setOwnedEvents(sorted);
-      setPressed(false);
+    if (e === 'owner') {
+      let s = [...events].sort((a, b) => a.owner.username.localeCompare(b.owner.username))
+      console.log(s);
+      setEvents(s);
+    } else if (e === 'unsorted') {
+      setEvents([...events].sort((a, b) => a._id.localeCompare(b._id)));
+    } else {
+      const sorted = [...events].sort((a, b) => a[e].localeCompare(b[e]));
+      setEvents(sorted);
     }
   };
 
@@ -93,6 +82,7 @@ function EventList(props) {
     setEditingStatus(true);
   };
   */
+
 
   const closeEventEditor = () => {
     setEditingStatus(false);
@@ -108,116 +98,162 @@ function EventList(props) {
     }
   }, [editingData]);
 
-  const displayEvents = (events, isOwned) => {
-    return events.map((event) => (
-      <div key={event._id}>
-        <Link to={`/event/${event._id}`} style={{ textDecoration: 'none' }} >
-          <Card className="border py-2 px-4 mb-3">
-            <div className='py-4'>
-              <div className=" text-primary px-4">
-                <div className="d-flex justify-content-between">
-                  <div id="event-header">
-                    {event.archived && (
-                      <div className="fw-bold text-secondary">Finalized</div>
-                    )}
-                    <h3 className="fs-4 fw-bold">{event.name}</h3>
-                    <span className='text-dark'>
-                      hosted by{' '}
-                      <span className="fw-bold text-dark ">{event.owner.username}</span>
-                    </span>
+  const filterArray = (e) => {
+    setFilterUnarchived(false);
+    setFilterOwned(false);
+    setFilterJoined(false);
+    setFilterArchived(false);
+    switch (e) {
+      case 'archived':
+        setFilterArchived(true);
+        break;
+      case 'unarchived':
+        setFilterUnarchived(true);
+        break;
+      case 'created':
+        setFilterOwned(true);
+        break;
+      case 'joined':
+        setFilterJoined(true);
+        break;
+      default:
+        break;
+    }
+  }
 
-                  </div>
-                  <div id="options">
-                    {isOwned && !event.archived && (
-                      <Button
-                        variant="btn btn-outline-primary  fw-bold"
-                        onClick={() => setEditingData(event)}
-                      >
-                        edit
-                      </Button>
-                    )}
+  const displayEvents = (events) => {
+    return events.map((event) => {
+      if (filterArchived === true && !event.archived) return null;
+      if (filterUnarchived === true && event.archived) return null;
+      return (
+        <div key={event._id}>
+          <Link to={`/event/${event._id}`} style={{ textDecoration: 'none' }} >
+            <Card className="border py-2 px-4 mb-3">
+              <div className='py-4'>
+                <div className=" px-4">
+                  <div className="d-flex justify-content-between">
+                    <div id="event-header">
+                      {event.archived && (
+                        <div className="fw-bold text-secondary">Archived</div>
+                      )}
+                      <h3 className="fs-4 fw-bold">{event.name}</h3>
+                      <span className='text-dark'>
+                        hosted by{' '}
+                        <span className="fw-bold text-dark ">{event.owner.username}</span>
+                      </span>
+
+                    </div>
+                    <div id="options">
+                      {event.owner._id === user.userId && !event.archived && (
+                        <Button
+                          variant="btn btn-outline-primary  fw-bold"
+                          onClick={() => setEditingData(event)}
+                        >
+                          edit
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
+                <div className="text-muted mt-1 px-4 mb-2">
+                  {event.description}
+                </div>
+
+                <>
+                  <Row className="px-4 mb-2 mt-3">
+                    {event.finalized && (
+                      <Col>
+                        <span className=" fw-bold text-secondary">When: </span>
+                        <span className="text-dark">
+                          {format(parseISO(event.finalTime), "H:mm aaa 'at' MM/dd/yyyy")}
+                        </span>
+                      </Col>
+                    )}
+                    {event.finalized && (<Col className=" fw-bold text-secondary ">What: <span className="text-dark"></span></Col>)}
+                  </Row>
+                  <Row className=" px-4 ">
+                    <Col>
+                      <span className="fw-bold text-secondary">Who:</span> <span className="text-dark">
+                        {event.members.map((member, i) => {
+                          if (i !== event.members.length - 1 && i < MAXUSERS) return (
+                            <span>{member.username}, </span>
+                          )
+                          else if (i < MAXUSERS && i === event.members.length - 1) return (
+                            <span> {member.username} </span>
+                          )
+                          else if (i === MAXUSERS) return (
+                            <span> and {event.members.length - MAXUSERS} other(s) </span>
+                          )
+                          else return;
+                        })}
+                      </span>
+                    </Col>
+                    {event.finalized && (<Col className=" fw-bold text-secondary ">Where: { }</Col>)}
+                  </Row>
+                </>
+
+
               </div>
-              <div className="text-muted mt-1 px-4 mb-2">
-                {event.description}
-              </div>
-
-              <>
-                <Row className="fw-bold text-secondary px-4 mb-2 mt-3">
-                  {event.archived && (<Col className=" fw-bold text-secondary ">When:</Col>)}
-                  {event.archived && (<Col className=" fw-bold text-secondary ">What: { }</Col>)}
-                </Row>
-                <Row className=" px-4 ">
-                  <Col><span className="fw-bold text-secondary">Who:</span> <span className="text-dark">
-                    {event.members.map((member, i) => {
-                      if (i !== event.members.length - 1 && i < MAXUSERS) return (
-                        <span>{member.username}, </span>
-                      )
-                      else if (i < MAXUSERS && i === event.members.length - 1) return (
-                        <span> {member.username} </span>
-                      )
-                      else if (i === MAXUSERS) return (
-                        <span> and {event.members.length - MAXUSERS} other(s) </span>
-                      )
-                      else return;
-                    })} </span></Col>
-                  {event.archived && (<Col className=" fw-bold text-secondary ">Where: { }</Col>)}
-                </Row>
-              </>
-
-
-            </div>
-          </Card>
-        </Link>
-      </div>
-    ));
+            </Card>
+          </Link>
+        </div>
+      )
+    });
   };
 
   return (
-    <>
-      <div
-        variant="outline-primary"
-        className="d-flex flex-row-reverse fw-bold"
-      >
-        <select
-          variant="outline-primary"
-          onChange={(e) => sortArray(e.target.value)}
-        >
-          <option>sort by</option>
-          <option>my events</option>
-          <option>owner</option>
-          <option value="createdAt">date</option>
-        </select>
-        <br></br>
-        <Button
-          onClick={(e) => handleSort(e.target.value)}
-          value="name"
-          variant="outline-primary"
-          size="sm"
-          className="fw-bold text-black mx-3 px-3"
-        >
-          A-Z
-        </Button>
-      </div>
+    <div>
+
       <br></br>
       <div id="all-events">
-        <h2 className="h3 fw-bold text-secondary">created events</h2>
-        <br />
-        {displayEvents(ownedEvents, true)}
-        <h2 className="h3 fw-bold text-secondary">my events</h2>
-        {displayEvents(memberedEvents, false)}
+        <h2 className="h2 fw-bold text-secondary">my events</h2>
+        <div className='d-flex justify-content-between mb-4'>
+          <LinkContainer to="/event/create">
+            <Button variant="outline-primary" className="ms-1 fw-bold">
+              create event +
+            </Button>
+          </LinkContainer>
+          <div
+            className="d-flex flex-row-reverse "
+          >
+            <FormSelect
+              className='ms-2'
+              onChange={(e) => filterArray(e.target.value)}
+            >
+              <option>filter by</option>
+              <option>created</option>
+              <option>joined</option>
+              <option>archived</option>
+              <option>unarchived</option>
+            </FormSelect>
+            <FormSelect
+              className='ms-2'
+              onChange={(e) => sortArray(e.target.value)}
+            >
+              <option value='unsorted'>sort by</option>
+              <option>name</option>
+              <option>owner</option>
+              <option value="createdAt">date</option>
+            </FormSelect>
+
+          </div>
+        </div>
+        {!filterJoined && !filterOwned && displayEvents(events)}
+        {filterJoined && displayEvents(events.filter((event) => event.owner._id !== user.userId))}
+        {filterOwned && displayEvents(events.filter((event) => event.owner._id === user.userId))}
       </div>
-      {editingStatus && (
-        <EventEdit
-          editing={editingStatus}
-          closeEditor={() => closeEventEditor()}
-          eventId={editingData._id}
-          editName={editingData.name}
-          editDescription={editingData.description}
-        ></EventEdit>
-      )}
-    </>
+      {
+        editingStatus && (
+          <EventEdit
+            editing={editingStatus}
+            closeEditor={() => closeEventEditor()}
+            eventId={editingData._id}
+            editName={editingData.name}
+            editDescription={editingData.description}
+          ></EventEdit>
+        )
+      }
+    </div >
   );
 }
 
