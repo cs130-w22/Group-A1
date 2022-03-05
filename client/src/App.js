@@ -42,6 +42,9 @@ function App() {
         setIsLoading(false);
         resolve();
       }).catch((err) => {
+        setUser(null);
+        localStorage.clear();
+        setIsLoading(false);
         console.log(err);
         reject();
       });
@@ -65,10 +68,10 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route element={<AuthRoute />}>
+              <Route path="/" element={<Home />} />
               <Route path="/event/create" element={<Create />} />
               <Route path="/event/:id" element={<EventPage />} />
             </Route>
-            <Route path="/" element={<Home />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         )}

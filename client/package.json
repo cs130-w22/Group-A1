@@ -24,6 +24,7 @@
     "react-google-button": "^0.7.2",
     "react-google-login": "^5.2.2",
     "react-hook-form": "^7.25.3",
+    "react-icons": "^4.3.1",
     "react-loader-spinner": "^5.1.0",
     "react-multi-date-picker": "^3.3.0",
     "react-router-bootstrap": "^0.26.0",
@@ -39,7 +40,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --watchAll=false --passWithNoTests",
+    "test-watch": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -66,6 +68,7 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.28.0",
-    "eslint-plugin-react-hooks": "^4.3.0"
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "jest-watch-typeahead": "^0.6.5"
   }
 }

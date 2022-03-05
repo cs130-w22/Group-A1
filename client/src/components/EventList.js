@@ -17,7 +17,7 @@ import EventEdit from './EventEdit';
 import PropTypes from 'prop-types';
 import { useHref, useParams } from 'react-router-dom';
 import PollList from './PollList';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import EventPage from './EventPage';
 import { bn } from 'date-fns/locale';
@@ -208,7 +208,6 @@ function EventList(thisprops) {
       </div>
     ));
   };
-
   return (
     <>
       <br></br>

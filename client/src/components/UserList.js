@@ -5,37 +5,32 @@ import { CategoryTitle, SectionTitle } from './styled/headers';
 
 export function UserList({ users }) {
   const listItems = users.map((user) => (
-    <li key={user.id}>
-      {user.username}
-    </li>
+    <li key={user._id || 'x'}>{user.username}</li>
   ));
   return <ul className="list-unstyled mb-4">{listItems}</ul>;
 }
-export function EventMembers({
-  coming, invited, declined, members,
-}) {
+export function EventMembers({ coming, invited, declined, members }) {
   return (
     <Container className="mt-4">
       <SectionTitle className="mb-3">Who&apos;s Coming?</SectionTitle>
       <Row>
-        <Col>
+        <Col xs={6}>
           <CategoryTitle count={coming.length}>Coming</CategoryTitle>
           <UserList users={coming} />
         </Col>
-        <Col>
+        <Col xs={6}>
           <CategoryTitle count={members.length}>Members</CategoryTitle>
           <UserList users={members} />
         </Col>
-        <Col>
+        <Col xs={6}>
           <CategoryTitle count={invited.length}>Invited</CategoryTitle>
           <UserList users={invited} />
         </Col>
-        <Col>
+        <Col xs={6}>
           <CategoryTitle count={declined.length}>Not Coming</CategoryTitle>
           <UserList users={declined} />
         </Col>
       </Row>
-
     </Container>
   );
 }

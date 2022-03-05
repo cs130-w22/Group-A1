@@ -26,12 +26,19 @@ export function ProtectedNav() {
   if (user) {
     return (
       <>
+        <LinkContainer to="/">
+          <Nav.Link
+            className="text-secondary"
+          >
+            home
+          </Nav.Link>
+        </LinkContainer>
         <LinkContainer to="/example">
           <Nav.Link className="fw-bold text-primary">
             example
           </Nav.Link>
         </LinkContainer>
-        <LinkContainer to="/event/62098bce59b677377499a563">
+        <LinkContainer to="/event/621b30264a3a292df2944362">
           <Nav.Link className="fw-bold text-primary">
             example event
           </Nav.Link>
@@ -46,6 +53,9 @@ export function TopNav({ onLogout }) {
   const navigate = useNavigate();
   const logout = () => {
     onLogout().then(() => {
+      navigate('/');
+    }).catch((err) => {
+      console.log(err);
       navigate('/');
     });
   };
@@ -66,17 +76,10 @@ export function TopNav({ onLogout }) {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto fw-bold">
-            <LinkContainer to="/">
-              <Nav.Link
-                className="text-secondary"
-              >
-                home
-              </Nav.Link>
-            </LinkContainer>
+
             <ProtectedNav />
           </Nav>
         </Navbar.Collapse>
-
         {user
           // <LinkContainer to="/logout">
           ? (
