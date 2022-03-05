@@ -12,6 +12,7 @@ const Poll = require('../models/poll');
 let userId = null;
 let eventId = null;
 let pollId = null;
+let optionId = null;
 let agent = null;
 const EARLIEST = 0;
 const LATEST = 5;
@@ -174,9 +175,87 @@ describe('Delete poll', () => {
 describe('Add poll option', () => {
   beforeAll(async () => {
     await setup();
+    await agent
+      .post(`/polls`)
+      .send({
+        event: eventId,
+        question: 'test',
+        maxOptionId: 0,
+        votesAllowed: 1,
+        addOptionEnabled: true
+      })
+      .expect(200)
+      .then(async (res) => {
+        pollId = res.body._id;
+      });
   });
 
-  it.todo('');
+  it('should return successfully', async () => {
+    await agent
+      .post(`/polls/${pollId}/options`)
+      .send({
+        text: 'test',
+      })
+      .expect(201)
+      .then(async (res) => {
+        optionId = res.body._id;
+      });
+  });
+
+  it('should show up in the database', async () => {
+    const option = await PollOption.findById(optionId);
+    expect(option).toBeTruthy();
+  });
+
+  afterAll((done) => {
+    mongoose.connection.db.dropDatabase(() => {
+      mongoose.connection.close(() => done());
+    });
+  });
+});
+
+describe('Edit poll option', () => {
+  beforeAll(async () => {
+    await setup();
+    await agent
+      .post(`/polls`)
+      .send({
+        event: eventId,
+        question: 'test',
+        maxOptionId: 0,
+        votesAllowed: 1,
+        addOptionEnabled: true
+      })
+      .expect(200)
+      .then(async (res) => {
+        pollId = res.body._id;
+      });
+    await agent
+      .post(`/polls/${pollId}/options`)
+      .send({
+        text: 'test',
+      })
+      .expect(201)
+      .then(async (res) => {
+        optionId = res.body._id;
+      });
+  });
+
+  it('should return successfully', async () => {
+    await agent
+      .patch(`/polls/options/${optionId}`)
+      .send({
+        update: {
+          text: 'test2'
+        }
+      })
+      .expect(200);
+  });
+
+  it('should update the poll option text', async () => {
+    const option = await PollOption.findById(optionId);
+    expect(option.text === 'test2').toBeTruthy();
+  });
 
   afterAll((done) => {
     mongoose.connection.db.dropDatabase(() => {
@@ -188,9 +267,43 @@ describe('Add poll option', () => {
 describe('Vote for poll option', () => {
   beforeAll(async () => {
     await setup();
+    await agent
+      .post(`/polls`)
+      .send({
+        event: eventId,
+        question: 'test',
+        maxOptionId: 0,
+        votesAllowed: 1,
+        addOptionEnabled: true
+      })
+      .expect(200)
+      .then(async (res) => {
+        pollId = res.body._id;
+      });
+    await agent
+      .post(`/polls/${pollId}/options`)
+      .send({
+        text: 'test',
+      })
+      .expect(201)
+      .then(async (res) => {
+        optionId = res.body._id;
+      });
   });
 
-  it.todo('');
+  it('should return successfully', async () => {
+    await agent
+      .post(`/polls/vote`)
+      .send({
+        optionId
+      })
+      .expect(200);
+  });
+
+  it('should have one vote', async () => {
+    const option = await PollOption.findById(optionId);
+    expect(option.voters.length === 1).toBeTruthy();
+  });
 
   afterAll((done) => {
     mongoose.connection.db.dropDatabase(() => {
@@ -202,9 +315,40 @@ describe('Vote for poll option', () => {
 describe('Delete poll option', () => {
   beforeAll(async () => {
     await setup();
+    await agent
+      .post(`/polls`)
+      .send({
+        event: eventId,
+        question: 'test',
+        maxOptionId: 0,
+        votesAllowed: 1,
+        addOptionEnabled: true
+      })
+      .expect(200)
+      .then(async (res) => {
+        pollId = res.body._id;
+      });
+    await agent
+      .post(`/polls/${pollId}/options`)
+      .send({
+        text: 'test',
+      })
+      .expect(201)
+      .then(async (res) => {
+        optionId = res.body._id;
+      });
   });
 
-  it.todo('');
+  it('should return successfully', async () => {
+    await agent
+      .delete(`/polls/options/${optionId}`)
+      .expect(200);
+  });
+
+  it('should not show up in the database', async () => {
+    const option = await PollOption.findById(optionId);
+    expect(option).toBeFalsy();
+  });
 
   afterAll((done) => {
     mongoose.connection.db.dropDatabase(() => {
