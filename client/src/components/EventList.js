@@ -1,3 +1,5 @@
+
+   
 /* eslint-disable array-callback-return */
 /* eslint-disable no-const-assign */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -128,71 +130,75 @@ function EventList(props) {
       return (
         <div key={event._id}>
             <Card className="border py-2 px-4 mb-3">
-                <div id="event details" className="py-2 px-4 mb-3">
-                  <Link to={`/event/${event._id}`} style={{ textDecoration: 'none' }} >
-                    <div className='py-4'>
-                      <div className=" px-4">
-                          <div id="event-header">
-                            {event.archived && (
-                              <div className="fw-bold text-secondary">Archived</div>
-                            )}
-                            <h3 className="fs-4 fw-bold">{event.name}</h3>
-                            <span className='text-dark'>
-                              hosted by{' '}
-                              <span className="fw-bold text-dark ">{event.owner.username}</span>
-                            </span>
+              <div className='py-4'>
+                <div className=" px-4">
+                  <div className="d-flex justify-content-between">
+                    <div id="event-header">
+                      {event.archived && (
+                        <div className="fw-bold text-secondary">Archived</div>
+                      )}
+                      <h3 className="fs-4 fw-bold">
+                        <a id="event-list-names" href={`/event/${event._id}`} 
+                          style={{ textDecoration: 'none' }}>
+                          {event.name}
+                        </a>
+                      </h3>
+                      <span className='text-dark'>
+                        hosted by{' '}
+                        <span className="fw-bold text-dark ">{event.owner.username}</span>
+                      </span>
 
-                          </div>
-                      </div>
-                      <div className="text-muted mt-1 px-4 mb-2">
-                        {event.description}
-                      </div>
-
-                      <>
-                        <Row className="px-4 mb-2 mt-3">
-                          {event.finalized && (
-                            <Col>
-                              <span className=" fw-bold text-secondary">When: </span>
-                              <span className="text-dark">
-                                {format(parseISO(event.finalTime), "H:mm aaa 'at' MM/dd/yyyy")}
-                              </span>
-                            </Col>
-                          )}
-                          {event.finalized && (<Col className=" fw-bold text-secondary ">What: <span className="text-dark"></span></Col>)}
-                        </Row>
-                        <Row className=" px-4 ">
-                          <Col>
-                            <span className="fw-bold text-secondary">Who:</span> <span className="text-dark">
-                              {event.members.map((member, i) => {
-                                if (i !== event.members.length - 1 && i < MAXUSERS) return (
-                                  <span>{member.username}, </span>
-                                )
-                                else if (i < MAXUSERS && i === event.members.length - 1) return (
-                                  <span> {member.username} </span>
-                                )
-                                else if (i === MAXUSERS) return (
-                                  <span> and {event.members.length - MAXUSERS} other(s) </span>
-                                )
-                                else return;
-                              })}
-                            </span>
-                          </Col>
-                          {event.finalized && (<Col className=" fw-bold text-secondary ">Where: { }</Col>)}
-                        </Row>
-                      </>
                     </div>
-                  </Link>
+                    <div id="options">
+                      {event.owner._id === user.userId && !event.archived && (
+                        <Button
+                          variant="btn btn-outline-primary  fw-bold"
+                          onClick={() => setEditingData(event)}
+                        >
+                          edit
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div id="options" className="py-4 px-4">
-                  {event.owner._id === user.userId && !event.archived && (
-                    <Button
-                      variant="btn btn-outline-primary  fw-bold"
-                      onClick={() => setEditingData(event)}
-                    >
-                      edit
-                    </Button>
-                  )}
-                
+                <div className="text-muted mt-1 px-4 mb-2">
+                  {event.description}
+                </div>
+
+                <>
+                  <Row className="px-4 mb-2 mt-3">
+                    {event.finalized && (
+                      <Col>
+                        <span className=" fw-bold text-secondary">When: </span>
+                        <span className="text-dark">
+                          {format(parseISO(event.finalTime), "H:mm aaa 'at' MM/dd/yyyy")}
+                        </span>
+                      </Col>
+                    )}
+                    {event.finalized && (<Col className=" fw-bold text-secondary ">What: <span className="text-dark"></span></Col>)}
+                  </Row>
+                  <Row className=" px-4 ">
+                    <Col>
+                      <span className="fw-bold text-secondary">Who:</span> <span className="text-dark">
+                        {event.members.map((member, i) => {
+                          if (i !== event.members.length - 1 && i < MAXUSERS) return (
+                            <span>{member.username}, </span>
+                          )
+                          else if (i < MAXUSERS && i === event.members.length - 1) return (
+                            <span> {member.username} </span>
+                          )
+                          else if (i === MAXUSERS) return (
+                            <span> and {event.members.length - MAXUSERS} other(s) </span>
+                          )
+                          else return;
+                        })}
+                      </span>
+                    </Col>
+                    {event.finalized && (<Col className=" fw-bold text-secondary ">Where: { }</Col>)}
+                  </Row>
+                </>
+
+
               </div>
             </Card>
         </div>
