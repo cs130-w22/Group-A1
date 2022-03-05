@@ -94,6 +94,7 @@ router.delete('/:id', (req, res) => {
       if (result.owner == req.session.userId) resolve();
       else reject('Forbidden');
     }))
+    .then(() => Poll.findByIdAndDelete(result.goingPoll))
     .then(() => Event.findByIdAndDelete(req.params.id))
     .then((result) => res.send(result))
     .catch((err) => {

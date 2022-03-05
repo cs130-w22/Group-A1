@@ -34,6 +34,26 @@ exports.createEvent = async (req, res) => {
     let timeLatest = 23;
     if (req.body.timeEarliest !== -1) timeEarliest = req.body.timeEarliest;
     if (req.body.timeLatest !== -1) timeLatest = req.body.timeLatest;
+
+
+    const goingPoll = new Poll({
+      event: null,
+      question: "Who's Going?",
+      maxOptionId: 2,
+      votesAllowed: 1,
+      addOptionEnabled: false
+    });
+    const goingOption = new PollOption({
+      poll: goingPoll._id,
+      text: 'Going'
+    });
+    const notGoingOption = new PollOption({
+      poll: goingPoll._id,
+      text: 'Not Going'
+    });
+    goingPoll.options.push(goingOption._id);
+    goingPoll.options.push(notGoingOption._id);
+
     const event = new Event({
       name: req.body.name,
       description: req.body.description,
@@ -43,7 +63,11 @@ exports.createEvent = async (req, res) => {
       archived: false,
       owner: userId,
       members: [userId],
+      goingPoll: goingPoll._id
     });
+
+    console.log(goingPoll)
+    console.log(event)
 
     await initializeAvailability(event);
 
@@ -113,6 +137,19 @@ exports.leaveEvent = async (req, res) => {
         },
       },
     );
+
+    const event = await Event.findById(req.params.id);
+    await PollOption.updateMany(
+      {
+        poll: event.goingPoll,
+      },
+      {
+        $pull: {
+          voters: userId,
+        },
+      },
+    );
+
     const polls = await Poll.find({
       event: req.params.id,
     });
