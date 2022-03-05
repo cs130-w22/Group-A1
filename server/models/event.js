@@ -16,6 +16,7 @@ const EventSchema = new Schema({
   kicked: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   blocks: [{ type: Schema.Types.ObjectId, ref: 'Availability' }],
   invitees: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  goingPoll: { type: Schema.Types.ObjectId, ref: 'Poll' }
 }, { timestamps: true });
 
 const Event = mongoose.model('event', EventSchema);
