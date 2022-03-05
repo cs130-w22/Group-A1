@@ -7,6 +7,24 @@ const Poll = require('../models/poll');
 const PollOption = require('../models/pollOption');
 const { initializeAvailability } = require('./availabilityController');
 
+exports.getEvents = (req, res) => {
+  const { userId } = req.session;
+  if (userId == null) return res.sendStatus(401);
+  Event.find({ $or: [{ owner: userId }, { members: userId }] })
+    .populate('owner', '_id username')
+    .populate('members', '_id username')
+    .then((myevents) => {
+      // eslint-disable-next-line eqeqeq
+      const owned = myevents.filter((event) => event.owner._id == userId);
+      // eslint-disable-next-line eqeqeq
+      const memberTo = myevents.filter((event) => event.owner._id != userId);
+      res.status(200).json({ owned, memberOnly: memberTo });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.sendStatus(500);
+    });
+};
 exports.createEvent = async (req, res) => {
   try {
     const { userId } = req.session;

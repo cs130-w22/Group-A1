@@ -50,6 +50,7 @@ function EventList(props) {
   useEffect(() => {
     getEventList()
       .then((res) => {
+        console.log(res);
         setOwnedEvents(res.data.owned);
         setMemberedEvents(res.data.memberOnly);
       })
@@ -98,6 +99,8 @@ function EventList(props) {
     setEditingData(undefined);
   };
 
+  const MAXUSERS = 3;
+
   useEffect(() => {
     if (editingData !== undefined) {
       setEditingStatus(() => true);
@@ -106,42 +109,64 @@ function EventList(props) {
   }, [editingData]);
 
   const displayEvents = (events, isOwned) => {
-    console.log(events);
     return events.map((event) => (
       <div key={event._id}>
-        <Link to={`/event/${event._id}`} style={{ textDecoration: 'none'}} >
-          <Card className="border py-4 px-4 mb-3">
-            <div>
-              <div className="fw-bold text-primary px-4 mt-4">
-                Event Name <span className="text-black">{event.name}</span>
-                <div className="text-black">
-                  hosted by{' '}
-                  <span className="text-muted px-3">{event.owner.username}</span>
+        <Link to={`/event/${event._id}`} style={{ textDecoration: 'none' }} >
+          <Card className="border py-2 px-4 mb-3">
+            <div className='py-4'>
+              <div className=" text-primary px-4">
+                <div className="d-flex justify-content-between">
+                  <div id="event-header">
+                    {event.archived && (
+                      <div className="fw-bold text-secondary">Finalized</div>
+                    )}
+                    <h3 className="fs-4 fw-bold">{event.name}</h3>
+                    <span className='text-dark'>
+                      hosted by{' '}
+                      <span className="fw-bold text-dark ">{event.owner.username}</span>
+                    </span>
+
+                  </div>
+                  <div id="options">
+                    {isOwned && !event.archived && (
+                      <Button
+                        variant="btn btn-outline-primary  fw-bold"
+                        onClick={() => setEditingData(event)}
+                      >
+                        edit
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                {event.archived && (
-                  <div className="fw-bold text-secondary">Finalized</div>
-                )}
               </div>
-              <div className="text-muted  px-4">
-                Decription: {event.description}
+              <div className="text-muted mt-1 px-4 mb-2">
+                {event.description}
               </div>
-              <br></br>
-              <Row className="fw-bold text-secondary px-4 mb-2">
-                <Col className=" fw-bold text-secondary ">When:</Col>
-                <Col className=" fw-bold text-secondary ">What: {}</Col>
-              </Row>
-              <Row className="fw-bold text-secondary px-4 mb-4">
-                <Col className=" fw-bold text-secondary ">Who:</Col>
-                <Col className=" fw-bold text-secondary ">Where: {}</Col>
-              </Row>
-              { isOwned && !event.archived && (
-                <Button
-                  varient="btn btn-outline-secondary"
-                  onClick={() => setEditingData(event)}
-                >
-                  edit
-                </Button>
-              )}
+
+              <>
+                <Row className="fw-bold text-secondary px-4 mb-2 mt-3">
+                  {event.archived && (<Col className=" fw-bold text-secondary ">When:</Col>)}
+                  {event.archived && (<Col className=" fw-bold text-secondary ">What: { }</Col>)}
+                </Row>
+                <Row className=" px-4 ">
+                  <Col><span className="fw-bold text-secondary">Who:</span> <span className="text-dark">
+                    {event.members.map((member, i) => {
+                      if (i !== event.members.length - 1 && i < MAXUSERS) return (
+                        <span>{member.username}, </span>
+                      )
+                      else if (i < MAXUSERS && i === event.members.length - 1) return (
+                        <span> {member.username} </span>
+                      )
+                      else if (i === MAXUSERS) return (
+                        <span> and {event.members.length - MAXUSERS} other(s) </span>
+                      )
+                      else return;
+                    })} </span></Col>
+                  {event.archived && (<Col className=" fw-bold text-secondary ">Where: { }</Col>)}
+                </Row>
+              </>
+
+
             </div>
           </Card>
         </Link>

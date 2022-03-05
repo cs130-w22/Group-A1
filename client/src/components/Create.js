@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useState, useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Alert, Button, Dropdown, Form,
 } from 'react-bootstrap';
@@ -13,9 +13,9 @@ import { createEvent } from '../api/event';
 import { UserContext } from '../utils/context';
 
 import { TITLE } from '../assets/constants';
-import EventList from './EventList';
 import { useParams } from 'react-router-dom';
-import { useEffect } from 'react';
+import EventList from './EventList';
+
 function Create() {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
@@ -37,14 +37,14 @@ function Create() {
     return hour < 13 ? `${hour}:00 AM` : `${hour % 12}:00 PM`;
   };
 
-  
+
   //var created = false;
   const {
     handleSubmit,
     control,
     setError,
     formState: { errors },
-    
+
   } = useForm();
 
   const onSubmit = (data) => {
@@ -96,12 +96,12 @@ function Create() {
               }
             }
           }
-          
+
         }
       });
   };
-  
-  
+
+
 
   return (
     <div>
@@ -211,10 +211,10 @@ function Create() {
 
         </Form.Group>
         <Button variant="outline-primary" className="fw-bold" type="submit">
-          
+
           create event
         </Button>
-        
+
       </Form>
     </div>
   );

@@ -1,13 +1,15 @@
+/* eslint-disable prefer-promise-reject-errors */
 const express = require('express');
 const { isValidObjectId } = require('mongoose');
 
 const router = express.Router();
 const { body } = require('express-validator');
 const {
-  getEvent, createEvent, joinEvent, leaveEvent,
+  getEvents, getEvent, createEvent, joinEvent, leaveEvent,
 } = require('../controllers/eventController');
 const { getUserAvailability, getAvailability, setAvailability } = require('../controllers/availabilityController');
 const { EventInvite } = require('../models/invite');
+const Event = require('../models/event');
 const Poll = require('../models/poll');
 
 // should be deleted eventually
@@ -20,30 +22,15 @@ router.get('/all', (req, res) => {
     });
 });
 
-// get all events for user + specify whether I am owner or member
-router.get('/', (req, res) => {
-  const { userId } = req.session;
-  if (userId == null) return res.sendStatus(401);
-  Event.find({ $or: [{ owner: userId }, { members: userId }] })
-    .populate('owner', '_id username')
-    .then((myevents) => {
-      const owned = myevents.filter((event) => event.owner._id == userId);
-      const memberTo = myevents.filter((event) => event.owner._id != userId);
-      console.log(myevents);
-      res.status(200).json({ owned: owned, memberOnly: memberTo });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.sendStatus(500);
-    });
-});
-
 router.post(
   '/',
   body('name').exists().notEmpty().withMessage('Please enter an event name'),
   body('dates').exists().notEmpty().withMessage('Please select at least one date'),
   createEvent,
 );
+
+// get all events for user + specify whether I am owner or member
+router.get('/', getEvents);
 
 router.get('/:id', getEvent);
 
@@ -76,15 +63,13 @@ router.post(
   (req, res) => {
     if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
     Event.findById(req.params.id)
+      .then((result) => new Promise((resolve, reject) => {
+        // eslint-disable-next-line eqeqeq
+        if (result.owner == req.session.userId) resolve([req.body.name, req.body.description]);
+        else reject('Forbidden');
+      }))
       .then((result) => {
-        return new Promise((resolve, reject) => {
-          if (result.owner == req.session.userId)
-            resolve([req.body.name, req.body.description]);
-          else reject('Forbidden');
-        });
-      })
-      .then((result) => {
-        [name, description] = result;
+        const [name, description] = result;
         const filter = { _id: req.params.id };
         const update = {
           name,
@@ -104,15 +89,12 @@ router.post(
 router.delete('/:id', (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   Event.findById(req.params.id)
-    .then((result) => {
-      return new Promise((resolve, reject) => {
-        if (result.owner == req.session.userId) resolve();
-        else reject('Forbidden');
-      });
-    })
-    .then(() => {
-      return Event.findByIdAndDelete(req.params.id);
-    })
+    .then((result) => new Promise((resolve, reject) => {
+      // eslint-disable-next-line eqeqeq
+      if (result.owner == req.session.userId) resolve();
+      else reject('Forbidden');
+    }))
+    .then(() => Event.findByIdAndDelete(req.params.id))
     .then((result) => res.send(result))
     .catch((err) => {
       console.log(err);
@@ -171,6 +153,7 @@ router.post('/:id/archive', (req, res) => {
   if (userId == null) return res.sendStatus(401);
   Event.findById(id)
     .then((result) => {
+      // eslint-disable-next-line eqeqeq
       if (result.owner != userId) {
         res
           .status(404)
@@ -193,6 +176,7 @@ router.post('/:id/unarchive', (req, res) => {
   if (userId == null) return res.sendStatus(401);
   Event.findById(id)
     .then((result) => {
+      // eslint-disable-next-line eqeqeq
       if (result.owner != userId) {
         res
           .status(404)
