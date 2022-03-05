@@ -8,6 +8,7 @@ import { TITLE } from '../assets/constants';
 import { UserContext } from '../utils/context';
 import EventList from './EventList';
 import InviteList from './InviteList';
+import Gcalender from './Gcalender';
 
 function Home() {
   const { user, setUser } = useContext(UserContext);

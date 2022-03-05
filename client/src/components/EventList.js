@@ -17,11 +17,11 @@ import EventEdit from './EventEdit';
 import PropTypes from 'prop-types';
 import { useHref, useParams } from 'react-router-dom';
 import PollList from './PollList';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import EventPage from './EventPage';
 import { bn } from 'date-fns/locale';
-import Gcalender from './Gcalender';
+//import Gcalender from './Gcalender';
 import { propTypes } from 'react-bootstrap/esm/Image';
 
 function EventList(thisprops) {
@@ -46,17 +46,18 @@ function EventList(thisprops) {
   const readOnly = useContext(EventContext);
   //gets event information about going or not
 
-  const savedEvent = localStorage.getItem('event_data');
-  const eventdata = JSON.parse(savedEvent);
+  //const savedEvent = localStorage.getItem('event_data');
+  //const eventdata = JSON.parse(savedEvent);
 
   //gets the name of the event/progile owner
-  const ownerName = thisprops.props;
+  //const ownerName = thisprops.props;
   //getting owned and invited events seperately from api
   useEffect(() => {
     getEventList()
       .then((res) => {
         setOwnedEvents(res.data.owned);
         setMemberedEvents(res.data.memberOnly);
+        console.log("this is the events ",ownedEvents)
       })
       .catch((error) => {
         console.error(error);
@@ -132,8 +133,8 @@ function EventList(thisprops) {
     } else {
       events = events;
     }
-    //console.log(events._id)
-    return events.map((event, i) => (
+    console.log(events)
+    return ownedEvents.map((event) => (
       <div event={event} key={event._id}>
         <Card className="border py-4 px-4 mb-3">
           <div>
@@ -141,7 +142,7 @@ function EventList(thisprops) {
               Event Name <span className="text-black">{event?.name}</span>
               <div className="text-black">
                 hosted by{' '}
-                <span className="text-muted px-3">{event.owner.username}</span>
+                <span className="text-muted px-3">{event?.owner.username}</span>
               </div>
             </div>
             <div className="text-muted  px-4">
@@ -152,7 +153,7 @@ function EventList(thisprops) {
               <Col className=" fw-bold text-secondary ">
                 When:
                 {
-                  event.finaltime //TODO:fix time
+                  event?.finaltime //TODO:fix time
                 }
               </Col>
               <Col className=" fw-bold text-secondary ">What: {}</Col>
@@ -208,6 +209,7 @@ function EventList(thisprops) {
       </div>
     ));
   };
+
   return (
     <>
       <br></br>
@@ -261,16 +263,7 @@ function EventList(thisprops) {
           editDescription={editingData.description}
         ></EventEdit>
       )}
-      {GcalActivate && (
-        <Gcalender
-          showCalender={GcalActivate}
-          eventId={calenderInfo._id}
-          editName={calenderInfo.name}
-          editDescription={calenderInfo.description}
-          wholeEvent={calenderInfo}
-          eventTime={calenderInfo.dates}
-        ></Gcalender>
-      )}
+      
     </>
   );
 }

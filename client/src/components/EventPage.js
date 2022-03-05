@@ -45,14 +45,13 @@ function EventPage() {
           declined: [{ id: '3', username: 'PartyPooper' }],
         });
         //var allData =[].concat(eventData);
-        localStorage.setItem('event_id', JSON.stringify(id));
-        localStorage.setItem('event_data', JSON.stringify(eventData));
+
         setIsMember(
           eventData.members.some((member) => member._id === user.userId),
         );
         setMembers(eventData.members);
-        setIsOwner(eventData.owner._id === user.userId);
-        setArchived(eventData.archived);
+        localStorage.setItem('event_id', JSON.stringify(id));
+        localStorage.setItem('event_data', JSON.stringify(eventData));
       })
       .catch((err) => {
         if (err.response.status === 401) {
@@ -86,6 +85,7 @@ function EventPage() {
     joinEvent(id)
       .then(() => {
         setIsMember(true);
+        //localStorage.setItem('going', JSON.stringify(isMember));
         const updatedInvites = invited.filter(
           (invite) => invite._id !== user.userId,
         );
