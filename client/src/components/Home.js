@@ -44,20 +44,14 @@ function Home() {
         <div>
           <Row>
             <Col xs={7}>
-              <h2 className="fs-3">
+              <h2 className="mb-0">
                 Hi
                 {' '}
-                <span className="fw-bold">
+                <span className="fw-bold  text-primary">
                   {user.username}
                   !
                 </span>
               </h2>
-              {' '}
-              <LinkContainer to="/event/create">
-                <Button variant="outline-primary" className="ms-1 fw-bold">
-                  create event +
-                </Button>
-              </LinkContainer>
               <EventList props={user?.username} />
             </Col>
             <Col>
