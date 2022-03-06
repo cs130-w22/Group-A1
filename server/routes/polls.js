@@ -15,21 +15,21 @@ router.post('/vote', (req, res) => {
         model: Event,
       },
     })
-    .then((option) => {
+    .then(async (option) => {
       const { userId } = req.session;
       if (option == null || option.poll == null || option.poll.event == null)
         return res.sendStatus(404);
       if (option.poll.event.archived == true) return res.sendStatus(403);
       if (option.voters.includes(userId)) {
-        option.voters.pull({ _id: userId });
-        option.save();
+        await option.voters.pull({ _id: userId });
+        await option.save();
         res.status(200).send(option);
       } else {
         Poll.findById(option.poll).then((poll) => {
-          poll.userCanVoteInPoll(userId).then((result) => {
+          poll.userCanVoteInPoll(userId).then(async (result) => {
             if (result) {
-              option.voters.push({ _id: userId });
-              option.save();
+              await option.voters.push({ _id: userId });
+              await option.save();
               res.status(200).send(option);
             } else res.status(202).send('User Votes Exceeded');
           });
