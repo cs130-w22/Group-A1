@@ -28,6 +28,7 @@ import { format, parseISO } from 'date-fns';
 
 function EventList(thisprops) {
   const [events, setEvents] = useState([]);
+  const [errorMsg, setErrorMsg] = useState();
   const [filter, setFilter] = useState('name');
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingData, setEditingData] = useState();
