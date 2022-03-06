@@ -1,9 +1,8 @@
-
-   
 /* eslint-disable array-callback-return */
 /* eslint-disable no-const-assign */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
+
 import React, { useState, useEffect, useContext } from 'react';
 import {
   Card,
@@ -14,76 +13,48 @@ import {
   Alert,
   Modal,
   Form,
-  ToggleButton,
   FormSelect,
 } from 'react-bootstrap';
-import { joinEvent, getEvent, getEventList } from '../api/event';
+import { getEventList } from '../api/event';
 import { getUser } from '../api/users';
-import { UserContext } from '../utils/context';
+import { UserContext, EventContext } from '../utils/context';
 import { Create } from './Create';
 import EventEdit from './EventEdit';
 import PropTypes from 'prop-types';
-import { useHref, useParams } from 'react-router-dom';
-import PollList from './PollList';
-import { NavLink, Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import EventPage from './EventPage';
-import { bn } from 'date-fns/locale';
+import Gcalender from './Gcalender';
 import { LinkContainer } from 'react-router-bootstrap';
 import { format, parseISO } from 'date-fns';
 
-function EventList(props) {
-  //const [createdEvent,setCreatedEvent] =useState(false);
-  const { id } = useParams();
-  const { user } = useContext(UserContext);
+function EventList(thisprops) {
   const [events, setEvents] = useState([]);
-  const [errorMsg, setErrorMsg] = useState('');
-  const navigate = useNavigate();
-  const [pressed, setPressed] = useState(false);
+  const [errorMsg, setErrorMsg] = useState();
+  const [filter, setFilter] = useState('name');
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingData, setEditingData] = useState();
-  const [filterArchived, setFilterArchived] = useState(false);
-  const [filterUnarchived, setFilterUnarchived] = useState(false);
-  const [filterOwned, setFilterOwned] = useState(false);
-  const [filterJoined, setFilterJoined] = useState(false);
+  const [GcalActivate, setGcalActivate] = useState(false);
+  const [sort, setSort] = useState("A-Z");
+  const [calenderInfo, setCalenderInfo] = useState();
+  const { user, setUser } = useContext(UserContext);
+  //gets event information about going or not
+
+  const savedEvent = localStorage.getItem('event_data');
+  const eventdata = JSON.parse(savedEvent);
 
   //gets the name of the event/progile owner
-  const ownerName = props.props;
+  const ownerName = thisprops.props;
   //getting owned and invited events seperately from api
   useEffect(() => {
     getEventList()
       .then((res) => {
-        console.log(res);
         setEvents(res.data.events);
+        //setMemberedEvents(res.data.memberOnly);
       })
       .catch((error) => {
         console.error(error);
         setErrorMsg('Error fetching Events, please try again later!');
       });
   }, [user]);
-
-  //handle the dropdown sorting
-  const sortArray = (e) => {
-    if (e === 'owner') {
-      let s = [...events].sort((a, b) => a.owner.username.localeCompare(b.owner.username))
-      console.log(s);
-      setEvents(s);
-    } else if (e === 'unsorted') {
-      setEvents([...events].sort((a, b) => a._id.localeCompare(b._id)));
-    } else {
-      const sorted = [...events].sort((a, b) => a[e].localeCompare(b[e]));
-      setEvents(sorted);
-    }
-  };
-
-  //console.log(ownedEvents,[ownedEvents]);
-
-  /*
-  const openEventEditor = (e, event) => {
-    setEditingData(event);
-    setEditingStatus(true);
-  };
-  */
 
 
   const closeEventEditor = () => {
@@ -92,7 +63,6 @@ function EventList(props) {
   };
 
   const MAXUSERS = 3;
-
   useEffect(() => {
     if (editingData !== undefined) {
       setEditingStatus(() => true);
@@ -100,56 +70,85 @@ function EventList(props) {
     }
   }, [editingData]);
 
-  const filterArray = (e) => {
-    setFilterUnarchived(false);
-    setFilterOwned(false);
-    setFilterJoined(false);
-    setFilterArchived(false);
-    switch (e) {
-      case 'archived':
-        setFilterArchived(true);
-        break;
-      case 'unarchived':
-        setFilterUnarchived(true);
-        break;
-      case 'created':
-        setFilterOwned(true);
-        break;
-      case 'joined':
-        setFilterJoined(true);
-        break;
-      default:
-        break;
+  const handleGcalender = (e) => {
+    setGcalActivate(true);
+    setCalenderInfo(e);
+  };
+
+  useEffect(() => {
+    if (calenderInfo !== undefined) {
+      setGcalActivate(() => true);
+      console.log('this is the calenderinfo ', calenderInfo);
     }
-  }
+  }, [calenderInfo]);
 
   const displayEvents = (events) => {
-    return events.map((event) => {
-      if (filterArchived === true && !event.archived) return null;
-      if (filterUnarchived === true && event.archived) return null;
-      return (
-        <div key={event._id}>
-            <Card className="border py-2 px-4 mb-3">
-              <div className='py-4'>
-                <div className=" px-4">
-                  <div className="d-flex justify-content-between">
-                    <div id="event-header">
-                      {event.archived && (
-                        <div className="fw-bold text-secondary">Archived</div>
-                      )}
-                      <h3 className="fs-4 fw-bold">
-                        <a id="event-list-names" href={`/event/${event._id}`} 
-                          style={{ textDecoration: 'none' }}>
-                          {event.name}
-                        </a>
-                      </h3>
-                      <span className='text-dark'>
-                        hosted by{' '}
-                        <span className="fw-bold text-dark ">{event.owner.username}</span>
-                      </span>
 
-                    </div>
-                    <div id="options">
+    //let props ={event:events, GcalActivate:GcalActivate}
+    //displays archived events
+    if (filter === 'archived') {
+      events = events.filter((item) => item.archived);
+    }
+    //displays non archived events
+    else if (filter === 'unarchived') {
+      events = events.filter((item) => !item.archived);
+    }
+    //this part is just to show filtering works
+    //can be changed when we have going/notgoing function added
+    else if (filter === 'going') {
+      events = events.filter((item) => item.isGoing);
+    }
+    //notgoing
+    else if (filter === 'notGoing') {
+      events = events.filter((item) => !item.isGoing);
+    }
+    //when none of the option is selected  display all the events
+    //only show the event i created
+    else if (filter === 'owner') {
+      events = events.filter((item) => item.owner._id === user.userId);
+    }
+    else if (filter === 'joined') {
+      events = events.filter((item) => item.owner._id !== user.userId);
+    }
+    if (sort === 'A-Z') {
+      events = events.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sort === 'Z-A') {
+      events = events.sort((a, b) => b.name.localeCompare(a.name));
+    }
+    else if (sort === 'creation') {
+      events = events.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    }
+    else if (sort === 'creationDesc') {
+      events = events.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    }
+    else {
+      events = events.sort((a, b) => a._id.localeCompare(b._id));
+    }
+    return events.map((event, i) => (
+      <div key={event._id}>
+        <Card className="border py-2 px-4 mb-3">
+          <div className='py-4'>
+            <div className=" px-4">
+              <div className="d-flex justify-content-between">
+                <div id="event-header">
+                  {event.archived && (
+                    <div className="fw-bold text-secondary">Archived</div>
+                  )}
+                  <h3 className="fs-4 fw-bold">
+                    <a id="event-list-names" href={`/event/${event._id}`}
+                      style={{ textDecoration: 'none' }}>
+                      {event.name}
+                    </a>
+                  </h3>
+                  <span className='text-dark'>
+                    hosted by{' '}
+                    <span className="fw-bold text-dark ">{event.owner.username}</span>
+                  </span>
+
+                </div>
+                <div id="options">
+                  <Col>
+                    <Row>
                       {event.owner._id === user.userId && !event.archived && (
                         <Button
                           variant="btn btn-outline-primary  fw-bold"
@@ -158,58 +157,71 @@ function EventList(props) {
                           edit
                         </Button>
                       )}
-                    </div>
-                  </div>
+                    </Row>
+                    <Row>
+                      {(event.members.username === user.username
+                        && event.finalized
+                      ) ?
+                        (<Button
+                          varient="btn btn-outline-secondary"
+                          onClick={() => handleGcalender(event)}
+                        >
+                          add to Google
+                        </Button>) : ('')}
+                    </Row>
+                  </Col>
                 </div>
-                <div className="text-muted mt-1 px-4 mb-2">
-                  {event.description}
-                </div>
-
-                <>
-                  <Row className="px-4 mb-2 mt-3">
-                    {event.finalized && (
-                      <Col>
-                        <span className=" fw-bold text-secondary">When: </span>
-                        <span className="text-dark">
-                          {format(parseISO(event.finalTime), "H:mm aaa 'at' MM/dd/yyyy")}
-                        </span>
-                      </Col>
-                    )}
-                    {event.finalized && (<Col className=" fw-bold text-secondary ">What: <span className="text-dark"></span></Col>)}
-                  </Row>
-                  <Row className=" px-4 ">
-                    <Col>
-                      <span className="fw-bold text-secondary">Who:</span> <span className="text-dark">
-                        {event.members.map((member, i) => {
-                          if (i !== event.members.length - 1 && i < MAXUSERS) return (
-                            <span>{member.username}, </span>
-                          )
-                          else if (i < MAXUSERS && i === event.members.length - 1) return (
-                            <span> {member.username} </span>
-                          )
-                          else if (i === MAXUSERS) return (
-                            <span> and {event.members.length - MAXUSERS} other(s) </span>
-                          )
-                          else return;
-                        })}
-                      </span>
-                    </Col>
-                    {event.finalized && (<Col className=" fw-bold text-secondary ">Where: { }</Col>)}
-                  </Row>
-                </>
-
-
               </div>
-            </Card>
-        </div>
-      )
-    });
+            </div>
+            <div className="text-muted mt-1 px-4 mb-2">
+              {event.description}
+            </div>
+
+            <>
+              <Row className="px-4 mb-2 mt-3">
+                {event.finalized && (
+                  <Col>
+                    <span className=" fw-bold text-secondary">When: </span>
+                    <span className="text-dark">
+                      {format(parseISO(event.finalTime), "H:mm aaa 'at' MM/dd/yyyy")}
+                    </span>
+                  </Col>
+                )}
+                {event.finalized && (<Col className=" fw-bold text-secondary ">What: <span className="text-dark"></span></Col>)}
+              </Row>
+              <Row className=" px-4 ">
+                <Col>
+                  <span className="fw-bold text-secondary">Who:</span> <span className="text-dark">
+                    {event.members.map((member, i) => {
+                      if (i !== event.members.length - 1 && i < MAXUSERS) return (
+                        <span>{member.username}, </span>
+                      )
+                      else if (i < MAXUSERS && i === event.members.length - 1) return (
+                        <span> {member.username} </span>
+                      )
+                      else if (i === MAXUSERS) return (
+                        <span> and {event.members.length - MAXUSERS} other(s) </span>
+                      )
+                      else return;
+                    })}
+                  </span>
+                </Col>
+                {event.finalized && (<Col className=" fw-bold text-secondary ">Where: { }</Col>)}
+              </Row>
+            </>
+
+
+          </div>
+        </Card>
+      </div>
+
+
+    ));
+
   };
 
   return (
-    <div>
-
-      <br></br>
+    <>
       <div id="all-events">
         <h2 className="h2 fw-bold text-secondary">my events</h2>
         <div className='d-flex justify-content-between mb-4'>
@@ -218,34 +230,43 @@ function EventList(props) {
               create event +
             </Button>
           </LinkContainer>
+
           <div
-            className="d-flex flex-row-reverse "
+            variant="outline-primary"
+            className="d-flex flex-row-reverse"
           >
             <FormSelect
               className='ms-2'
-              onChange={(e) => filterArray(e.target.value)}
+              onChange={(e) => setFilter(e.target.value)}
             >
               <option>filter by</option>
-              <option>created</option>
+              <option value="owner">created</option>
               <option>joined</option>
               <option>archived</option>
               <option>unarchived</option>
+              <option>going</option>
+              <option value="notGoing">not going</option>
             </FormSelect>
             <FormSelect
-              className='ms-2'
-              onChange={(e) => sortArray(e.target.value)}
+              variant="outline-primary"
+              style={{ width: '200px' }}
+              onChange={(e) => setSort(e.target.value)}
             >
-              <option value='unsorted'>sort by</option>
-              <option>name</option>
-              <option>owner</option>
-              <option value="createdAt">date</option>
+              <option value="sortby">sort by</option>
+              <option value="A-Z"> A-Z </option>
+              <option value="Z-A"> Z-A </option>
+
+              <option value="creation"> Creation Date (asc)</option>
+              <option value="creationDesc"> Creation Date (desc)</option>
             </FormSelect>
 
           </div>
         </div>
-        {!filterJoined && !filterOwned && displayEvents(events)}
-        {filterJoined && displayEvents(events.filter((event) => event.owner._id !== user.userId))}
-        {filterOwned && displayEvents(events.filter((event) => event.owner._id === user.userId))}
+        <br className="" />
+        <div className="text-secondary">
+          {displayEvents(events)}
+        </div>
+
       </div>
       {
         editingStatus && (
@@ -258,7 +279,19 @@ function EventList(props) {
           ></EventEdit>
         )
       }
-    </div >
+      {
+        GcalActivate && (
+          <Gcalender
+            showCalender={GcalActivate}
+            eventId={calenderInfo._id}
+            editName={calenderInfo.name}
+            editDescription={calenderInfo.description}
+            wholeEvent={calenderInfo}
+            eventTime={calenderInfo.dates}
+          ></Gcalender>
+        )
+      }
+    </>
   );
 }
 
