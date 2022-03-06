@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Col, Container, Row, Alert, Button, Modal } from 'react-bootstrap';
 import { Watch } from 'react-loader-spinner';
@@ -29,7 +29,6 @@ function EventPage() {
   const [errorMsg, setErrorMsg] = useState();
   const [invited, setInvited] = useState([]);
   const [isMember, setIsMember] = useState(false);
-  const [isOwner, setIsOwner] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
@@ -41,14 +40,13 @@ function EventPage() {
         document.title = `${TITLE} - ${eventData.name}`;
         setData({
           ...eventData,
-          coming: [{ id: '2', username: 'StrawberryEater' }],
-          declined: [{ id: '3', username: 'PartyPooper' }],
         });
         //var allData =[].concat(eventData);
 
         setIsMember(
           eventData.members.some((member) => member._id === user.userId),
         );
+        setArchived(eventData.archived);
         setMembers(eventData.members);
         localStorage.setItem('event_id', JSON.stringify(id));
         localStorage.setItem('event_data', JSON.stringify(eventData));
@@ -99,7 +97,7 @@ function EventPage() {
   localStorage.setItem("going", JSON.stringify(isMember));
   const contextProvider = useMemo(
     () => ({ readOnly: !isMember || archived, eventId: id, archived: archived }),
-    [isMember, archived, id, data],
+    [isMember, archived, id],
   );
 
   const onInvite = (invite) => {
@@ -237,12 +235,12 @@ function EventPage() {
                 <InviteBox eventURL={id || ''} onInvite={onInvite} />
               )}
               <EventMembers
-                coming={data?.coming}
-                members={members}
-                invited={invited}
-                declined={data?.declined}
+                coming={data?.coming || []}
+                members={members || []}
+                invited={invited || []}
+                declined={data?.declined || []}
               />
-              {isMember && isOwner && (
+              {isMember && data.owner._id === user.userId && (
                 <div className="d-grid gap-2 mx-4">
                   <Button
                     variant="primary"
