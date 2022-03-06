@@ -8,39 +8,31 @@ import {
   Alert,
   Modal,
   Form,
+  FormSelect,
 } from 'react-bootstrap';
-import { joinEvent, getEvent, getEventList } from '../api/event';
+import { getEventList } from '../api/event';
 import { getUser } from '../api/users';
 import { UserContext, EventContext } from '../utils/context';
 import { Create } from './Create';
 import EventEdit from './EventEdit';
 import PropTypes from 'prop-types';
-import { useHref, useParams } from 'react-router-dom';
-import PollList from './PollList';
-import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import EventPage from './EventPage';
-import { bn } from 'date-fns/locale';
 import Gcalender from './Gcalender';
-import { propTypes } from 'react-bootstrap/esm/Image';
+import { LinkContainer } from 'react-router-bootstrap';
+import { format, parseISO } from 'date-fns';
 
 function EventList(thisprops) {
   //const [createdEvent,setCreatedEvent] =useState(false);
-  const { id } = useParams();
-  const [ownedEvents, setOwnedEvents] = useState([]);
-  const [memberedEvents, setMemberedEvents] = useState([]);
-  const [eventList, setEventList] = useState([]);
+  const [events, setEvents] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   //const [event, setEvent] = useState();
   const navigate = useNavigate();
-  const [IsMem, setIsMem] = useState(false);
-  const [members, setMembers] = useState([]);
-  const [dataSorted, setDataSorted] = useState([]);
-  const [sortItem, setSortItem] = useState('name');
+  const [filter, setFilter] = useState('name');
   const [pressed, setPressed] = useState(false);
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingData, setEditingData] = useState();
   const [GcalActivate, setGcalActivate] = useState(false);
+  const [sort, setSort] = useState("A-Z");
   const [calenderInfo, setCalenderInfo] = useState();
   const { user, setUser } = useContext(UserContext);
   const readOnly = useContext(EventContext);
@@ -55,7 +47,7 @@ function EventList(thisprops) {
   useEffect(() => {
     getEventList()
       .then((res) => {
-        setOwnedEvents(res.data.events);
+        setEvents(res.data.events);
         //setMemberedEvents(res.data.memberOnly);
       })
       .catch((error) => {
@@ -64,29 +56,13 @@ function EventList(thisprops) {
       });
   }, [user]);
 
-  //handles the alphabetical sorting
-  const handleSort = () => {
-    let o;
-    //this is a to z
-    if (pressed) {
-      o = ownedEvents.sort((a, b) => a.name.localeCompare(b.name));
-      //m = memberedEvents.sort((a, b) => a.name.localeCompare(b.name));
-      setPressed(false);
-    }
-    //this is z to a
-    else {
-      o = ownedEvents.sort((a, b) => b.name.localeCompare(a.name));
-      //m = memberedEvents.sort((a, b) => b.name.localeCompare(a.name));
-      setPressed(true);
-    }
-    setOwnedEvents(o);
-    //setMemberedEvents(m);
-  };
+
   const closeEventEditor = () => {
     setEditingStatus(false);
     setEditingData(undefined);
   };
 
+  const MAXUSERS = 3;
   useEffect(() => {
     if (editingData !== undefined) {
       setEditingStatus(() => true);
@@ -109,169 +85,210 @@ function EventList(thisprops) {
   const displayEvents = (events) => {
     //let props ={event:events, GcalActivate:GcalActivate}
     //displays archived events
-    if (sortItem === 'archived') {
+    if (filter === 'archived') {
       events = events.filter((item) => item.archived);
     }
     //displays non archived events
-    else if (sortItem === 'notArchived') {
+    else if (filter === 'unarchived') {
       events = events.filter((item) => !item.archived);
     }
     //this part is just to show filtering works
     //can be changed when we have going/notgoing function added
-    else if (sortItem === 'going') {
+    else if (filter === 'going') {
       events = events.filter((item) => item.isGoing);
     }
     //notgoing
-    else if (sortItem === 'notGoing') {
+    else if (filter === 'notGoing') {
       events = events.filter((item) => !item.isGoing);
     }
     //when none of the option is selected  display all the events
     //only show the event i created
-    else if (sortItem === 'owner') {
+    else if (filter === 'owner') {
       events = events.filter((item) => item.owner._id === user.userId);
-    } else {
-      events = events;
     }
-    console.log(events)
+    else if (filter === 'joined') {
+      events = events.filter((item) => item.owner._id !== user.userId);
+    }
+    if (sort === 'A-Z') {
+      events = events.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sort === 'Z-A') {
+      events = events.sort((a, b) => b.name.localeCompare(a.name));
+    }
+    else if (sort === 'creation') {
+      events = events.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    }
+    else if (sort === 'creationDesc') {
+      events = events.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    }
+    else {
+      events = events.sort((a, b) => a._id.localeCompare(b._id));
+    }
     return events.map((event, i) => (
-      <div event={event} key={event._id}>
-        <Card className="border py-4 px-4 mb-3">
-          <div>
-            <div className="fw-bold text-primary px-4 mt-4">
-              Event Name <span className="text-black">{event?.name}</span>
-              <div className="text-black">
-                hosted by{' '}
-                <span className="text-muted px-3">{event.owner.username}</span>
+      <div key={event._id}>
+        <Card className="border py-2 px-4 mb-3">
+          <div className='py-4'>
+            <div className=" px-4">
+              <div className="d-flex justify-content-between">
+                <div id="event-header">
+                  {event.archived && (
+                    <div className="fw-bold text-secondary">Archived</div>
+                  )}
+                  <h3 className="fs-4 fw-bold">
+                    <a id="event-list-names" href={`/event/${event._id}`}
+                      style={{ textDecoration: 'none' }}>
+                      {event.name}
+                    </a>
+                  </h3>
+                  <span className='text-dark'>
+                    hosted by{' '}
+                    <span className="fw-bold text-dark ">{event.owner.username}</span>
+                  </span>
+
+                </div>
+                <div id="options">
+                  <Col>
+                    <Row>
+                      {event.owner._id === user.userId && !event.archived && (
+                        <Button
+                          variant="btn btn-outline-primary  fw-bold"
+                          onClick={() => setEditingData(event)}
+                        >
+                          edit
+                        </Button>
+                      )}
+                    </Row>
+                    <Row>
+                      {(event.members.username === user.username
+                        && event.finalized
+                      ) ?
+                        (<Button
+                          varient="btn btn-outline-secondary"
+                          onClick={() => handleGcalender(event)}
+                        >
+                          add to Google
+                        </Button>) : ('')}
+                    </Row>
+                  </Col>
+                </div>
               </div>
             </div>
-            <div className="text-muted  px-4">
-              Decription: {event?.description}
+            <div className="text-muted mt-1 px-4 mb-2">
+              {event.description}
             </div>
-            <br></br>
-            <Row className="fw-bold text-secondary px-4 mb-2">
-              <Col className=" fw-bold text-secondary ">
-                When:
-                {
-                  event.finaltime //TODO:fix time
-                }
-              </Col>
-              <Col className=" fw-bold text-secondary ">What: {}</Col>
-            </Row>
-            <Row className="fw-bold text-secondary px-4 mb-4">
-              <Col className=" fw-bold text-secondary ">
-                Who:
-                {
-                  //TODO:fix this when member part is integrated
-                  event.members.map((e) => (
-                  <div key={e} className="text-black mx-1">
-                      {e.username}
-                    </div>
-                   ))
-                }
-              </Col>
-              <Col className=" fw-bold text-secondary ">
-                Where:{' '}
-                {
-                  //TODO: fix location
-                }
-              </Col>
-            </Row>
-            <hr className="bg-secondary" />
-            <Row>
-              <Col>
-                {' '}
-                { (event.owner.username === user.username) ?
-                 (
-                  <Button
-                    varient="btn btn-outline-secondary"
-                    onClick={() => setEditingData(event)}
-                  >
-                    edit
-                  </Button>
-                ):('')}
-              </Col>
-              <Col className="col-4">
-                {
-                (event.members.username === user.username 
-                  && event.finalized
-                  )?
-                  (<Button
-                    varient="btn btn-outline-secondary"
-                    onClick={() => handleGcalender(event)}
-                  >
-                    add to Google
-                  </Button>):('')
-                
-                  
-                }
-              </Col>
-            </Row>
+
+            <>
+              <Row className="px-4 mb-2 mt-3">
+                {event.finalized && (
+                  <Col>
+                    <span className=" fw-bold text-secondary">When: </span>
+                    <span className="text-dark">
+                      {format(parseISO(event.finalTime), "H:mm aaa 'at' MM/dd/yyyy")}
+                    </span>
+                  </Col>
+                )}
+                {event.finalized && (<Col className=" fw-bold text-secondary ">What: <span className="text-dark"></span></Col>)}
+              </Row>
+              <Row className=" px-4 ">
+                <Col>
+                  <span className="fw-bold text-secondary">Who:</span> <span className="text-dark">
+                    {event.members.map((member, i) => {
+                      if (i !== event.members.length - 1 && i < MAXUSERS) return (
+                        <span>{member.username}, </span>
+                      )
+                      else if (i < MAXUSERS && i === event.members.length - 1) return (
+                        <span> {member.username} </span>
+                      )
+                      else if (i === MAXUSERS) return (
+                        <span> and {event.members.length - MAXUSERS} other(s) </span>
+                      )
+                      else return;
+                    })}
+                  </span>
+                </Col>
+                {event.finalized && (<Col className=" fw-bold text-secondary ">Where: { }</Col>)}
+              </Row>
+            </>
+
+
           </div>
         </Card>
       </div>
+
+
     ));
   };
 
   return (
     <>
-      <br></br>
       <div id="all-events">
-        <h2 className="h3 fw-bold text-secondary mt-3">created events</h2>
-        <div
-          variant="outline-primary"
-          className="d-flex flex-row-reverse fw-bold ml-auto"
-        >
-          <select
-            variant="outline-primary"
-            onChange={(e) => setSortItem(e.target.value)}
-          >
-            <option value="sortby">sort by</option>
-            <option value="owner"> created by me </option>
-            <option value="going"> going </option>
-            <option value="notGoing"> not going </option>
-            <option value="archived"> archived </option>
-            <option value="notArchived"> not archived </option>
-          </select>
-          <br></br>
-          <Button
-            onClick={() => {
-              setPressed(true);
-              handleSort();
-            }}
-            value="alpha"
-            variant="outline-primary"
-            size="sm"
-            className="fw-bold text-black mx-3 px-3"
-          >
-            A-Z
-          </Button>
-        </div>
+        <h2 className="h2 fw-bold text-secondary">my events</h2>
+        <div className='d-flex justify-content-between mb-4'>
+          <LinkContainer to="/event/create">
+            <Button variant="outline-primary" className="ms-1 fw-bold">
+              create event +
+            </Button>
+          </LinkContainer>
 
+          <div
+            variant="outline-primary"
+            className="d-flex flex-row-reverse"
+          >
+            <FormSelect
+              className='ms-2'
+              onChange={(e) => setFilter(e.target.value)}
+            >
+              <option>filter by</option>
+              <option value="owner">created</option>
+              <option>joined</option>
+              <option>archived</option>
+              <option>unarchived</option>
+              <option>going</option>
+              <option value="notGoing">not going</option>
+            </FormSelect>
+            <FormSelect
+              variant="outline-primary"
+              style={{ width: '200px' }}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <option value="sortby">sort by</option>
+              <option value="A-Z"> A-Z </option>
+              <option value="Z-A"> Z-A </option>
+
+              <option value="creation"> Creation Date (asc)</option>
+              <option value="creationDesc"> Creation Date (desc)</option>
+            </FormSelect>
+
+          </div>
+        </div>
         <br className="" />
         <div className="text-secondary">
-          {displayEvents(ownedEvents)}
+          {displayEvents(events)}
         </div>
-        
+
       </div>
-      {editingStatus && (
-        <EventEdit
-          editing={editingStatus}
-          closeEditor={() => closeEventEditor()}
-          eventId={editingData._id}
-          editName={editingData.name}
-          editDescription={editingData.description}
-        ></EventEdit>
-      )}
-      {GcalActivate && (
-        <Gcalender
-          showCalender={GcalActivate}
-          eventId={calenderInfo._id}
-          editName={calenderInfo.name}
-          editDescription={calenderInfo.description}
-          wholeEvent={calenderInfo}
-          eventTime={calenderInfo.dates}
-        ></Gcalender>
-      )}
+      {
+        editingStatus && (
+          <EventEdit
+            editing={editingStatus}
+            closeEditor={() => closeEventEditor()}
+            eventId={editingData._id}
+            editName={editingData.name}
+            editDescription={editingData.description}
+          ></EventEdit>
+        )
+      }
+      {
+        GcalActivate && (
+          <Gcalender
+            showCalender={GcalActivate}
+            eventId={calenderInfo._id}
+            editName={calenderInfo.name}
+            editDescription={calenderInfo.description}
+            wholeEvent={calenderInfo}
+            eventTime={calenderInfo.dates}
+          ></Gcalender>
+        )
+      }
     </>
   );
 }
