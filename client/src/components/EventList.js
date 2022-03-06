@@ -1,3 +1,8 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable no-const-assign */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+
 import React, { useState, useEffect, useContext } from 'react';
 import {
   Card,
@@ -22,20 +27,14 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { format, parseISO } from 'date-fns';
 
 function EventList(thisprops) {
-  //const [createdEvent,setCreatedEvent] =useState(false);
   const [events, setEvents] = useState([]);
-  const [errorMsg, setErrorMsg] = useState('');
-  //const [event, setEvent] = useState();
-  const navigate = useNavigate();
   const [filter, setFilter] = useState('name');
-  const [pressed, setPressed] = useState(false);
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingData, setEditingData] = useState();
   const [GcalActivate, setGcalActivate] = useState(false);
   const [sort, setSort] = useState("A-Z");
   const [calenderInfo, setCalenderInfo] = useState();
   const { user, setUser } = useContext(UserContext);
-  const readOnly = useContext(EventContext);
   //gets event information about going or not
 
   const savedEvent = localStorage.getItem('event_data');
@@ -83,6 +82,7 @@ function EventList(thisprops) {
   }, [calenderInfo]);
 
   const displayEvents = (events) => {
+
     //let props ={event:events, GcalActivate:GcalActivate}
     //displays archived events
     if (filter === 'archived') {
@@ -216,6 +216,7 @@ function EventList(thisprops) {
 
 
     ));
+
   };
 
   return (
