@@ -21,7 +21,7 @@ import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import EventPage from './EventPage';
 import { bn } from 'date-fns/locale';
-//import Gcalender from './Gcalender';
+import Gcalender from './Gcalender';
 import { propTypes } from 'react-bootstrap/esm/Image';
 
 function EventList(thisprops) {
@@ -46,18 +46,17 @@ function EventList(thisprops) {
   const readOnly = useContext(EventContext);
   //gets event information about going or not
 
-  //const savedEvent = localStorage.getItem('event_data');
-  //const eventdata = JSON.parse(savedEvent);
+  const savedEvent = localStorage.getItem('event_data');
+  const eventdata = JSON.parse(savedEvent);
 
   //gets the name of the event/progile owner
-  //const ownerName = thisprops.props;
+  const ownerName = thisprops.props;
   //getting owned and invited events seperately from api
   useEffect(() => {
     getEventList()
       .then((res) => {
-        setOwnedEvents(res.data.owned);
-        setMemberedEvents(res.data.memberOnly);
-        console.log("this is the events ",ownedEvents)
+        setOwnedEvents(res.data.events);
+        //setMemberedEvents(res.data.memberOnly);
       })
       .catch((error) => {
         console.error(error);
@@ -67,21 +66,21 @@ function EventList(thisprops) {
 
   //handles the alphabetical sorting
   const handleSort = () => {
-    let o, m;
+    let o;
     //this is a to z
     if (pressed) {
       o = ownedEvents.sort((a, b) => a.name.localeCompare(b.name));
-      m = memberedEvents.sort((a, b) => a.name.localeCompare(b.name));
+      //m = memberedEvents.sort((a, b) => a.name.localeCompare(b.name));
       setPressed(false);
     }
     //this is z to a
     else {
       o = ownedEvents.sort((a, b) => b.name.localeCompare(a.name));
-      m = memberedEvents.sort((a, b) => b.name.localeCompare(a.name));
+      //m = memberedEvents.sort((a, b) => b.name.localeCompare(a.name));
       setPressed(true);
     }
     setOwnedEvents(o);
-    setMemberedEvents(m);
+    //setMemberedEvents(m);
   };
   const closeEventEditor = () => {
     setEditingStatus(false);
@@ -107,7 +106,7 @@ function EventList(thisprops) {
     }
   }, [calenderInfo]);
 
-  const displayEvents = (events, isOwned) => {
+  const displayEvents = (events) => {
     //let props ={event:events, GcalActivate:GcalActivate}
     //displays archived events
     if (sortItem === 'archived') {
@@ -134,7 +133,7 @@ function EventList(thisprops) {
       events = events;
     }
     console.log(events)
-    return ownedEvents.map((event) => (
+    return events.map((event, i) => (
       <div event={event} key={event._id}>
         <Card className="border py-4 px-4 mb-3">
           <div>
@@ -142,7 +141,7 @@ function EventList(thisprops) {
               Event Name <span className="text-black">{event?.name}</span>
               <div className="text-black">
                 hosted by{' '}
-                <span className="text-muted px-3">{event?.owner.username}</span>
+                <span className="text-muted px-3">{event.owner.username}</span>
               </div>
             </div>
             <div className="text-muted  px-4">
@@ -153,7 +152,7 @@ function EventList(thisprops) {
               <Col className=" fw-bold text-secondary ">
                 When:
                 {
-                  event?.finaltime //TODO:fix time
+                  event.finaltime //TODO:fix time
                 }
               </Col>
               <Col className=" fw-bold text-secondary ">What: {}</Col>
@@ -163,11 +162,11 @@ function EventList(thisprops) {
                 Who:
                 {
                   //TODO:fix this when member part is integrated
-                  //event.members.map((e) => (
-                  //  <div key={e} className="text-black mx-1">
-                  //    {e.username}
-                  //  </div>
-                  // ))
+                  event.members.map((e) => (
+                  <div key={e} className="text-black mx-1">
+                      {e.username}
+                    </div>
+                   ))
                 }
               </Col>
               <Col className=" fw-bold text-secondary ">
@@ -181,27 +180,30 @@ function EventList(thisprops) {
             <Row>
               <Col>
                 {' '}
-                {isOwned && (
+                { (event.owner.username === user.username) ?
+                 (
                   <Button
                     varient="btn btn-outline-secondary"
                     onClick={() => setEditingData(event)}
                   >
                     edit
                   </Button>
-                )}
+                ):('')}
               </Col>
               <Col className="col-4">
-                {!readOnly &&
-                events.some((item) => item.members.includes(user.userId)) ? (
-                  <Button
+                {
+                (event.members.username === user.username 
+                  && event.finalized
+                  )?
+                  (<Button
                     varient="btn btn-outline-secondary"
                     onClick={() => handleGcalender(event)}
                   >
                     add to Google
-                  </Button>
-                ) : (
-                  ''
-                )}
+                  </Button>):('')
+                
+                  
+                }
               </Col>
             </Row>
           </div>
@@ -247,12 +249,9 @@ function EventList(thisprops) {
 
         <br className="" />
         <div className="text-secondary">
-          <h2 className="h3 fw-bold text-secondary">my events</h2>
-          {displayEvents(ownedEvents, true)}
+          {displayEvents(ownedEvents)}
         </div>
-        <br />
-        <h2 className="h3 fw-bold text-secondary mt-3">membered events</h2>
-        {displayEvents(memberedEvents, false)}
+        
       </div>
       {editingStatus && (
         <EventEdit
@@ -263,7 +262,16 @@ function EventList(thisprops) {
           editDescription={editingData.description}
         ></EventEdit>
       )}
-      
+      {GcalActivate && (
+        <Gcalender
+          showCalender={GcalActivate}
+          eventId={calenderInfo._id}
+          editName={calenderInfo.name}
+          editDescription={calenderInfo.description}
+          wholeEvent={calenderInfo}
+          eventTime={calenderInfo.dates}
+        ></Gcalender>
+      )}
     </>
   );
 }
