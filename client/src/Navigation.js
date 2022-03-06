@@ -33,16 +33,6 @@ export function ProtectedNav() {
             home
           </Nav.Link>
         </LinkContainer>
-        <LinkContainer to="/example">
-          <Nav.Link className="fw-bold text-primary">
-            example
-          </Nav.Link>
-        </LinkContainer>
-        <LinkContainer to="/event/621b30264a3a292df2944362">
-          <Nav.Link className="fw-bold text-primary">
-            example event
-          </Nav.Link>
-        </LinkContainer>
       </>
     );
   }
