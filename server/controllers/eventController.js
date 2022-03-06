@@ -66,9 +66,6 @@ exports.createEvent = async (req, res) => {
       goingPoll: goingPoll._id
     });
 
-    console.log(goingPoll)
-    console.log(event)
-
     await initializeAvailability(event);
 
     res.status(201).send(event._id);
