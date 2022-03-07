@@ -30,6 +30,7 @@ function EventPage() {
   const [invited, setInvited] = useState([]);
   const [isMember, setIsMember] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [goingPoll, setGoingPoll] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,6 +49,7 @@ function EventPage() {
         );
         setArchived(eventData.archived);
         setMembers(eventData.members);
+        setGoingPoll(eventData.goingPoll);
         localStorage.setItem('event_id', JSON.stringify(id));
         localStorage.setItem('event_data', JSON.stringify(eventData));
       })
@@ -60,8 +62,15 @@ function EventPage() {
           navigate('/404');
         }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+      });
   }, [id, user, setUser, navigate]);
+
+  useEffect(() => {
+    console.log(goingPoll);
+    console.log(data);
+  }, [data, goingPoll])
 
   useEffect(() => {
     getEventInvites(id)
@@ -155,6 +164,7 @@ function EventPage() {
       });
   };
 
+
   return (
     <Container fluid className="px-0 pt-4">
       {loading && (
@@ -239,6 +249,8 @@ function EventPage() {
                 members={members || []}
                 invited={invited || []}
                 declined={data?.declined || []}
+                goingPoll = {goingPoll}
+                archived = {archived}
               />
               {isMember && data.owner._id === user.userId && (
                 <div className="d-grid gap-2 mx-4">

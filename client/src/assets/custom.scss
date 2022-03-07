@@ -27,3 +27,22 @@
   height:20px;
 }
 
+//event page
+.toggle-button{
+  background-color: transparent !important;
+  border: 5px solid;
+  box-shadow: none;
+}
+
+.toggle-button.focus{
+  box-shadow: none;
+}
+
+.toggle-button-active{
+  border: none;
+  box-shadow: none;
+}
+
+.toggle-button-active.focus{
+  box-shadow: none;
+}
