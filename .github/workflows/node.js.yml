@@ -60,5 +60,6 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "cs130-cya"
           heroku_email: "alvinonguyen00@gmail.com"
+          appdir: "client/build"
           buildpack: heroku/nodejs
           env_file: "server/.env"
