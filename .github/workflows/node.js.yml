@@ -62,4 +62,4 @@ jobs:
           heroku_email: "alvinonguyen00@gmail.com"
           appdir: "client/build"
           buildpack: heroku/nodejs
-          env_file: "server/.env"
+          env_file: "../../server/.env"
