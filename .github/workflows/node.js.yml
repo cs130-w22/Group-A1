@@ -54,18 +54,11 @@ jobs:
     - run: git config user.email "cya@github.com"
     - run: git config user.name "Github"
     - run: git add -A && git commit -m "Edit code"
-    - name: Deploy frontend
+    - name: Deploy
       uses: AkhileshNS/heroku-deploy@v3.12.12
       with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "cs130-cya"
           heroku_email: "alvinonguyen00@gmail.com"
-          appdir: "client/build"
-    - name: Deploy backend
-      uses: AkhileshNS/heroku-deploy@v3.12.12
-      with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "cs130-cya-backend"
-          heroku_email: "alvinonguyen00@gmail.com"
-          appdir: "server"
-          env_file: ".env"
+          buildpack: heroku/nodejs
+          env_file: "server/.env"
