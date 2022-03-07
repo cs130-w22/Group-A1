@@ -6,7 +6,7 @@
     "start-watch": "cd server && nodemon server.js",
     "dev": "concurrently \"npm run start-watch\" \"cd client && npm start\"",
     "postinstall": "concurrently \"cd client && npm install\" \"cd server && npm install\"",
-    "build": "cd client && npm run build",
+    "build": "cd client && npm run build && mv build ../app",
     "test": "cd server && npm run test && cd ../client && npm run test",
     "prepare": "husky install"
   },
