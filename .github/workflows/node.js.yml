@@ -56,7 +56,7 @@ jobs:
           heroku_app_name: "cs130-cya"
           heroku_email: "alvinonguyen00@gmail.com"
           appdir: "client/build"
-          remote_branch: "main"
+          remote_branch: "master"
     - name: Deploy backend
       uses: AkhileshNS/heroku-deploy@v3.12.12
       with:
@@ -65,4 +65,4 @@ jobs:
           heroku_email: "alvinonguyen00@gmail.com"
           appdir: "server"
           env_file: ".env"
-          remote_branch: "main"
+          remote_branch: "master"
