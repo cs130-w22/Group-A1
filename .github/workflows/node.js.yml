@@ -64,7 +64,7 @@ jobs:
           HD_PORT: 3000
       with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "cs130-cya-backend"
+          heroku_app_name: "cs130-cya"
           heroku_email: "alvinonguyen00@gmail.com"
           buildpack: heroku/create-react-app
           appdir: client
