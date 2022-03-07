@@ -19,11 +19,11 @@ const createServer = (middleware) => {
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  app.use(express.static(path.join(__dirname, 'client', 'build', 'static')));
+  // app.use(express.static(path.join(__dirname, 'client', 'build', 'static')));
   
-  app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
-  });
+  // app.get('/', function (req, res) {
+  //   res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+  // });
 
   // other middleware
   if (middleware != null && Array.isArray(middleware)) {
