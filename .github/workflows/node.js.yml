@@ -49,6 +49,7 @@ jobs:
       env:
         CI: ""
     - run: npm test
+    - run: cat "node_modules" > client/.gitignore
     - run: rm -r .husky
     - run: git config user.email "cya@github.com"
     - run: git config user.name "Github"
