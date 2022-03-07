@@ -201,7 +201,8 @@ function Create() {
             ))}
           </Form.Select>
         </Form.Group>
-        <Form.Group controlId="formLatest" className="mb-3">
+        {/* <Form.Group controlId="formLatest" className="mb-3">
+        
           <Form.Label>
             Select Time Zone (placeholder)
           </Form.Label>
@@ -209,7 +210,7 @@ function Create() {
             aria-label="Select time zone"
           />
 
-        </Form.Group>
+        </Form.Group> */}
         <Button variant="outline-primary" className="fw-bold" type="submit">
 
           create event

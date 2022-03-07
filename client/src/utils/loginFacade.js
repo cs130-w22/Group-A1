@@ -50,8 +50,12 @@ const loginFacade = (data, setError, navigate, redirect, setUser) => {
     })
     .catch((err) => {
       // add server-side errors to validation displays
-      const errorHandler = new ErrorHandler(err.response, err.response.status);
-      errorHandler.setErrors(setError);
+      if (err.response) {
+        const errorHandler = new ErrorHandler(err.response, err.response.status);
+        errorHandler.setErrors(setError);
+      } else {
+        console.log(err);
+      }
     });
 };
 
