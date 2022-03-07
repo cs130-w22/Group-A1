@@ -54,7 +54,7 @@ jobs:
     - run: git config user.email "cya@github.com"
     - run: git config user.name "Github"
     - run: git add -A && git commit -m "Edit code"
-    - name: Deploy Frontend
+    - name: Deploy
       uses: AkhileshNS/heroku-deploy@v3.12.12
       env:
           HD_DB_URI: ${{ secrets.DB_URI }}
@@ -67,18 +67,18 @@ jobs:
           heroku_app_name: "cs130-cya"
           heroku_email: "alvinonguyen00@gmail.com"
           buildpack: "https://github.com/mars/create-react-app-buildpack"
-          appdir: client
-    - name: Deploy Backend
-      uses: AkhileshNS/heroku-deploy@v3.12.12
-      env:
-          HD_DB_URI: ${{ secrets.DB_URI }}
-          HD_TESTDB_URI: ${{ secrets.TESTDB_URI }}
-          HD_SESSION_URI: ${{ secrets.SESSION_URI }}
-          HD_SECRET: ${{ secrets.SECRET }}
-          HD_PORT: 5000
-      with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "cs130-cya-backend"
-          heroku_email: "alvinonguyen00@gmail.com"
-          buildpack: heroku/nodejs
-          appdir: server
+#           appdir: client
+#     - name: Deploy Backend
+#       uses: AkhileshNS/heroku-deploy@v3.12.12
+#       env:
+#           HD_DB_URI: ${{ secrets.DB_URI }}
+#           HD_TESTDB_URI: ${{ secrets.TESTDB_URI }}
+#           HD_SESSION_URI: ${{ secrets.SESSION_URI }}
+#           HD_SECRET: ${{ secrets.SECRET }}
+#           HD_PORT: 5000
+#       with:
+#           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+#           heroku_app_name: "cs130-cya-backend"
+#           heroku_email: "alvinonguyen00@gmail.com"
+#           buildpack: heroku/nodejs
+#           appdir: server
