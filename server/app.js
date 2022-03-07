@@ -21,7 +21,7 @@ const createServer = (middleware) => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.static(path.join(__dirname, '..', 'client', 'build', 'static')));
   
-  app.get('/', function (req, res) {
+  app.get('*', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
   });
 
