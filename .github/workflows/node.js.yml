@@ -6,8 +6,8 @@ name: Node.js CI
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+#  pull_request:
+#    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -49,3 +49,19 @@ jobs:
       env:
         CI: ""
     - run: npm test
+    - name: Deploy frontend
+      uses: AkhileshNS/heroku-deploy@v3.12.12
+      with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "cs130-cya"
+          heroku_email: "alvinonguyen00@gmail.com"
+          appdir: "client/build"
+          env_file: "client/.env"
+    - name: Deploy backend
+      uses: AkhileshNS/heroku-deploy@v3.12.12
+      with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "cs130-cya-backend"
+          heroku_email: "alvinonguyen00@gmail.com"
+          appdir: "server"
+          env_file: "server/.env"
