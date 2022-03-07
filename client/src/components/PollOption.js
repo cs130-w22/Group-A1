@@ -38,7 +38,6 @@ function PollOption({ data, onDelete, editing }) {
       if (checked) {
         setVoteMode(true);
         setVotes(votes.filter((voter) => res.data.voters.includes(voter._id)));
-        console.log(votes);
         setChecked(!checked);
       } else {
         if (res.status === 202) {
@@ -52,7 +51,7 @@ function PollOption({ data, onDelete, editing }) {
         }
 
       }
-      
+
     }).catch((err) => console.log(err));
   };
 
