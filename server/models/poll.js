@@ -14,7 +14,6 @@ const PollSchema = new Schema({
 
 PollSchema.methods.getUserVotesNumber = async function getUserVotesNumber(user, cb) {
   try {
-    console.log('poll schema', user);
     const options = await mongoose.model('PollOption').find({poll: this._id });
     let votes = 0;
     for (let i = 0; i < options.length; i += 1) {

@@ -26,7 +26,6 @@ router.post('/vote', (req, res) => {
       } else {
         Poll.findById(option.poll).then((poll) => {
           poll.getUserVotesNumber(userId).then((currentVotes) => {
-            console.log(currentVotes);
             if (currentVotes < poll.votesAllowed) {
               option.voters.push({ _id: userId });
               option.save();
@@ -39,7 +38,7 @@ router.post('/vote', (req, res) => {
       }
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -47,7 +46,6 @@ router.post('/vote', (req, res) => {
 // update poll
 router.patch('/:id', (req, res) => {
   const { update } = req.body;
-  console.log('updates', update);
   Poll.findById(req.params.id)
     .populate({
       path: 'event',
@@ -75,7 +73,7 @@ router.patch('/:id', (req, res) => {
         });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -88,7 +86,7 @@ router.get('/options', (req, res) => {
       res.json(options);
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -111,7 +109,7 @@ router.delete('/options/:optionId', (req, res) => {
       );
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -121,7 +119,7 @@ router.delete('/options', (req, res) => {
   PollOption.deleteMany()
     .then(() => res.sendStatus(204))
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -131,7 +129,7 @@ router.get('/', (req, res) => {
   Poll.find()
     .populate('options')
     .then((polls) => res.json(polls))
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 });
 
 // create poll
@@ -141,10 +139,12 @@ router.post('/', (req, res) => {
       if (event.archived === true) return res.sendStatus(403);
       Poll.create(req.body).then((poll) => {
         res.json({ pData: poll, canVote: true });
-        console.log(poll);
+      }).catch((err) => {
+        console.error(err);
+        res.sendStatus(500);
       });
     }).catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -165,7 +165,7 @@ router.get('/:id', (req, res) => {
         data.userCanVoteInPoll(userId).then((result) => {
           res.json({ pData: data, canVote: result });
         }).catch((err) => {
-          console.log(err);
+          console.error(err);
           res.sendStatus(500);
         });
       } else {
@@ -173,7 +173,7 @@ router.get('/:id', (req, res) => {
       }
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -241,7 +241,7 @@ router.patch('/options/:optionId', (req, res) => {
       }).then((data) => (data ? res.json(data) : res.sendStatus(404)));
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -252,7 +252,7 @@ router.get('/:id/options', (req, res) => {
     .populate('options')
     .then((data) => (data ? res.json(data) : res.sendStatus(404)))
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -264,7 +264,7 @@ router.delete('/', (req, res) => {
       res.sendStatus(204);
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -285,7 +285,7 @@ router.delete('/:id', (req, res) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
