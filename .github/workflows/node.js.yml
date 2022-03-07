@@ -62,7 +62,7 @@ jobs:
           HD_SESSION_URI: ${{ secrets.SESSION_URI }}
           HD_SECRET: ${{ secrets.SECRET }}
           HD_PORT: 3000
-          HD_JS_RUNTIME_TARGET_BUNDLE: "/client/build/js/*.js"
+          HD_JS_RUNTIME_TARGET_BUNDLE: "/client/build/static/js/*.js"
       with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "cs130-cya"
