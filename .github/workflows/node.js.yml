@@ -49,6 +49,9 @@ jobs:
       env:
         CI: ""
     - run: npm test
+    - run: git config user.email "cya@github.com"
+    - run: git config user.name "Github"
+    - run: git add -A && git commit -m "Edit code"
     - name: Deploy frontend
       uses: AkhileshNS/heroku-deploy@v3.12.12
       with:
@@ -56,7 +59,6 @@ jobs:
           heroku_app_name: "cs130-cya"
           heroku_email: "alvinonguyen00@gmail.com"
           appdir: "client/build"
-          remote_branch: "master"
     - name: Deploy backend
       uses: AkhileshNS/heroku-deploy@v3.12.12
       with:
@@ -65,4 +67,3 @@ jobs:
           heroku_email: "alvinonguyen00@gmail.com"
           appdir: "server"
           env_file: ".env"
-          remote_branch: "master"
