@@ -56,9 +56,15 @@ jobs:
     - run: git add -A && git commit -m "Edit code"
     - name: Deploy
       uses: AkhileshNS/heroku-deploy@v3.12.12
+      env:
+          HD_DB_URI: ${{ secrets.DB_URI }}
+          HD_TESTDB_URI: ${{ secrets.TESTDB_URI }}
+          HD_SESSION_URI: ${{ secrets.SESSION_URI }}
+          HD_SECRET: ${{ secrets.SECRET }}
+          HD_PORT: 5000
       with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "cs130-cya"
           heroku_email: "alvinonguyen00@gmail.com"
           buildpack: heroku/nodejs
-          env_file: "server/.env"
+          # env_file: "server/.env"
