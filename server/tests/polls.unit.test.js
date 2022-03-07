@@ -79,7 +79,7 @@ describe('Adding poll', () => {
       })
       .expect(200)
       .then(async (res) => {
-        pollId = res.body._id;
+        pollId = res.body.pData._id;
       });
   });
 
@@ -109,7 +109,7 @@ describe('Edit poll', () => {
       })
       .expect(200)
       .then(async (res) => {
-        pollId = res.body._id;
+        pollId = res.body.pData._id;
       });
   });
 
@@ -150,7 +150,7 @@ describe('Delete poll', () => {
       })
       .expect(200)
       .then(async (res) => {
-        pollId = res.body._id;
+        pollId = res.body.pData._id;
       });
   });
 
@@ -186,7 +186,7 @@ describe('Add poll option', () => {
       })
       .expect(200)
       .then(async (res) => {
-        pollId = res.body._id;
+        pollId = res.body.pData._id;
       });
   });
 
@@ -228,7 +228,7 @@ describe('Edit poll option', () => {
       })
       .expect(200)
       .then(async (res) => {
-        pollId = res.body._id;
+        pollId = res.body.pData._id;
       });
     await agent
       .post(`/polls/${pollId}/options`)
@@ -278,7 +278,7 @@ describe('Vote for poll option', () => {
       })
       .expect(200)
       .then(async (res) => {
-        pollId = res.body._id;
+        pollId = res.body.pData._id;
       });
     await agent
       .post(`/polls/${pollId}/options`)
@@ -297,7 +297,7 @@ describe('Vote for poll option', () => {
       .send({
         optionId
       })
-      .expect(200);
+      .expect(201);
   });
 
   it('should have one vote', async () => {
@@ -326,7 +326,7 @@ describe('Delete poll option', () => {
       })
       .expect(200)
       .then(async (res) => {
-        pollId = res.body._id;
+        pollId = res.body.pData._id;
       });
     await agent
       .post(`/polls/${pollId}/options`)

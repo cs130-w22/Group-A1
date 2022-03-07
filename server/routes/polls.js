@@ -17,27 +17,28 @@ router.post('/vote', (req, res) => {
     })
     .then(async (option) => {
       const { userId } = req.session;
-      if (option == null || option.poll == null || option.poll.event == null)
-        return res.sendStatus(404);
-      if (option.poll.event.archived == true) return res.sendStatus(403);
+      if (option == null || option.poll == null || option.poll.event == null) return res.sendStatus(404);
+      if (option.poll.event.archived === true) return res.sendStatus(403);
       if (option.voters.includes(userId)) {
         await option.voters.pull({ _id: userId });
         await option.save();
         res.status(200).send(option);
       } else {
         Poll.findById(option.poll).then((poll) => {
-          poll.userCanVoteInPoll(userId).then(async (result) => {
-            if (result) {
-              await option.voters.push({ _id: userId });
-              await option.save();
-              res.status(200).send(option);
+          poll.getUserVotesNumber(userId).then((currentVotes) => {
+            if (currentVotes < poll.votesAllowed) {
+              option.voters.push({ _id: userId });
+              option.save();
+              if (currentVotes === poll.votesAllowed - 1) res.status(201);
+              else res.status(200);
+              res.send(option);
             } else res.status(202).send('User Votes Exceeded');
           });
         });
       }
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -52,7 +53,7 @@ router.patch('/:id', (req, res) => {
     })
     .then((poll) => {
       if (poll == null || poll.event == null) return res.sendStatus(404);
-      if (poll.event.archived == true) return res.sendStatus(403);
+      if (poll.event.archived === true) return res.sendStatus(403);
       Poll.findOneAndUpdate({ _id: req.params.id }, update, {
         new: true,
       })
@@ -63,10 +64,16 @@ router.patch('/:id', (req, res) => {
             select: '_id username',
           },
         })
-        .then((data) => (data ? res.json(data) : res.sendStatus(404)));
+        .then(async (data) => {
+          if (data) {
+            const { userId } = req.session;
+            const pollCanVote = await data.userCanVoteInPoll(userId);
+            res.json({ pData: data, canVote: pollCanVote });
+          } else res.sendStatus(404);
+        });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -79,7 +86,7 @@ router.get('/options', (req, res) => {
       res.json(options);
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -95,16 +102,14 @@ router.delete('/options/:optionId', (req, res) => {
       },
     })
     .then((option) => {
-      const { userId } = req.session;
-      if (option == null || option.poll == null || option.poll.event == null)
-        return res.sendStatus(404);
-      if (option.poll.event.archived == true) return res.sendStatus(403);
+      if (option == null || option.poll == null || option.poll.event == null) return res.sendStatus(404);
+      if (option.poll.event.archived === true) return res.sendStatus(403);
       PollOption.findOneAndDelete({ _id: req.params.optionId }).then(
         (deleted) => (deleted ? res.json(deleted) : res.sendStatus(404)),
       );
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -114,7 +119,7 @@ router.delete('/options', (req, res) => {
   PollOption.deleteMany()
     .then(() => res.sendStatus(204))
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -124,17 +129,24 @@ router.get('/', (req, res) => {
   Poll.find()
     .populate('options')
     .then((polls) => res.json(polls))
-    .catch((err) => console.log(err));
+    .catch((err) => console.error(err));
 });
 
-// add poll
+// create poll
 router.post('/', (req, res) => {
   Event.findById(req.body.event)
     .then((event) => {
-      if (event.archived == true) return res.sendStatus(403);
-      else return Poll.create(req.body).then((poll) => res.json(poll));
-    })
-    .catch((err) => console.log(err));
+      if (event.archived === true) return res.sendStatus(403);
+      Poll.create(req.body).then((poll) => {
+        res.json({ pData: poll, canVote: true });
+      }).catch((err) => {
+        console.error(err);
+        res.sendStatus(500);
+      });
+    }).catch((err) => {
+      console.error(err);
+      res.sendStatus(500);
+    });
 });
 
 // get poll
@@ -147,9 +159,21 @@ router.get('/:id', (req, res) => {
         select: '_id username',
       },
     })
-    .then((data) => (data ? res.json(data) : res.sendStatus(404)))
+    .then((data) => {
+      if (data) {
+        const { userId } = req.session;
+        data.userCanVoteInPoll(userId).then((result) => {
+          res.json({ pData: data, canVote: result });
+        }).catch((err) => {
+          console.error(err);
+          res.sendStatus(500);
+        });
+      } else {
+        res.sendStatus(404);
+      }
+    })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -167,7 +191,7 @@ router.post('/:id/options', (req, res) => {
     })
     .then((poll) => {
       if (poll == null || poll.event == null) return res.sendStatus(404);
-      if (poll.event.archived == true) return res.sendStatus(403);
+      if (poll.event.archived === true) return res.sendStatus(403);
       PollOption.create({
         poll: pollId,
         text: req.body.text,
@@ -210,15 +234,14 @@ router.patch('/options/:optionId', (req, res) => {
     })
     .then((option) => {
       const { userId } = req.session;
-      if (option == null || option.poll == null || option.poll.event == null)
-        return res.sendStatus(404);
+      if (option == null || option.poll == null || option.poll.event == null) { return res.sendStatus(404); }
       if (option.poll.event.archived == true) return res.sendStatus(403);
       PollOption.findOneAndUpdate({ _id: optionId }, update, {
         new: true,
       }).then((data) => (data ? res.json(data) : res.sendStatus(404)));
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -229,7 +252,7 @@ router.get('/:id/options', (req, res) => {
     .populate('options')
     .then((data) => (data ? res.json(data) : res.sendStatus(404)))
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -241,7 +264,7 @@ router.delete('/', (req, res) => {
       res.sendStatus(204);
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });
@@ -262,7 +285,7 @@ router.delete('/:id', (req, res) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
       res.sendStatus(500);
     });
 });

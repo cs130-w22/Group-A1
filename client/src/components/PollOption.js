@@ -8,8 +8,9 @@ import {
   addOption, deleteOption, updateOption, voteOption,
 } from '../api/polls';
 import EditIcon from '../assets/edit_icon_small.svg';
-import { UserContext, EventContext } from '../utils/context';
+import { UserContext, EventContext, PollContext } from '../utils/context';
 import { EventButton, overlayFunction } from './EventButton';
+import {number} from "prop-types";
 
 const editButton = {
   boxSizing: 'content-box',
@@ -22,13 +23,12 @@ const editButton = {
   opacity: '0.5',
 };
 
-function PollOption({ data, onDelete, editing }) {
+function PollOption({ pollId, data, onDelete, editing, pollState, votable, votingToggle, onUpdate }) {
   const { user } = useContext(UserContext);
   const { readOnly } = useContext(EventContext);
-  const optionId = data._id;
+  const [optionId, setOptionId] = useState(data._id);
   const [optionText, setOptionText] = useState(data.text);
   const [checked, setChecked] = useState(data.voters.includes(user.userId));
-  const [voteMode, setVoteMode] = useState(readOnly);
   const [editMode, setEditMode] = useState(editing);
   const [votes, setVotes] = useState(data.voters);
 
@@ -36,17 +36,19 @@ function PollOption({ data, onDelete, editing }) {
     voteOption(data._id).then((res) => {
       console.log("checked", checked);
       if (checked) {
-        setVoteMode(true);
+        votingToggle(true);
         setVotes(votes.filter((voter) => res.data.voters.includes(voter._id)));
         console.log(votes);
         setChecked(!checked);
       } else {
+        if (res.status === 201) {
+          votingToggle(false);
+        }
+
         if (res.status === 202) {
-          setVoteMode(false);
           alert("Maximum number of votes reached!");
         }
         else {
-          setVoteMode(true);
           setVotes([...votes, { _id: user.userId, username: user.username }]);
           setChecked(!checked);
         }
@@ -57,16 +59,28 @@ function PollOption({ data, onDelete, editing }) {
   };
 
   const saveText = (e) => {
-    e.preventDefault();
+    //e.preventDefault();
     if (readOnly) return;
-    updateOption(optionId, { text: optionText })
-      .then(() => setEditMode(false))
-      .catch((err) => console.log(err));
+    if (typeof optionId === 'number') { //new option case
+      if (pollId !== '0') { // adding option to an existing poll
+        addOption(pollId, optionText)
+            .then((opt) => {
+              setOptionId(opt._id);
+              setEditMode(false);
+            })
+      }
+    }
+    else {
+      updateOption(optionId, {text: optionText})
+          .then(() => setEditMode(false))
+          .catch((err) => console.log(err));
+    }
   };
 
   const handleChange = (e) => {
     if (readOnly) return;
     setOptionText(e.target.value);
+    onUpdate(optionId, e.target.value);
   };
 
   const allowEdits = () => {
@@ -76,12 +90,15 @@ function PollOption({ data, onDelete, editing }) {
 
   const removeOption = () => {
     if (readOnly) return;
-    if (optionId) {
+    if (typeof optionId === 'string') {
       deleteOption(optionId)
-        .then((res) => {
-          onDelete(res.data);
-        })
-        .catch((err) => console.log(err));
+          .then((res) => {
+            onDelete(res.data);
+          })
+          .catch((err) => console.log(err));
+    }
+    else {
+      onDelete(data);
     }
   };
 
@@ -103,7 +120,7 @@ function PollOption({ data, onDelete, editing }) {
 
       <div className="d-flex justify-content-between align-items-center">
         <div className="pe-2 flex-shrink-1 d-flex align-items-center">
-          {!editMode
+          {(!editMode && !pollState)
             && (
               <div>
                 <EventButton
@@ -123,24 +140,14 @@ function PollOption({ data, onDelete, editing }) {
                 >
                   <span>
 
-                    <input className="form-check-input mt-2 mb-2 ms-2" type="checkbox" checked={checked} readOnly disabled={readOnly} onClick={changeVote} />
+                    <input className="form-check-input mt-2 mb-2 ms-2" type="checkbox" checked={checked} readOnly disabled={!checked && !votable} onClick={changeVote} />
                   </span>
                 </OverlayTrigger>
               </div>
             )}
-          {/* <ToggleButton
-            variant="link"
-            id={'vote-button'.concat(optionId)}
-            checked={checked}
-            onClick={changeVote}
-            disabled={editMode}
-          >
-            {checked ? '☑' : '☐'}
-          </ToggleButton> */}
-
         </div>
         {' '}
-        {editMode && (
+        {(editMode || pollState) && (
           <Form className="w-100 d-flex ms-n2" onSubmit={saveText}>
             <Form.Control
               key={'poll-text-'.concat(optionId)}
@@ -148,28 +155,31 @@ function PollOption({ data, onDelete, editing }) {
               type="text"
               placeholder="Enter Poll Option"
               onChange={handleChange}
-              // readOnly={!editMode}
+              //readOnly={!editMode}
               value={optionText || ''}
             />
-            <Button
-              variant="success"
-              className="align-self-center ms-2"
-              hidden={!editMode}
-              onClick={saveText}
-            >
-              Save
-            </Button>
-            <Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>
+            {!pollState &&
+                (<Button
+                    variant="success"
+                    className="align-self-center ms-2"
+                    hidden={!editMode}
+                    onClick={saveText}
+                >
+                  Save
+                </Button>)
+            }
+            {(editMode || pollState) &&
+                (<Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>)}
           </Form>
 
         )}
-        <span hidden={editMode} className="mx-3 text-nowrap flex-grow-1">{optionText}</span>
+        <span hidden={editMode || pollState} className="mx-3 text-nowrap flex-grow-1">{optionText}</span>
 
         <OverlayTrigger
           placement="right"
           overlay={votesOverlay()}
         >
-          <span className="voteCount" hidden={editMode}>
+          <span className="voteCount" hidden={editMode || pollState}>
             Votes:
             {' '}
             {votes.length}
