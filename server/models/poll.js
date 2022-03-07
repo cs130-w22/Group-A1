@@ -14,34 +14,30 @@ const PollSchema = new Schema({
 
 PollSchema.methods.getUserVotesNumber = async function getUserVotesNumber(user, cb) {
   try {
-    console.log("poll schema", user);
+    console.log('poll schema', user);
     const options = await mongoose.model('PollOption').find({poll: this._id });
     let votes = 0;
-    for (var i = 0; i < options.length; i++) {
+    for (let i = 0; i < options.length; i += 1) {
       if (options[i].voters.includes(user)) {
-        votes++; 
+        votes += 1;
       }
-    };
+    }
     return votes;
   } catch (err) {
     return err;
   }
-}
+};
 
 PollSchema.methods.userCanVoteInPoll = async function userCanVoteInPoll(user, cb) {
   try {
     const options = await mongoose.model('PollOption').find({poll: this._id });
     let votes = 0;
-    for (var i = 0; i < options.length; i++) {
+    for (let i = 0; i < options.length; i += 1) {
       if (options[i].voters.includes(user)) {
-        votes++; 
+        votes += 1;
       }
-    };
-    if (votes >= this.votesAllowed) {
-      return false;
     }
-    else
-      return true;
+    return votes < this.votesAllowed;
   } catch (err) {
     return err;
   }
@@ -49,7 +45,10 @@ PollSchema.methods.userCanVoteInPoll = async function userCanVoteInPoll(user, cb
 
 const Poll = mongoose.model('Poll', PollSchema);
 
-
+PollSchema.pre('create', {document: false, query: true}, async (next) => {
+  console.log('saveCalled');
+  next();
+});
 
 PollSchema.pre('deleteOne', { document: false, query: true }, async (next) => {
   const poll = await Poll.findOne(this.getFilter());

@@ -34,13 +34,29 @@ router.get('/', getEvents);
 
 router.get('/:id', getEvent);
 
-router.get('/:id/polls', (req, res) => {
+async function getPollVotability(poll, userId) {
+  return poll.userCanVoteInPoll(userId);
+}
+
+router.get('/:id/polls', async (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   Poll.find({
     event: req.params.id,
   })
     .populate('options')
-    .then((result) => res.send(result))
+    .then(async (result) => {
+      const { userId } = req.session;
+      const canVotePromises = [];
+      for (let i = 0; i < result.length; i += 1) {
+        canVotePromises.push(getPollVotability(result[i], userId));
+      }
+      const canVotes = await Promise.all(canVotePromises);
+      const jsonList = [];
+      for (let i = 0; i < result.length; i += 1) {
+        jsonList.push({ pData: result[i], canVote: canVotes[i] });
+      }
+      res.json({ list: jsonList });
+    })
     .catch((err) => {
       console.log(err);
       res.sendStatus(500);
