@@ -16,6 +16,11 @@ import { TITLE } from '../assets/constants';
 import { useParams } from 'react-router-dom';
 import EventList from './EventList';
 
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function Create() {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();

@@ -26,6 +26,12 @@ import Gcalender from './Gcalender';
 import { LinkContainer } from 'react-router-bootstrap';
 import { format, parseISO } from 'date-fns';
 
+/**
+ * Returns EventList component for a specific User
+ * @param thisprops
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function EventList(thisprops) {
   const [events, setEvents] = useState([]);
   const [errorMsg, setErrorMsg] = useState();

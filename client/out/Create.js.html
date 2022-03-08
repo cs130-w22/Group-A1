@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Create.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Create.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-unused-vars */
+/* eslint-disable jsx-a11y/control-has-associated-label */
+import React, { useState, useEffect, useContext } from 'react';
+import {
+  Alert, Button, Dropdown, Form,
+} from 'react-bootstrap';
+
+import { Calendar, DateObject } from 'react-multi-date-picker';
+import DatePanel from 'react-multi-date-picker/plugins/date_panel';
+import { useNavigate } from 'react-router-dom';
+import { Controller, useForm } from 'react-hook-form';
+import { createEvent } from '../api/event';
+import { UserContext } from '../utils/context';
+
+import { TITLE } from '../assets/constants';
+import { useParams } from 'react-router-dom';
+import EventList from './EventList';
+
+/**
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
+function Create() {
+  const { user, setUser } = useContext(UserContext);
+  const navigate = useNavigate();
+  const [dates, setDates] = useState();
+  const [earlistTime, setEarliestTime] = useState(-1);
+  const [latestTime, setLatestTime] = useState(-1);
+  const [description, setDescription] = useState('');
+  const [timeZone, setTimeZone] = useState();
+  const hoursInDay = Array.from({ length: 24 }, (x, i) => i);
+  const [dateError, setDateError] = useState();
+
+  useEffect(() => {
+    document.title = `${TITLE} - create`;
+  }, []);
+
+  const { id } = useParams();
+  const hoursDisplayFormat = (hour) => {
+    if (hour % 24 === 0) return '12:00 AM';
+    return hour &lt; 13 ? `${hour}:00 AM` : `${hour % 12}:00 PM`;
+  };
+
+
+  //var created = false;
+  const {
+    handleSubmit,
+    control,
+    setError,
+    formState: { errors },
+
+  } = useForm();
+
+  const onSubmit = (data) => {
+    if (dates == null || dates.length === 0) {
+      return setDateError('Please select at least one date');
+    }
+    const body = {
+      name: data.eventName,
+      description,
+      timeEarliest: earlistTime,
+      timeLatest: latestTime,
+      dates,
+      timeZone,
+    };
+    setDateError(null);
+
+    return createEvent(body)
+      .then((res) => {
+        navigate(`/event/${res.data}`);
+        //created = true;
+        //localStorage.setItem("created",JSON.stringify(created));
+      }).catch((error) => {
+        console.log(error);
+        if (error.response.status === 500) {
+          setError(
+            'form',
+            { type: 'api', message: "We're sorry! Something went wrong on our end." },
+            { shouldFocus: true },
+          );
+        } else if (error.response.status === 401) {
+          setUser(null);
+          navigate('/login');
+        } else {
+          const validationErrors = error.response.data?.errors;
+          if (validationErrors?.length > 0) {
+            console.log(validationErrors);
+            for (let i = 0; i &lt; validationErrors.length; i += 1) {
+              const errorParam = validationErrors[i].param;
+              const errorMsg = validationErrors[i].msg;
+              if (errorParam === 'dates') {
+                console.log('wat');
+                setDateError(errorMsg);
+              } else {
+                setError(
+                  errorParam,
+                  { type: 'api', message: errorMsg },
+                  { shouldFocus: true },
+                );
+              }
+            }
+          }
+
+        }
+      });
+  };
+
+
+
+  return (
+    &lt;div>
+      {errors.form &amp;&amp; &lt;Alert variant="danger">{errors.form}&lt;/Alert>}
+      &lt;h2 className="mb-3">Create Event&lt;/h2>
+
+      &lt;Calendar
+        value={dates}
+        onChange={setDates}
+        multiple
+        sort
+        format="MM/DD/YYYY"
+        calendarPosition="bottom-center"
+        plugins={[&lt;DatePanel />]}
+      />
+      {dateError !== null &amp;&amp; &lt;p className="text-danger mb-1 mt-1">{dateError}&lt;/p>}
+
+      &lt;br />
+      &lt;Form className="w-50" onSubmit={handleSubmit(onSubmit)}>
+        &lt;Form.Group controlId="formName" className="mb-3">
+          &lt;Form.Label>
+            Event Name
+          &lt;/Form.Label>
+          &lt;Controller
+            control={control}
+            name="eventName"
+            defaultValue=""
+            rules={{
+              required: {
+                value: true,
+                message: 'Event name required',
+              },
+            }}
+            render={({
+              field: {
+                onChange, value, ref,
+              },
+            }) => (
+              &lt;Form.Control
+                onChange={onChange}
+                ref={ref}
+                value={value}
+                isInvalid={errors.eventName}
+              />
+            )}
+          />
+          &lt;Form.Control.Feedback type="invalid">
+            {errors.eventName?.message}
+          &lt;/Form.Control.Feedback>
+        &lt;/Form.Group>
+        &lt;Form.Group controlId="formDescription" className="mb-3">
+          &lt;Form.Label>
+            Event Description
+          &lt;/Form.Label>
+          &lt;Form.Control
+            as="textarea"
+            rows={3}
+            name="descriptionTextArea"
+            placeholder="Enter Event Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)
+            }
+          />
+        &lt;/Form.Group>
+        &lt;Form.Group controlId="formEarliest" className="mb-3">
+          &lt;Form.Label>
+            Earliest Possible Time
+          &lt;/Form.Label>
+          &lt;Form.Select
+            aria-label="Select earliest time"
+            onChange={(e) => setEarliestTime(e.target.value)}
+            className="selectEarliestDropdown"
+            defaultValue="0"
+          >
+            {hoursInDay.map((hour) => (
+              &lt;option key={hour} value={hour}>
+                {hoursDisplayFormat(hour)}
+              &lt;/option>
+            ))}
+          &lt;/Form.Select>
+
+        &lt;/Form.Group>
+        &lt;Form.Group controlId="formLatest" className="mb-3">
+          &lt;Form.Label>
+            Latest Possible Time
+          &lt;/Form.Label>
+          &lt;Form.Select
+            aria-label="Select latest time"
+            onChange={(e) => setLatestTime(e.target.value)}
+            className="selectLatestDropdown"
+            defaultValue="0"
+          >
+            {hoursInDay.map((hour) => (
+              &lt;option key={hour} value={hour}>
+                {hoursDisplayFormat(hour)}
+              &lt;/option>
+            ))}
+          &lt;/Form.Select>
+        &lt;/Form.Group>
+        &lt;Form.Group controlId="formLatest" className="mb-3">
+          &lt;Form.Label>
+            Select Time Zone (placeholder)
+          &lt;/Form.Label>
+          &lt;Form.Select
+            aria-label="Select time zone"
+          />
+
+        &lt;/Form.Group>
+        &lt;Button variant="outline-primary" className="fw-bold" type="submit">
+
+          create event
+        &lt;/Button>
+
+      &lt;/Form>
+    &lt;/div>
+  );
+}
+
+export default Create;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Availability.html">Availability</a></li><li><a href="AvailabilitySection.html">AvailabilitySection</a></li><li><a href="Create.html">Create</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventList.html">EventList</a></li><li><a href="EventMembers.html">EventMembers</a></li><li><a href="EventPage.html">EventPage</a></li><li><a href="Home.html">Home</a></li><li><a href="InviteBox.html">InviteBox</a></li><li><a href="InviteList.html">InviteList</a></li><li><a href="LoadingIndicator.html">LoadingIndicator</a></li><li><a href="Login.html">Login</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="overlayFunction.html">overlayFunction</a></li><li><a href="Poll.html">Poll</a></li><li><a href="PollOption.html">PollOption</a></li><li><a href="PollSection.html">PollSection</a></li><li><a href="TimeSelectBlock.html">TimeSelectBlock</a></li><li><a href="UserList.html">UserList</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 07 2022 23:49:32 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

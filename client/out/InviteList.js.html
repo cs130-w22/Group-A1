@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: InviteList.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: InviteList.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useContext, useEffect, useState } from 'react';
+import { Button, Card, Container } from 'react-bootstrap';
+import { ImCheckmark, ImCross } from 'react-icons/im';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import {
+  acceptEventInvite,
+  declineEventInvite,
+  getUserInvites,
+} from '../api/invite';
+import { UserContext } from '../utils/context';
+
+// eslint-disable-next-line no-unused-vars
+const InviteButtons = styled.div`
+  width: 20%;
+`;
+// eslint-disable-next-line no-unused-vars
+const InviteText = styled.div`
+  width: 80%;
+`;
+
+/**
+ * Returns InviteList component
+ * @returns {JSX.Element} React component listing Events User has been invited to
+ * @constructor
+ */
+function InviteList() {
+  const { user, setUser } = useContext(UserContext);
+  const [invites, setInvites] = useState([]);
+  const navigate = useNavigate();
+  useEffect(() => {
+    getUserInvites(user.userId).then((res) => {
+      setInvites(res.data.invites);
+    });
+  }, [user]);
+
+  const onAccept = (id) => {
+    acceptEventInvite(id)
+      .then((res) => {
+        console.log(`Accepted ${res.data.event}`);
+        setInvites(invites.filter((invite) => invite._id !== id));
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setUser(null);
+          navigate('/login');
+        } else {
+          console.log(err);
+        }
+      });
+  };
+
+  const onDecline = (id) => {
+    declineEventInvite(id)
+      .then(() => {
+        setInvites(invites.filter((invite) => invite._id !== id));
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          setUser(null);
+          navigate('/login');
+        } else {
+          console.log(err);
+        }
+      });
+  };
+
+  const invitesList = invites.map((invite) => (
+    &lt;Card className="mx-0 shadow-sm border-primary" key={invite._id}>
+      &lt;Card.Body className="p-3 px-4">
+        &lt;div className="d-flex">
+          &lt;InviteText className="me-2">
+            &lt;span className="text-primary fw-bold">
+              {invite.sender.username}
+            &lt;/span>{' '}
+            invited you to
+            &lt;span className="fw-bold"> {invite.target.name}&lt;/span>
+          &lt;/InviteText>
+          &lt;InviteButtons className="ms-2">
+            {' '}
+            &lt;div className="mt-1 d-flex ">
+              &lt;Button
+                variant="outline-success"
+                className="fw-bold me-2 btn-sm rounded-circle invite-button"
+                aria-label="accept"
+                onClick={() => onAccept(invite._id)}
+              >
+                &lt;ImCheckmark className="mt-n1" />
+              &lt;/Button>
+              &lt;Button
+                variant="outline-secondary"
+                className="fw-bold btn-sm rounded-circle invite-button"
+                aria-label="decline"
+                onClick={() => onDecline(invite._id)}
+              >
+                &lt;ImCross className="mt-n1" />
+              &lt;/Button>
+            &lt;/div>
+          &lt;/InviteButtons>
+        &lt;/div>
+      &lt;/Card.Body>
+    &lt;/Card>
+  ));
+
+  return (
+    &lt;Container className="mx-0 mt-2">
+      &lt;h3 className="text-secondary fw-bold">your invites&lt;/h3>
+      {invites?.length === 0 &amp;&amp; &lt;p className="text-muted">No invites yet!&lt;/p>}
+      &lt;div>{invitesList}&lt;/div>
+    &lt;/Container>
+  );
+}
+export default InviteList;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Availability.html">Availability</a></li><li><a href="AvailabilitySection.html">AvailabilitySection</a></li><li><a href="Create.html">Create</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventList.html">EventList</a></li><li><a href="EventMembers.html">EventMembers</a></li><li><a href="EventPage.html">EventPage</a></li><li><a href="Home.html">Home</a></li><li><a href="InviteBox.html">InviteBox</a></li><li><a href="InviteList.html">InviteList</a></li><li><a href="LoadingIndicator.html">LoadingIndicator</a></li><li><a href="Login.html">Login</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="overlayFunction.html">overlayFunction</a></li><li><a href="Poll.html">Poll</a></li><li><a href="PollOption.html">PollOption</a></li><li><a href="PollSection.html">PollSection</a></li><li><a href="TimeSelectBlock.html">TimeSelectBlock</a></li><li><a href="UserList.html">UserList</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 07 2022 23:49:32 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

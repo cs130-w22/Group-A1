@@ -19,6 +19,11 @@ const InviteText = styled.div`
   width: 80%;
 `;
 
+/**
+ * Returns InviteList component
+ * @returns {JSX.Element} React component listing Events User has been invited to
+ * @constructor
+ */
 function InviteList() {
   const { user, setUser } = useContext(UserContext);
   const [invites, setInvites] = useState([]);

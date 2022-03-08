@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Login.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Login.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import '../assets/custom.scss';
+import React, { useContext, useEffect } from 'react';
+import {
+  Link, Navigate, useLocation, useNavigate,
+} from 'react-router-dom';
+import { Form, Button, Container } from 'react-bootstrap';
+import { Controller, useForm } from 'react-hook-form';
+import { UserContext } from '../utils/context';
+import loginFacade from '../utils/loginFacade';
+import { TITLE } from '../assets/constants';
+
+/**
+ * Returns Login component
+ * @returns {JSX.Element} React component that allows User to login
+ * @constructor
+ */
+function Login() {
+  // use react hook form to handle form navigation
+  const {
+    handleSubmit,
+    control,
+    setError,
+    formState: { errors },
+  } = useForm();
+  const redirect = useLocation().state?.from?.pathname || '/';
+  const navigate = useNavigate();
+  // get login and user from context
+  const { user, setUser } = useContext(UserContext);
+  useEffect(() => {
+    document.title = `${TITLE} - login`;
+  }, []);
+  // handles the input
+  const onSubmit = (data) => {
+    console.log(redirect);
+    loginFacade(data, setError, navigate, redirect, setUser);
+  };
+  // redirect to home page if already signed in
+  if (user?.id) return &lt;Navigate to="/" replace />;
+  return (
+    &lt;Container className="d-flex h-100 justify-content-center">
+      &lt;div className="loginContainer align-self-center">
+        &lt;div className="content p-5 my-5 bg-white rounded">
+          &lt;h2 className="fw-bold fs-2 mb-0">Hi there!👋&lt;/h2>
+          &lt;p className="fs-5 text-muted">Let&amp;apos;s get you signed in.&lt;/p>
+          &lt;Form className="form mt-3" onSubmit={handleSubmit(onSubmit)}>
+            &lt;Form.Group className="mb-3" controlId="formEmail">
+              &lt;Form.Label>Email&lt;/Form.Label>
+              &lt;Controller
+                control={control}
+                name="email"
+                defaultValue=""
+                rules={{
+                  required: {
+                    value: true,
+                    message: 'Email required',
+                  },
+                }}
+                render={({
+                  field: {
+                    onChange, value, ref,
+                  },
+                }) => (
+                  &lt;Form.Control
+                    placeholder="example@email.com"
+                    onChange={onChange}
+                    ref={ref}
+                    value={value}
+                    isInvalid={errors.email}
+                  />
+                )}
+              />
+              &lt;Form.Control.Feedback type="invalid">
+                {errors.email?.message}
+              &lt;/Form.Control.Feedback>
+            &lt;/Form.Group>
+            &lt;Form.Group className="mb-3">
+              &lt;Form.Label>Password&lt;/Form.Label>
+              &lt;Controller
+                name="password"
+                control={control}
+                defaultValue=""
+                rules={{
+                  required: {
+                    value: true,
+                    message: 'Password required',
+                  },
+                  minLength: {
+                    value: 5,
+                    message: 'Password must be at least 5 characters long.',
+                  },
+                }}
+                render={({
+                  field: {
+                    onChange, value, ref,
+                  },
+                }) => (
+                  &lt;Form.Control
+                    placeholder="Password"
+                    type="password"
+                    onChange={onChange}
+                    ref={ref}
+                    value={value}
+                    isInvalid={errors.password}
+                  />
+                )}
+              />
+              &lt;Form.Control.Feedback type="invalid">
+                {errors.password?.message}
+              &lt;/Form.Control.Feedback>
+            &lt;/Form.Group>
+            &lt;Form.Control.Feedback type="invalid">
+              {errors.form?.message}
+            &lt;/Form.Control.Feedback>
+            &lt;Button
+              variant="outline-primary"
+              type="submit"
+              className="ms-1 fw-bold w-100 mt-1"
+            >
+              login
+            &lt;/Button>
+            &lt;div className="text-center mt-3">
+              Need an account?
+              {' '}
+              &lt;br />
+              &lt;Link className="text-secondary" to="/signup">
+                Sign up instead
+              &lt;/Link>
+            &lt;/div>
+          &lt;/Form>
+        &lt;/div>
+      &lt;/div>
+    &lt;/Container>
+  );
+}
+export default Login;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Availability.html">Availability</a></li><li><a href="AvailabilitySection.html">AvailabilitySection</a></li><li><a href="Create.html">Create</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventList.html">EventList</a></li><li><a href="EventMembers.html">EventMembers</a></li><li><a href="EventPage.html">EventPage</a></li><li><a href="Home.html">Home</a></li><li><a href="InviteBox.html">InviteBox</a></li><li><a href="InviteList.html">InviteList</a></li><li><a href="LoadingIndicator.html">LoadingIndicator</a></li><li><a href="Login.html">Login</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="overlayFunction.html">overlayFunction</a></li><li><a href="Poll.html">Poll</a></li><li><a href="PollOption.html">PollOption</a></li><li><a href="PollSection.html">PollSection</a></li><li><a href="TimeSelectBlock.html">TimeSelectBlock</a></li><li><a href="UserList.html">UserList</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 07 2022 23:49:32 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

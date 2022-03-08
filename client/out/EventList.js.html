@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: EventList.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: EventList.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable array-callback-return */
+/* eslint-disable no-const-assign */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+
+import React, { useState, useEffect, useContext } from 'react';
+import {
+  Card,
+  Row,
+  Col,
+  ListGroup,
+  Button,
+  Alert,
+  Modal,
+  Form,
+  FormSelect,
+} from 'react-bootstrap';
+import { getEventList } from '../api/event';
+import { getUser } from '../api/users';
+import { UserContext, EventContext } from '../utils/context';
+import { Create } from './Create';
+import EventEdit from './EventEdit';
+import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
+import Gcalender from './Gcalender';
+import { LinkContainer } from 'react-router-bootstrap';
+import { format, parseISO } from 'date-fns';
+
+/**
+ * Returns EventList component for a specific User
+ * @param thisprops
+ * @returns {JSX.Element}
+ * @constructor
+ */
+function EventList(thisprops) {
+  const [events, setEvents] = useState([]);
+  const [errorMsg, setErrorMsg] = useState();
+  const [filter, setFilter] = useState('name');
+  const [editingStatus, setEditingStatus] = useState(false);
+  const [editingData, setEditingData] = useState();
+  const [GcalActivate, setGcalActivate] = useState(false);
+  const [sort, setSort] = useState("A-Z");
+  const [calenderInfo, setCalenderInfo] = useState();
+  const { user, setUser } = useContext(UserContext);
+  //gets event information about going or not
+
+  const savedEvent = localStorage.getItem('event_data');
+  const eventdata = JSON.parse(savedEvent);
+
+  //gets the name of the event/progile owner
+  const ownerName = thisprops.props;
+  //getting owned and invited events seperately from api
+  useEffect(() => {
+    getEventList()
+      .then((res) => {
+        setEvents(res.data.events);
+        //setMemberedEvents(res.data.memberOnly);
+      })
+      .catch((error) => {
+        console.error(error);
+        setErrorMsg('Error fetching Events, please try again later!');
+      });
+  }, [user]);
+
+
+  const closeEventEditor = () => {
+    setEditingStatus(false);
+    setEditingData(undefined);
+  };
+
+  const MAXUSERS = 3;
+  useEffect(() => {
+    if (editingData !== undefined) {
+      setEditingStatus(() => true);
+      console.log(editingData);
+    }
+  }, [editingData]);
+
+  const handleGcalender = (e) => {
+    setGcalActivate(true);
+    setCalenderInfo(e);
+  };
+
+  useEffect(() => {
+    if (calenderInfo !== undefined) {
+      setGcalActivate(() => true);
+      console.log('this is the calenderinfo ', calenderInfo);
+    }
+  }, [calenderInfo]);
+
+  const displayEvents = (events) => {
+
+    //let props ={event:events, GcalActivate:GcalActivate}
+    //displays archived events
+    if (filter === 'archived') {
+      events = events.filter((item) => item.archived);
+    }
+    //displays non archived events
+    else if (filter === 'unarchived') {
+      events = events.filter((item) => !item.archived);
+    }
+    //this part is just to show filtering works
+    //can be changed when we have going/notgoing function added
+    else if (filter === 'going') {
+      events = events.filter((item) => item.isGoing);
+    }
+    //notgoing
+    else if (filter === 'notGoing') {
+      events = events.filter((item) => !item.isGoing);
+    }
+    //when none of the option is selected  display all the events
+    //only show the event i created
+    else if (filter === 'owner') {
+      events = events.filter((item) => item.owner._id === user.userId);
+    }
+    else if (filter === 'joined') {
+      events = events.filter((item) => item.owner._id !== user.userId);
+    }
+    if (sort === 'A-Z') {
+      events = events.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sort === 'Z-A') {
+      events = events.sort((a, b) => b.name.localeCompare(a.name));
+    }
+    else if (sort === 'creation') {
+      events = events.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    }
+    else if (sort === 'creationDesc') {
+      events = events.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    }
+    else {
+      events = events.sort((a, b) => a._id.localeCompare(b._id));
+    }
+    return events.map((event, i) => (
+      &lt;div key={event._id}>
+        &lt;Card className="border py-2 px-4 mb-3">
+          &lt;div className='py-4'>
+            &lt;div className=" px-4">
+              &lt;div className="d-flex justify-content-between">
+                &lt;div id="event-header">
+                  {event.archived &amp;&amp; (
+                    &lt;div className="fw-bold text-secondary">Archived&lt;/div>
+                  )}
+                  &lt;h3 className="fs-4 fw-bold">
+                    &lt;a id="event-list-names" href={`/event/${event._id}`}
+                      style={{ textDecoration: 'none' }}>
+                      {event.name}
+                    &lt;/a>
+                  &lt;/h3>
+                  &lt;span className='text-dark'>
+                    hosted by{' '}
+                    &lt;span className="fw-bold text-dark ">{event.owner.username}&lt;/span>
+                  &lt;/span>
+
+                &lt;/div>
+                &lt;div id="options">
+                  &lt;Col>
+                    &lt;Row>
+                      {event.owner._id === user.userId &amp;&amp; !event.archived &amp;&amp; (
+                        &lt;Button
+                          variant="btn btn-outline-primary  fw-bold"
+                          onClick={() => setEditingData(event)}
+                        >
+                          edit
+                        &lt;/Button>
+                      )}
+                    &lt;/Row>
+                    &lt;Row>
+                      {(event.members.username === user.username
+                        &amp;&amp; event.finalized
+                      ) ?
+                        (&lt;Button
+                          varient="btn btn-outline-secondary"
+                          onClick={() => handleGcalender(event)}
+                        >
+                          add to Google
+                        &lt;/Button>) : ('')}
+                    &lt;/Row>
+                  &lt;/Col>
+                &lt;/div>
+              &lt;/div>
+            &lt;/div>
+            &lt;div className="text-muted mt-1 px-4 mb-2">
+              {event.description}
+            &lt;/div>
+
+            &lt;>
+              &lt;Row className="px-4 mb-2 mt-3">
+                {event.finalized &amp;&amp; (
+                  &lt;Col>
+                    &lt;span className=" fw-bold text-secondary">When: &lt;/span>
+                    &lt;span className="text-dark">
+                      {format(parseISO(event.finalTime), "H:mm aaa 'at' MM/dd/yyyy")}
+                    &lt;/span>
+                  &lt;/Col>
+                )}
+                {event.finalized &amp;&amp; (&lt;Col className=" fw-bold text-secondary ">What: &lt;span className="text-dark">&lt;/span>&lt;/Col>)}
+              &lt;/Row>
+              &lt;Row className=" px-4 ">
+                &lt;Col>
+                  &lt;span className="fw-bold text-secondary">Who:&lt;/span> &lt;span className="text-dark">
+                    {event.members.map((member, i) => {
+                      if (i !== event.members.length - 1 &amp;&amp; i &lt; MAXUSERS) return (
+                        &lt;span>{member.username}, &lt;/span>
+                      )
+                      else if (i &lt; MAXUSERS &amp;&amp; i === event.members.length - 1) return (
+                        &lt;span> {member.username} &lt;/span>
+                      )
+                      else if (i === MAXUSERS) return (
+                        &lt;span> and {event.members.length - MAXUSERS} other(s) &lt;/span>
+                      )
+                      else return;
+                    })}
+                  &lt;/span>
+                &lt;/Col>
+                {event.finalized &amp;&amp; (&lt;Col className=" fw-bold text-secondary ">Where: { }&lt;/Col>)}
+              &lt;/Row>
+            &lt;/>
+
+
+          &lt;/div>
+        &lt;/Card>
+      &lt;/div>
+
+
+    ));
+
+  };
+
+  return (
+    &lt;>
+      &lt;div id="all-events">
+        &lt;h2 className="h2 fw-bold text-secondary">my events&lt;/h2>
+        &lt;div className='d-flex justify-content-between mb-4'>
+          &lt;LinkContainer to="/event/create">
+            &lt;Button variant="outline-primary" className="ms-1 fw-bold">
+              create event +
+            &lt;/Button>
+          &lt;/LinkContainer>
+
+          &lt;div
+            variant="outline-primary"
+            className="d-flex flex-row-reverse"
+          >
+            &lt;FormSelect
+              className='ms-2'
+              onChange={(e) => setFilter(e.target.value)}
+            >
+              &lt;option>filter by&lt;/option>
+              &lt;option value="owner">created&lt;/option>
+              &lt;option>joined&lt;/option>
+              &lt;option>archived&lt;/option>
+              &lt;option>unarchived&lt;/option>
+              &lt;option>going&lt;/option>
+              &lt;option value="notGoing">not going&lt;/option>
+            &lt;/FormSelect>
+            &lt;FormSelect
+              variant="outline-primary"
+              style={{ width: '200px' }}
+              onChange={(e) => setSort(e.target.value)}
+            >
+              &lt;option value="sortby">sort by&lt;/option>
+              &lt;option value="A-Z"> A-Z &lt;/option>
+              &lt;option value="Z-A"> Z-A &lt;/option>
+
+              &lt;option value="creation"> Creation Date (asc)&lt;/option>
+              &lt;option value="creationDesc"> Creation Date (desc)&lt;/option>
+            &lt;/FormSelect>
+
+          &lt;/div>
+        &lt;/div>
+        &lt;br className="" />
+        &lt;div className="text-secondary">
+          {displayEvents(events)}
+        &lt;/div>
+
+      &lt;/div>
+      {
+        editingStatus &amp;&amp; (
+          &lt;EventEdit
+            editing={editingStatus}
+            closeEditor={() => closeEventEditor()}
+            eventId={editingData._id}
+            editName={editingData.name}
+            editDescription={editingData.description}
+          >&lt;/EventEdit>
+        )
+      }
+      {
+        GcalActivate &amp;&amp; (
+          &lt;Gcalender
+            showCalender={GcalActivate}
+            eventId={calenderInfo._id}
+            editName={calenderInfo.name}
+            editDescription={calenderInfo.description}
+            wholeEvent={calenderInfo}
+            eventTime={calenderInfo.dates}
+          >&lt;/Gcalender>
+        )
+      }
+    &lt;/>
+  );
+}
+
+/*
+EventMembers.propTypes = {
+  coming: PropTypes.arrayOf(PropTypes.object).isRequired,
+  invited: PropTypes.arrayOf(PropTypes.object).isRequired,
+  declined: PropTypes.arrayOf(PropTypes.object).isRequired,
+};
+UserList.propTypes = {
+  users: PropTypes.arrayOf(PropTypes.object).isRequired,
+};
+*/
+export default EventList;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Availability.html">Availability</a></li><li><a href="AvailabilitySection.html">AvailabilitySection</a></li><li><a href="Create.html">Create</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventList.html">EventList</a></li><li><a href="EventMembers.html">EventMembers</a></li><li><a href="EventPage.html">EventPage</a></li><li><a href="Home.html">Home</a></li><li><a href="InviteBox.html">InviteBox</a></li><li><a href="InviteList.html">InviteList</a></li><li><a href="LoadingIndicator.html">LoadingIndicator</a></li><li><a href="Login.html">Login</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="overlayFunction.html">overlayFunction</a></li><li><a href="Poll.html">Poll</a></li><li><a href="PollOption.html">PollOption</a></li><li><a href="PollSection.html">PollSection</a></li><li><a href="TimeSelectBlock.html">TimeSelectBlock</a></li><li><a href="UserList.html">UserList</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 07 2022 23:49:32 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

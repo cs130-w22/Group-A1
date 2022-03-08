@@ -10,9 +10,23 @@ import PollOption from './PollOption';
 import { EventContext } from '../utils/context';
 import { EventButton } from './EventButton';
 
-function Poll({
-  pollId, pollData: data, editMode: editState, handleDelete, handleClose, votable, updater
-}) {
+/**
+ * Component for showing poll details
+ * @param {string} pollId - Poll identifier ('0' if new poll that has not been saved yet)
+ * @param {Object} data All poll data from api call ({options: [], votesAllowed: number, question: string})
+ * @param {boolean} editState tells us whether poll is in "edit state" or not
+ * @param {boolean} votable indicates whether user can vote in poll or not (from API call)
+ * @param {handleDelete} handleDelete callback to run on Poll delete
+ * @param {handleClose} handleClose callback to run on new Poll save to turn off creating mode
+ * @param {updatePollList} updater callback to run on new Poll save to update PollList
+ * @returns {JSX.Element} poll component JSX
+ * @constructor
+ */
+function Poll({pollId, pollData: data, editMode: editState, votable, handleDelete, handleClose, updater}) {
+
+  /**
+   * The event context the poll is in
+   */
   const { eventId, readOnly } = useContext(EventContext);
   const [pollData, setPollData] = useState(data);
   const [options, setOptions] = useState( data.options ? data.options.map((opt) => {
@@ -24,10 +38,19 @@ function Poll({
   const [pollTitle, setPollTitle] = useState(data.question);
   const [canVote, setCanVote] = useState(votable);
 
+
+  /**
+   * Function to change whether user can vote in poll or not based on whether they have reached the maximum votes allowed for the poll.
+   * @param {boolean} toSet true if user can vote in poll, false if not
+   */
   const toggleVoting = (toSet) => {
     setCanVote(toSet);
-  }
+  };
 
+  /**
+   * Update Poll's option list on PollOption delete
+   * @param deleted
+   */
   const onDeleteOption = (deleted) => {
     setOptions(options.filter((option) => option.data._id !== deleted._id));
   };
