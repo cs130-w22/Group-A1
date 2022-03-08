@@ -2,7 +2,7 @@ import React, {
   useEffect, useContext, useState,
 } from 'react';
 import PropTypes from 'prop-types';
-import { Nav } from 'react-bootstrap';
+import { Alert, Nav } from 'react-bootstrap';
 import { EventContext, UserContext } from '../utils/context';
 import Selector from './Selector';
 import { SectionTitle } from './styled/headers';
@@ -13,7 +13,7 @@ import LoadingIndicator from './LoadingIndicator';
 function AvailabilitySection({ members, timeEarliest, timeLatest }) {
   const { eventId } = useContext(EventContext);
   const { user } = useContext(UserContext);
-  const { readOnly } = useContext(EventContext);
+  const { readOnly, archived } = useContext(EventContext);
   const [availability, setAvailability] = useState([]);
   const [view, setView] = useState('view');
   const [loading, setLoading] = useState(false);
@@ -47,14 +47,14 @@ function AvailabilitySection({ members, timeEarliest, timeLatest }) {
   };
   const editMode = () => (
     <div style={{ display: view === 'view' ? 'none' : 'inherit' }}>
+      {readOnly && !archived && <Alert variant='warning'>You must be a member of this event to select your availability.</Alert>}
       <Selector
         onSelect={onSelect}
         availability={availability}
         timeEarliest={timeEarliest}
         timeLatest={timeLatest}
       />
-      {readOnly && <p>You must be a member of this event to select your availability.</p>}
-    </div>
+    </div >
   );
   return (
     <div>
@@ -62,14 +62,14 @@ function AvailabilitySection({ members, timeEarliest, timeLatest }) {
         <SectionTitle className="mt-5 mb-4">Availability ⏰</SectionTitle>
         {loading && <LoadingIndicator />}
         {!loading && availability !== null && (
-        <Nav variant="pills" className="mb-2 fw-bold avail-tabs ms-3" defaultActiveKey="view" onSelect={handleSelect}>
-          <Nav.Item>
-            <Nav.Link eventKey="view">group schedule</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="edit">my availability</Nav.Link>
-          </Nav.Item>
-        </Nav>
+          <Nav variant="pills" className="mb-2 fw-bold avail-tabs ms-3" defaultActiveKey="view" onSelect={handleSelect}>
+            <Nav.Item>
+              <Nav.Link eventKey="view">group schedule</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="edit">my availability</Nav.Link>
+            </Nav.Item>
+          </Nav>
         )}
 
       </div>

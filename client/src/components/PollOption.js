@@ -10,7 +10,7 @@ import {
 import EditIcon from '../assets/edit_icon_small.svg';
 import { UserContext, EventContext, PollContext } from '../utils/context';
 import { EventButton, overlayFunction } from './EventButton';
-import {number} from "prop-types";
+import { number } from "prop-types";
 
 const editButton = {
   boxSizing: 'content-box',
@@ -92,10 +92,10 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
     if (readOnly) return;
     if (typeof optionId === 'string') {
       deleteOption(optionId)
-          .then((res) => {
-            onDelete(res.data);
-          })
-          .catch((err) => console.log(err));
+        .then((res) => {
+          onDelete(res.data);
+        })
+        .catch((err) => console.log(err));
     }
     else {
       onDelete(data);
@@ -159,17 +159,17 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
               value={optionText || ''}
             />
             {!pollState &&
-                (<Button
-                    variant="success"
-                    className="align-self-center ms-2"
-                    hidden={!editMode}
-                    onClick={saveText}
-                >
-                  Save
-                </Button>)
+              (<Button
+                variant="success"
+                className="align-self-center ms-2"
+                hidden={!editMode}
+                onClick={saveText}
+              >
+                Save
+              </Button>)
             }
             {(editMode || pollState) &&
-                (<Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>)}
+              (<Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>)}
           </Form>
 
         )}

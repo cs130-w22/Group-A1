@@ -14,10 +14,10 @@ export function EventMembers({ coming, invited, declined, members }) {
     <Container className="mt-4">
       <SectionTitle className="mb-3">Who&apos;s Coming?</SectionTitle>
       <Row>
-        <Col xs={6}>
+        {coming.length > 0 && (<Col xs={6}>
           <CategoryTitle count={coming.length}>Coming</CategoryTitle>
           <UserList users={coming} />
-        </Col>
+        </Col>)}
         <Col xs={6}>
           <CategoryTitle count={members.length}>Members</CategoryTitle>
           <UserList users={members} />
@@ -26,10 +26,10 @@ export function EventMembers({ coming, invited, declined, members }) {
           <CategoryTitle count={invited.length}>Invited</CategoryTitle>
           <UserList users={invited} />
         </Col>
-        <Col xs={6}>
+        {declined.length > 0 && (<Col xs={6}>
           <CategoryTitle count={declined.length}>Not Coming</CategoryTitle>
           <UserList users={declined} />
-        </Col>
+        </Col>)}
       </Row>
     </Container>
   );

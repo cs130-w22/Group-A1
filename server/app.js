@@ -15,7 +15,10 @@ const inviteRouter = require('./routes/invite');
 
 const createServer = (middleware) => {
   const app = express();
-  app.use(cors());
+  app.use(cors({
+    credentials: true,
+    origin: 'https://cya-client-cs130.herokuapp.com',
+  }));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
@@ -35,6 +38,9 @@ const createServer = (middleware) => {
   app.use('/polls', pollRouter);
   app.use('/event', eventRouter);
   app.use('/invite', inviteRouter);
+  app.get('/', (req, res) => {
+    res.send('Hello World!');
+  });
   return app;
 };
 

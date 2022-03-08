@@ -12,6 +12,6 @@ echo "Done."
 
 # npx lint-staged
 
-npm run build --if-present
+# npm run build --if-present
 
-npm test
+# npm test

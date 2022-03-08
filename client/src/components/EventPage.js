@@ -167,10 +167,10 @@ function EventPage() {
 
           <Modal show={showModal}>
             <Modal.Header>
-              <Modal.Title>Leave Group</Modal.Title>
+              <Modal.Title>Leave Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>Are you sure you want to leave this group?</p>
+              <p>Are you sure you want to leave this event?</p>
             </Modal.Body>
 
             <Modal.Footer>
@@ -193,7 +193,7 @@ function EventPage() {
 
           {!isMember && !errorMsg && (
             <Alert className="d-flex justify-content-between">
-              You are not a part of this group yet! You can take a look around,
+              You are not a part of this event yet! You can take a look around,
               or join the event to start planning!
               <Button
                 variant="outline-primary fw-bold btn-sm"
