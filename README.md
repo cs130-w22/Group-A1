@@ -9,7 +9,7 @@ Our web app hopes to solve that by centralizing everything in one place. Miss th
 Hope you enjoy!
 
 ## Building, Testing, & Deploying
-The builds and deployments are handled automatically by Github Actions. Builds and tests are triggered whenever a pull request is made to `main`, or whenever a commit is made to `main`. Deployments are triggered and made to Heroku whenever commits are made to `main`. The frontend app is deployed at https://cya-client-cs130.herokuapp.com/ while the backend is deployed at https://cya-api-cs130.herokuapp.com/.
+The builds and deployments are handled automatically by Github Actions. Builds and tests are triggered whenever a pull request is made to `main`, or whenever a commit is made to `main`. Deployments are triggered and made to Heroku whenever commits are made to `prod`. The frontend app is deployed at https://cya-client-cs130.herokuapp.com/ while the backend is deployed at https://cya-api-cs130.herokuapp.com/.
 
 Please check [the wiki](https://github.com/cs130-w22/Group-A1/wiki/00-Deployment) for how to install locally from source or deploy to Heroku.
 
