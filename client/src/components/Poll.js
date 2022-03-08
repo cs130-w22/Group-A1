@@ -19,7 +19,7 @@ function Poll({
     return { data: opt, editing: false }
   }) : null); // includes edit property for poll Option for now
   const [editMode, setEditMode] = useState(editState);
-  const [votesAllowed, setVotesAllowed] = useState(1);
+  const [votesAllowed, setVotesAllowed] = useState(data.votesAllowed || 1);
   const [errorMsg, setErrorMsg] = useState();
   const [pollTitle, setPollTitle] = useState(data.question);
   const [canVote, setCanVote] = useState(votable);
@@ -45,7 +45,6 @@ function Poll({
   }, [pollData]);
 
   useEffect(() => {
-    console.log("updatingOptions");
     if (pollData.options != null) {
       const newOptions = [];
       const pollOptions = pollData.options;

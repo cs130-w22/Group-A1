@@ -4,6 +4,7 @@ const router = express.Router();
 const PollOption = require('../models/pollOption');
 const Poll = require('../models/poll');
 const Event = require('../models/event');
+const User = require('../models/user');
 
 // toggle vote of current user (only if toggle does not exceed allotted votes)
 router.post('/vote', (req, res) => {
@@ -17,25 +18,33 @@ router.post('/vote', (req, res) => {
     })
     .then(async (option) => {
       const { userId } = req.session;
-      if (option == null || option.poll == null || option.poll.event == null) return res.sendStatus(404);
-      if (option.poll.event.archived === true) return res.sendStatus(403);
-      if (option.voters.includes(userId)) {
-        await option.voters.pull({ _id: userId });
-        await option.save();
-        res.status(200).send(option);
-      } else {
-        Poll.findById(option.poll).then((poll) => {
-          poll.getUserVotesNumber(userId).then((currentVotes) => {
-            if (currentVotes < poll.votesAllowed) {
-              option.voters.push({ _id: userId });
-              option.save();
-              if (currentVotes === poll.votesAllowed - 1) res.status(201);
+      User.findById(userId, 'username').then(async (user) => {
+        if (option == null || option.poll == null || option.poll.event == null) return res.sendStatus(404);
+        if (option.poll.event.archived === true) return res.sendStatus(403);
+        console.log("found", option.voters.includes(user));
+        if (option.voters.includes(userId)) {
+          option.voters.splice(option.voters.findIndex((v) => v === userId), 1);
+          option.save().then((saved) => {
+            res.status(200).send(saved);
+          });
+        } else {
+          option.poll.getUserVotesNumber(userId).then(async (currentVotes) => {
+            if (currentVotes < option.poll.votesAllowed) {
+              option.voters.push(user);
+              await option.save();
+              if (currentVotes === option.poll.votesAllowed - 1) res.status(201);
               else res.status(200);
               res.send(option);
             } else res.status(202).send('User Votes Exceeded');
+          }).catch((err) => {
+            console.error(err);
+            res.sendStatus(500);
           });
-        });
-      }
+        }
+      }).catch((err) => {
+        console.error(err);
+        res.sendStatus(500);
+      });
     })
     .catch((err) => {
       console.error(err);
@@ -203,15 +212,23 @@ router.post('/:id/options', (req, res) => {
         voters: req.body.voters || [],
       })
         .then((option) => {
-          poll.options.push(option);
-          poll.maxOptionId++;
-          poll
-            .save()
-            .then(() => res.status(201).json(option))
-            .catch((err) => {
-              console.error(err);
-              res.sendStatus(500);
-            });
+          option.populate({
+            path: 'voters',
+            select: '_id username',
+          }).execPopulate().then((popOpt) => {
+            poll.options.push(popOpt);
+            poll.maxOptionId++;
+            poll
+              .save()
+              .then(() => res.status(201).json(popOpt))
+              .catch((err) => {
+                console.error(err);
+                res.sendStatus(500);
+              });
+          }).catch((err) => {
+            console.error(err);
+            res.sendStatus(500);
+          });
         })
         .catch((err) => {
           console.error(err);
@@ -253,7 +270,13 @@ router.patch('/options/:optionId', (req, res) => {
 // get poll options
 router.get('/:id/options', (req, res) => {
   Poll.findById(req.params.id, 'options')
-    .populate('options')
+    .populate({
+      path: 'options',
+      populate: {
+        path: 'voters',
+        select: '_id username',
+      },
+    }).exec()
     .then((data) => (data ? res.json(data) : res.sendStatus(404)))
     .catch((err) => {
       console.error(err);
