@@ -43,7 +43,7 @@ router.get('/:id/polls', async (req, res) => {
   Poll.find({
     event: req.params.id,
   })
-    .populate('options')
+    .populate({ path: 'options', populate: { path: 'voters', select: '_id username' } })
     .then(async (result) => {
       const { userId } = req.session;
       const canVotePromises = [];

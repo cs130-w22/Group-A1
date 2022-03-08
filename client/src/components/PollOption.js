@@ -28,23 +28,21 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
   const { readOnly } = useContext(EventContext);
   const [optionId, setOptionId] = useState(data._id);
   const [optionText, setOptionText] = useState(data.text);
-  const [checked, setChecked] = useState(data.voters.includes(user.userId));
+  const [checked, setChecked] = useState(!!data.voters.find((voter) => voter._id === user.userId));
   const [editMode, setEditMode] = useState(editing);
   const [votes, setVotes] = useState(data.voters);
 
   const changeVote = (e) => {
-    voteOption(data._id).then((res) => {
-      console.log("checked", checked);
+    voteOption(optionId).then((res) => {
+      console.log(res);
       if (checked) {
         votingToggle(true);
-        setVotes(votes.filter((voter) => res.data.voters.includes(voter._id)));
-        console.log(votes);
+        setVotes(votes.filter((voter) => voter._id !== user.userId));
         setChecked(!checked);
       } else {
         if (res.status === 201) {
           votingToggle(false);
         }
-
         if (res.status === 202) {
           alert("Maximum number of votes reached!");
         }
@@ -52,27 +50,29 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
           setVotes([...votes, { _id: user.userId, username: user.username }]);
           setChecked(!checked);
         }
-
       }
-      
     }).catch((err) => console.log(err));
   };
 
   const saveText = (e) => {
-    //e.preventDefault();
+    e.preventDefault();
     if (readOnly) return;
     if (typeof optionId === 'number') { //new option case
       if (pollId !== '0') { // adding option to an existing poll
         addOption(pollId, optionText)
             .then((opt) => {
-              setOptionId(opt._id);
+              console.log(opt);
+              setOptionId(opt.data._id);
               setEditMode(false);
-            })
+            }).catch((err) => console.error('option cannot be empty'));
       }
     }
     else {
       updateOption(optionId, {text: optionText})
-          .then(() => setEditMode(false))
+          .then((opt) =>{
+            setOptionId(opt.data._id);
+            setEditMode(false)
+          })
           .catch((err) => console.log(err));
     }
   };
@@ -104,7 +104,7 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
 
   useEffect(() => {
     setVotes(data.voters);
-  }, [data]);
+  }, [data, optionId]);
 
   const votesOverlay = () => (
     <Tooltip hidden={votes.length === 0}>
