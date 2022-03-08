@@ -5,8 +5,10 @@
 
 This repo serves as a template for repositories in this organization. The following information describes how the native features/workflows of Github can be customized to work in a scrum development process.
 
-## Building & Running
-In the root directory of the project:
+## Building, Testing, & Deploying
+The builds and deployments are handled automatically by Github Actions. Builds and tests are triggered whenever a pull request is made to `main`, or whenever a commit is made to `main`. Deployments are triggered and made to Heroku whenever commits are made to `main`. The frontend app is deployed at https://cya-client-cs130.herokuapp.com/ while the backend is deployed at https://cya-api-cs130.herokuapp.com/.
+
+To build the frontend and backend apps locally, clone this repository. In the repository's root directory run the following commands:
 ```
 npm install
 npm run dev
