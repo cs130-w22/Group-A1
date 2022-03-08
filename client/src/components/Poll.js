@@ -10,6 +10,7 @@ import PollOption from './PollOption';
 import { EventContext } from '../utils/context';
 import { EventButton } from './EventButton';
 
+
 /**
  * Component for showing poll details
  * @param {string} pollId - Poll identifier ('0' if new poll that has not been saved yet)
@@ -140,13 +141,13 @@ function Poll({pollId, pollData: data, editMode: editState, votable, handleDelet
         }).catch((err) => console.log(err));
         handleClose();
       }
-       else {
-        updatePoll(pollId, {question: pollTitle, votesAllowed: votesAllowed})
-            .then((res) => {
-              setEditMode(false);
-              setPollData(res.data.pData);
-            })
-            .catch((err) => console.log(err));
+      else {
+        updatePoll(pollId, { question: pollTitle, votesAllowed: votesAllowed || 1 })
+          .then((res) => {
+            setEditMode(false);
+            setPollData(res.data.pData);
+          })
+          .catch((err) => console.log(err));
       }
     }
   };

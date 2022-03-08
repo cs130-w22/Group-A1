@@ -10,10 +10,7 @@ import {
 import EditIcon from '../assets/edit_icon_small.svg';
 import { UserContext, EventContext } from '../utils/context';
 import { EventButton, overlayFunction } from './EventButton';
-<<<<<<< HEAD
-=======
-import { number } from "prop-types";
->>>>>>> ab01e5401da6cf995bc63402f5667dd0d7283064
+
 
 const editButton = {
   boxSizing: 'content-box',
