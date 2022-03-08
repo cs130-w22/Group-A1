@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: PollList.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: PollList.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useEffect, useContext } from 'react';
+import {
+  Card,
+  ListGroup,
+  Button,
+  Alert,
+  Modal,
+  Form,
+  OverlayTrigger,
+  Tooltip,
+} from 'react-bootstrap';
+import { ThemeProvider } from 'styled-components';
+import { getEventPolls } from '../api/event';
+import { createPoll, getPolls } from '../api/polls';
+import { EventContext } from '../utils/context';
+import { EventButton } from './EventButton';
+import Poll from './Poll';
+
+function PollList() {
+  const { eventId, readOnly, archived } = useContext(EventContext);
+  const [pollList, setPollList] = useState([]);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [creatingPoll, setCreatingPoll] = useState();
+
+  const handleDelete = (deleted) => {
+    const updatedPollList = pollList.filter((poll) => poll.pData._id !== deleted);
+    setPollList(updatedPollList);
+  };
+
+    /**
+     * Callback for adding Poll to PollList
+     * @callback updatePollList
+     * @param {Poll} poll Poll to add to PollList
+     */
+  const updatePollList = (poll) => {
+      setPollList([...pollList, poll]);
+  }
+
+  const handleClose = () => {
+      setCreating(false);
+  };
+
+  useEffect(() => {
+    getEventPolls(eventId)
+      .then((res) => {
+        const resPolls = res.data.list;
+        setPollList(resPolls.map((resPoll) => resPoll)); //poll list contains poll data (pData) and voting ability (canVote)
+      })
+      .catch((error) => {
+        console.error(error);
+        setErrorMsg('Error fetching polls, please try again later!');
+      });
+  }, [eventId]);
+
+  const createNewPoll = () => {
+    // check if allowed
+    if (readOnly) return;
+    setCreating(true);
+    const createPollData = {
+        question: '',
+        options: null
+    }
+    const poll = (
+          &lt;Poll
+            key={pollList.length}
+            pollId='0'
+            pollData={createPollData}
+            editMode
+            votable={true}
+            handleDelete={handleDelete}
+            handleClose={handleClose}
+            readOnly={readOnly}
+            updater={updatePollList}
+          />
+        );
+        setCreatingPoll(poll);
+  };
+
+  return (
+    &lt;div>
+      {errorMsg &amp;&amp; &lt;Alert variant="danger">{errorMsg}&lt;/Alert>}
+      {pollList.map((poll) => (
+        &lt;Poll
+          key={poll.pData._id}
+          pollId={poll.pData._id}
+          pollData={poll.pData}
+          editMode={false}
+          votable={poll.canVote}
+          handleDelete={handleDelete}
+          handleClose={handleClose}
+          readOnly={readOnly}
+          updater={updatePollList}
+        />
+      ))}
+
+      &lt;EventButton
+        onClick={createNewPoll}
+        readOnly={readOnly}
+        archived={archived}
+      >
+        + add poll
+      &lt;/EventButton>
+      &lt;Modal show={creating} onHide={handleClose}>
+        &lt;Modal.Header closeButton>
+          &lt;h3>Create Poll&lt;/h3>
+        &lt;/Modal.Header>
+        &lt;Modal.Body>
+          &lt;Card>{creatingPoll}&lt;/Card>
+        &lt;/Modal.Body>
+      &lt;/Modal>
+    &lt;/div>
+  );
+}
+
+export default PollList;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Availability.html">Availability</a></li><li><a href="AvailabilitySection.html">AvailabilitySection</a></li><li><a href="Create.html">Create</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventList.html">EventList</a></li><li><a href="EventMembers.html">EventMembers</a></li><li><a href="EventPage.html">EventPage</a></li><li><a href="Home.html">Home</a></li><li><a href="InviteBox.html">InviteBox</a></li><li><a href="InviteList.html">InviteList</a></li><li><a href="LoadingIndicator.html">LoadingIndicator</a></li><li><a href="Login.html">Login</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="overlayFunction.html">overlayFunction</a></li><li><a href="Poll.html">Poll</a></li><li><a href="PollOption.html">PollOption</a></li><li><a href="PollSection.html">PollSection</a></li><li><a href="TimeSelectBlock.html">TimeSelectBlock</a></li><li><a href="UserList.html">UserList</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 07 2022 23:49:32 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

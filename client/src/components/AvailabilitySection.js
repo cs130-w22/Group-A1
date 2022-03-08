@@ -10,6 +10,14 @@ import Availability from './Availability';
 import { getAvailability } from '../api/event';
 import LoadingIndicator from './LoadingIndicator';
 
+/**
+ * Returns AvailabilitySection component
+ * @param {User[]} members Event members
+ * @param timeEarliest earliest time in Event could be
+ * @param timeLatest latest time Event could be
+ * @returns {JSX.Element} React component containing Availability selector
+ * @constructor
+ */
 function AvailabilitySection({ members, timeEarliest, timeLatest }) {
   const { eventId } = useContext(EventContext);
   const { user } = useContext(UserContext);

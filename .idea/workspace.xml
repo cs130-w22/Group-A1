@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="AUTOSCROLL_TO_SOURCE" value="true" />
+    <option name="FILTER_RESOLVED_ITEMS" value="false" />
+    <option name="SHOW_STRUCTURE" value="true" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7f803a45-51c5-440f-9958-3ad440560d11" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/.parcel-cache/5c0aaf99bedac262" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/.parcel-cache/b39c140ab6de1d8e" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/.parcel-cache/data.mdb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/.parcel-cache/dbd3305554bb371c.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/.parcel-cache/lock.mdb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/docs/entry.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/docs/scripts/app.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/docs/scripts/linenumber.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/docs/scripts/search.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/docs/styles/app.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/docs/styles/iframe.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/docs/styles/prettify-jsdoc.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/docs/styles/prettify-tomorrow.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/docs/styles/reset.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/jsdoc.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/Availability.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/Availability.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/AvailabilitySection.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/AvailabilitySection.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/Create.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/Create.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/EventButton.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/EventEdit.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/EventEdit.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/EventList.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/EventList.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/EventMembers.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/EventPage.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/EventPage.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/Home.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/Home.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/InviteBox.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/InviteBox.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/InviteList.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/InviteList.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/LoadingIndicator.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/LoadingIndicator.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/Login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/Login.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/NotFound.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/NotFound.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/Poll.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/Poll.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/PollList.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/PollOption.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/PollOption.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/PollSection.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/PollSection.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/TimeSelectBlock.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/TimeSelectBlock.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/UserList.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/UserList.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/entry.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Bold-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Bold-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Bold-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-BoldItalic-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-BoldItalic-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-BoldItalic-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Italic-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Italic-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Italic-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Light-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Light-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Light-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-LightItalic-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-LightItalic-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-LightItalic-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Regular-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Regular-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/fonts/OpenSans-Regular-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/global.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/overlayFunction.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/scripts/app.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/scripts/linenumber.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/scripts/prettify/Apache-License-2.0.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/scripts/prettify/lang-css.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/scripts/prettify/prettify.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/scripts/search.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/styles/app.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/styles/iframe.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/styles/jsdoc-default.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/styles/prettify-jsdoc.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/styles/prettify-tomorrow.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/out/styles/reset.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docFiles.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/_config.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/auth.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/controllers_availabilityController.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/cookie.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/event.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Bold-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Bold-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Bold-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-BoldItalic-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-BoldItalic-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-BoldItalic-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Italic-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Italic-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Italic-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Light-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Light-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Light-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-LightItalic-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-LightItalic-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-LightItalic-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Regular-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Regular-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/fonts/OpenSans-Regular-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/invite.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/login.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/logout.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/module-controllers_availabilityController-module_initializeAvailability.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/module-controllers_availabilityController.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/module-routers_auth.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/module-routers_cookie.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/module-routers_event.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/module-routers_invite.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/module-routers_login.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/module-routers_logout.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/module-routers_polls.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/module-routers_signup.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/polls.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/routes_auth.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/routes_cookie.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/routes_event.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/routes_invite.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/routes_login.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/routes_logout.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/routes_polls.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/routes_signup.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/scripts/linenumber.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/scripts/prettify/Apache-License-2.0.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/scripts/prettify/lang-css.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/scripts/prettify/prettify.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/signup.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/styles/jsdoc-default.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/styles/prettify-jsdoc.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/styles/prettify-tomorrow.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/exportToHTML/Poll.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/Poll.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/PollList.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/UserList.js.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Bold-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Bold-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Bold-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-BoldItalic-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-BoldItalic-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-BoldItalic-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Italic-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Italic-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Italic-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Light-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Light-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Light-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-LightItalic-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-LightItalic-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-LightItalic-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Regular-webfont.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Regular-webfont.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/fonts/OpenSans-Regular-webfont.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/global.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/scripts/app.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/scripts/linenumber.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/scripts/prettify/Apache-License-2.0.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/scripts/prettify/lang-css.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/scripts/prettify/prettify.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/scripts/search.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/styles/app.min.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/styles/iframe.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/styles/jsdoc-default.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/styles/prettify-jsdoc.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/styles/prettify-tomorrow.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/styles/reset.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.husky/pre-commit" beforeDir="false" afterPath="$PROJECT_DIR$/.husky/pre-commit" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Availability.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Availability.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/AvailabilitySection.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/AvailabilitySection.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Create.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Create.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/EventButton.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/EventButton.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/EventEdit.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/EventEdit.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/EventList.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/EventList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/EventPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/EventPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Home.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Home.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/InviteBox.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/InviteBox.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/InviteList.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/InviteList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/LoadingIndicator.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/LoadingIndicator.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/NotFound.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/NotFound.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Poll.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Poll.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/PollList.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/PollList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/PollOption.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/PollOption.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/PollSection.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/PollSection.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Selector.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Selector.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/TimeBlock.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/TimeBlock.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/TimeSelectBlock.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/TimeSelectBlock.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/UserList.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/UserList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/utils/axiosInstance.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/utils/axiosInstance.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/utils/loginFacade.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/utils/loginFacade.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/controllers/availabilityController.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/controllers/availabilityController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/cookie.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/cookie.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/event.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/event.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/invite.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/invite.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/logout.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/logout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/polls.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/polls.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/routes/signup.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes/signup.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExportToHTMLSettings">
+    <option name="printScope" value="1" />
+    <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/exportToHTML" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectId" id="262JkzcynIDJcsm6dr46FwjKC6G" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.standard" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.standard" value="" />
+    <property name="nodejs.jest.jest_package" value="$PROJECT_DIR$/server/node_modules/jest" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Console Colors" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager" selected="Jest.Vote for poll option">
+    <configuration name="Delete poll option" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/server/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/server" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/server/tests/polls.unit.test.js" />
+      <test-names>
+        <test-name value="Delete poll option" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Edit poll option" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/server/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/server" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/server/tests/polls.unit.test.js" />
+      <test-names>
+        <test-name value="Edit poll option" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Vote for poll option" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/server/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/server" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/server/tests/polls.unit.test.js" />
+      <test-names>
+        <test-name value="Vote for poll option" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Vote for poll option.should have one vote" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/server/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/server" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/server/tests/polls.unit.test.js" />
+      <test-names>
+        <test-name value="Vote for poll option" />
+        <test-name value="should have one vote" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Vote for poll option.should return successfully" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/server/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/server" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/server/tests/polls.unit.test.js" />
+      <test-names>
+        <test-name value="Vote for poll option" />
+        <test-name value="should return successfully" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Jest.Vote for poll option" />
+        <item itemvalue="Jest.Vote for poll option.should return successfully" />
+        <item itemvalue="Jest.Vote for poll option.should have one vote" />
+        <item itemvalue="Jest.Delete poll option" />
+        <item itemvalue="Jest.Edit poll option" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7f803a45-51c5-440f-9958-3ad440560d11" name="Changes" comment="" />
+      <created>1646615897037</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1646615897037</updated>
+      <workItem from="1646615900913" duration="91000" />
+      <workItem from="1646616009885" duration="77537000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Group_A1$Adding_poll_should_return_successfully.info" NAME="Adding poll.should return successfully Coverage Results" MODIFIED="1646672439709" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="JestJavaScriptTestRunnerCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
+</project>

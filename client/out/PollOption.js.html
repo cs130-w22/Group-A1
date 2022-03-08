@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: PollOption.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: PollOption.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, {
+  useContext, useEffect, useState,
+} from 'react';
+import {
+  ToggleButton, Button, CloseButton, Form, Row, Col, Container, Overlay, OverlayTrigger, Tooltip,
+} from 'react-bootstrap';
+import {
+  addOption, deleteOption, updateOption, voteOption,
+} from '../api/polls';
+import EditIcon from '../assets/edit_icon_small.svg';
+import { UserContext, EventContext } from '../utils/context';
+import { EventButton, overlayFunction } from './EventButton';
+
+const editButton = {
+  boxSizing: 'content-box',
+  width: '1em',
+  height: '1em',
+  color: '#000',
+  background: 'transparent',
+  border: '0',
+  borderRadius: '0.25rem',
+  opacity: '0.5',
+};
+
+/**
+ * Component representing a single PollOption
+ * @param {string} pollId parent Poll identifier ('0' if new poll that has not been saved yet)
+ * @param {Object} data PollOption data from database ({_id: ObjectId, text: string, voters:[]})
+ * @param {boolean} editing true if PollOption is in edit mode
+ * @param {boolean} pollState true if parent Poll is in edit mode
+ * @param {boolean} votable true if User can vote in PollOption's parent Poll
+ * @param {callback} onDelete callback function to remove PollOption from parent Poll on delete
+ * @param {callback} votingToggle callback function to edit parent Poll canVote state on PollOption vote change
+ * @param {callback} onUpdate callback function to update parent Poll with current PollOption
+ */
+function PollOption({ pollId, data, editing, pollState, votable, onDelete, votingToggle, onUpdate }) {
+  const { user } = useContext(UserContext);
+  const { readOnly } = useContext(EventContext);
+  const [optionId, setOptionId] = useState(data._id);
+  const [optionText, setOptionText] = useState(data.text);
+  const [checked, setChecked] = useState(!!data.voters.find((voter) => voter._id === user.userId));
+  const [editMode, setEditMode] = useState(editing);
+  const [votes, setVotes] = useState(data.voters);
+
+  useEffect(() => {
+    setVotes(data.voters);
+  }, [data, optionId]);
+
+  /**
+   * Function to add/remove User's vote from poll
+   */
+  const changeVote = () => {
+    voteOption(optionId).then((res) => {
+      console.log(res);
+      if (checked) {
+        votingToggle(true);
+        setVotes(votes.filter((voter) => voter._id !== user.userId));
+        setChecked(!checked);
+      } else {
+        if (res.status === 201) {
+          votingToggle(false);
+        }
+        if (res.status === 202) {
+          alert("Maximum number of votes reached!");
+        }
+        else {
+          setVotes([...votes, { _id: user.userId, username: user.username }]);
+          setChecked(!checked);
+        }
+      }
+    }).catch((err) => console.log(err));
+  };
+
+  /**
+   * Function to save PollOption on button click
+   * @param e
+   */
+  const saveText = (e) => {
+    e.preventDefault();
+    if (readOnly) return;
+    if (typeof optionId === 'number') { //new option case
+      if (pollId !== '0') { // adding option to an existing poll
+        addOption(pollId, optionText)
+            .then((opt) => {
+              console.log(opt);
+              setOptionId(opt.data._id);
+              setEditMode(false);
+            }).catch((err) => console.error('option cannot be empty'));
+      }
+    }
+    else {
+      updateOption(optionId, {text: optionText})
+          .then((opt) =>{
+            setOptionId(opt.data._id);
+            setEditMode(false)
+          })
+          .catch((err) => console.log(err));
+    }
+  };
+
+  /**
+   * Function to handle PollOption text changes and propagate them to parent Poll
+   * @param e
+   */
+  const handleChange = (e) => {
+    if (readOnly) return;
+    setOptionText(e.target.value);
+    onUpdate(optionId, e.target.value);
+  };
+
+  /**
+   * Function to change editMode on Edit Button click
+   */
+  const allowEdits = () => {
+    if (readOnly) return;
+    setEditMode(true);
+  };
+
+  /**
+   * Function to delete PollOption and propagate change to parent Poll
+   */
+  const removeOption = () => {
+    if (readOnly) return;
+    if (typeof optionId === 'string') {
+      deleteOption(optionId)
+          .then((res) => {
+            onDelete(res.data);
+          })
+          .catch((err) => console.log(err));
+    }
+    else {
+      onDelete(data);
+    }
+  };
+
+  /**
+   * Component that displays PollOption voters as Tooltip
+   * @returns {JSX.Element}
+   */
+  const votesOverlay = () => (
+    &lt;Tooltip hidden={votes.length === 0}>
+      {votes.map((voter, i) => [
+        i > 0 &amp;&amp; ', ',
+        &lt;span key={voter.username}>{voter.username}&lt;/span>,
+      ])}
+    &lt;/Tooltip>
+  );
+
+  return (
+    &lt;Container className="px-1 mb-3">
+
+      &lt;div className="d-flex justify-content-between align-items-center">
+        &lt;div className="pe-2 flex-shrink-1 d-flex align-items-center">
+          {(!editMode &amp;&amp; !pollState)
+            &amp;&amp; (
+              &lt;div>
+                &lt;EventButton
+                  className="color-secondary align-self-center mb-3 me-3 p-0"
+                  style={editButton}
+                  hidden={editMode}
+                  onClick={allowEdits}
+                  readOnly={readOnly}
+                >
+                  &lt;img src={EditIcon} alt="Edit" />
+                &lt;/EventButton>
+                &lt;OverlayTrigger
+                  placement="right"
+                  overlay={
+                    overlayFunction(readOnly)
+                  }
+                >
+                  &lt;span>
+
+                    &lt;input className="form-check-input mt-2 mb-2 ms-2" type="checkbox" checked={checked} readOnly disabled={!checked &amp;&amp; !votable} onClick={changeVote} />
+                  &lt;/span>
+                &lt;/OverlayTrigger>
+              &lt;/div>
+            )}
+        &lt;/div>
+        {' '}
+        {(editMode || pollState) &amp;&amp; (
+          &lt;Form className="w-100 d-flex ms-n2" onSubmit={saveText}>
+            &lt;Form.Control
+              key={'poll-text-'.concat(optionId)}
+              id={'poll-text'.concat(optionId)}
+              type="text"
+              placeholder="Enter Poll Option"
+              onChange={handleChange}
+              //readOnly={!editMode}
+              value={optionText || ''}
+            />
+            {!pollState &amp;&amp;
+                (&lt;Button
+                    variant="success"
+                    className="align-self-center ms-2"
+                    hidden={!editMode}
+                    onClick={saveText}
+                >
+                  Save
+                &lt;/Button>)
+            }
+            {(editMode || pollState) &amp;&amp;
+                (&lt;Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete&lt;/Button>)}
+          &lt;/Form>
+
+        )}
+        &lt;span hidden={editMode || pollState} className="mx-3 text-nowrap flex-grow-1">{optionText}&lt;/span>
+
+        &lt;OverlayTrigger
+          placement="right"
+          overlay={votesOverlay()}
+        >
+          &lt;span className="voteCount" hidden={editMode || pollState}>
+            Votes:
+            {' '}
+            {votes.length}
+          &lt;/span>
+        &lt;/OverlayTrigger>
+      &lt;/div>
+
+    &lt;/Container>
+  );
+}
+
+export default PollOption;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#PollOption">PollOption</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 07 2022 23:25:07 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

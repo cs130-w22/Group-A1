@@ -3,12 +3,28 @@ import { Col, Container, Row } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { CategoryTitle, SectionTitle } from './styled/headers';
 
-export function UserList({ users }) {
+/**
+ * Component containing generic list of usernames
+ * @param {User[]} users list of Users to include in formatted list
+ * @return {JSX.Element}
+ * @constructor
+ */
+ function UserList({ users }) {
   const listItems = users.map((user) => (
     <li key={user._id || 'x'}>{user.username}</li>
   ));
   return <ul className="list-unstyled mb-4">{listItems}</ul>;
 }
+
+/**
+ * Component containing event members sorted by Event invite response
+ * @param {User[]} coming list of Users marked as "Coming"
+ * @param {User[]} invited list of Users marked as "Invited"
+ * @param {User[]} declined list of Users marked as "Declined"
+ * @param {User[]} members list of Users marked as "Members"
+ * @return {JSX.Element}
+ * @constructor
+ */
 export function EventMembers({ coming, invited, declined, members }) {
   return (
     <Container className="mt-4">
@@ -34,6 +50,7 @@ export function EventMembers({ coming, invited, declined, members }) {
     </Container>
   );
 }
+
 EventMembers.propTypes = {
   coming: PropTypes.arrayOf(PropTypes.object).isRequired,
   members: PropTypes.arrayOf(PropTypes.object).isRequired,

@@ -7,6 +7,13 @@ import { SectionTitle } from './styled/headers';
 import { sendEventInvite } from '../api/invite';
 import { EventContext } from '../utils/context';
 
+/**
+ * Returns InviteBox component
+ * @param {string} eventURL URL to event that will be used as invite link
+ * @param {callback} onInvite callback function that will be called on Invite send
+ * @returns {JSX.Element} InviteBox component
+ * @constructor
+ */
 function InviteBox({
   eventURL,
   onInvite,

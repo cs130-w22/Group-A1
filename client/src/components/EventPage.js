@@ -19,6 +19,11 @@ import { EventMembers } from './UserList';
 import { getEventInvites } from '../api/invite';
 import { TITLE } from '../assets/constants';
 
+/**
+ * Returns EventPage as a React component
+ * @returns {JSX.Element} EventPage including AvailabilitySection, PollSection, and Users
+ * @constructor
+ */
 function EventPage() {
   const { user, setUser } = useContext(UserContext);
   const { id } = useParams();

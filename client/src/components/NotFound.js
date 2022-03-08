@@ -3,6 +3,11 @@ import { Button, Container } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { TITLE } from '../assets/constants';
 
+/**
+ * Returns component that displays Error message
+ * @returns {JSX.Element} NotFound component
+ * @constructor
+ */
 function NotFound() {
   useEffect(() => {
     document.title = `${TITLE} - 404`;

@@ -9,6 +9,11 @@ import { UserContext } from '../utils/context';
 import loginFacade from '../utils/loginFacade';
 import { TITLE } from '../assets/constants';
 
+/**
+ * Returns Login component
+ * @returns {JSX.Element} React component that allows User to login
+ * @constructor
+ */
 function Login() {
   // use react hook form to handle form navigation
   const {

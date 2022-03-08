@@ -27,6 +27,11 @@ function PollList() {
     setPollList(updatedPollList);
   };
 
+    /**
+     * Callback for adding Poll to PollList
+     * @callback updatePollList
+     * @param {Poll} poll Poll to add to PollList
+     */
   const updatePollList = (poll) => {
     setPollList([...pollList, poll]);
   }

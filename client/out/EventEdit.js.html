@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: EventEdit.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: EventEdit.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useContext, useEffect } from 'react';
+import { Alert, Button, Card, Form, Modal } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { Controller, useForm } from 'react-hook-form';
+import PropTypes, { any } from 'prop-types';
+import { editEvent, deleteEvent } from '../api/event';
+import { UserContext } from '../utils/context';
+import { EventButton } from './EventButton';
+
+/**
+ * Returns EventEdit component that allows User to create an Event
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
+function EventEdit(props) {
+  const { user, setUser } = useContext(UserContext);
+  //const [eventName, setEventName] = useState(props.editName);
+  const [description, setDescription] = useState(props.editDescription);
+  const navigate = useNavigate();
+
+  /*
+  useEffect(() => {
+    console.log(eventName);
+    console.log(description);
+    console.log(props.eventId);
+  }, [eventName, description, props.eventId]);
+  */
+
+  const {
+    handleSubmit,
+    control,
+    setError,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    const body = {
+      name: data.eventName,
+      description,
+    };
+    return editEvent(props.eventId, body)
+      .then((res) => {
+        navigate(`/event/${props.eventId}`);
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          setError(
+            'form',
+            {
+              type: 'api',
+              message: "We're sorry! Something went wrong on our end.",
+            },
+            { shouldFocus: true },
+          );
+        } else if (error.response.status === 401) {
+          setUser(null);
+          navigate('/login');
+        } else {
+          const validationErrors = error.response.data?.errors;
+          if (validationErrors?.length > 0) {
+            for (let i = 0; i &lt; validationErrors.length; i += 1) {
+              const errorParam = validationErrors[i].param;
+              const errorMsg = validationErrors[i].msg;
+              setError(
+                errorParam,
+                { type: 'api', message: errorMsg },
+                { shouldFocus: true },
+              );
+            }
+          }
+        }
+      });
+  };
+
+  const handleDeletion = () => {
+    deleteEvent(props.eventId)
+      .then((res) => {
+        if (window.location.pathname !== '/') navigate('/');
+        else window.location.reload(false);
+      })
+      .catch((error) => {
+        if (error.response.status === 500) {
+          setError(
+            'form',
+            {
+              type: 'api',
+              message: "We're sorry! Something went wrong on our end.",
+            },
+            { shouldFocus: true },
+          );
+        } else if (error.response.status === 401) {
+          setUser(null);
+          navigate('/login');
+        } else {
+          const validationErrors = error.response.data?.errors;
+          if (validationErrors?.length > 0) {
+            for (let i = 0; i &lt; validationErrors.length; i += 1) {
+              const errorParam = validationErrors[i].param;
+              const errorMsg = validationErrors[i].msg;
+              setError(
+                errorParam,
+                { type: 'api', message: errorMsg },
+                { shouldFocus: true },
+              );
+            }
+          }
+        }
+      });
+  };
+
+  return (
+    &lt;div>
+      {errors.form &amp;&amp; &lt;Alert variant="danger">{errors.form}&lt;/Alert>}
+      &lt;Modal show={props.editing} onHide={props.closeEditor} centered>
+        &lt;Form onSubmit={handleSubmit(onSubmit)}>
+          &lt;Modal.Header closeButton>
+            &lt;Modal.Title className="h3 fw-bold text-secondary">
+              Edit Event
+            &lt;/Modal.Title>
+          &lt;/Modal.Header>
+          &lt;Modal.Body>
+            &lt;Form.Label className="fw-bold text-primary">Event Name&lt;/Form.Label>
+
+            &lt;Controller
+              control={control}
+              name="eventName"
+              defaultValue={props.editName}
+              rules={{
+                required: {
+                  value: true,
+                  message: 'Event name required',
+                },
+              }}
+              render={({ field: { onChange, value, ref } }) => (
+                &lt;Form.Control
+                  onChange={onChange}
+                  ref={ref}
+                  value={value}
+                  isInvalid={errors.eventName}
+                />
+              )}
+            />
+            &lt;Form.Control.Feedback type="invalid">
+              {errors.eventName?.message}
+            &lt;/Form.Control.Feedback>
+
+            &lt;br>&lt;/br>
+
+            &lt;Form.Group controlId="formDescription" className="mb-3">
+              &lt;Form.Label className="fw-bold text-primary">
+                Event Description
+              &lt;/Form.Label>
+              &lt;Form.Control
+                as="textarea"
+                rows={3}
+                name="descriptionTextArea"
+                placeholder="Enter Event Description"
+                defaultValue={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            &lt;/Form.Group>
+          &lt;/Modal.Body>
+          &lt;Modal.Footer>
+            &lt;Button variant="success" className="ms-2 " type="submit">
+              save
+            &lt;/Button>
+            &lt;Button variant="danger" className="ms-2 " onClick={handleDeletion}>
+              delete
+            &lt;/Button>
+            &lt;Button
+              variant="outline-primary"
+              className="ms-2 "
+              onClick={() => props.closeEditor()}
+            >
+              cancel
+            &lt;/Button>
+          &lt;/Modal.Footer>
+        &lt;/Form>
+      &lt;/Modal>
+    &lt;/div>
+  );
+}
+
+/*
+EventEdit.propTypes = {
+  editing: PropTypes.bool.isRequired, 
+  closeEditor: any,
+  eventData: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string,
+  }).isRequired,
+};
+*/
+
+export default EventEdit;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Availability.html">Availability</a></li><li><a href="AvailabilitySection.html">AvailabilitySection</a></li><li><a href="Create.html">Create</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventList.html">EventList</a></li><li><a href="EventMembers.html">EventMembers</a></li><li><a href="EventPage.html">EventPage</a></li><li><a href="Home.html">Home</a></li><li><a href="InviteBox.html">InviteBox</a></li><li><a href="InviteList.html">InviteList</a></li><li><a href="LoadingIndicator.html">LoadingIndicator</a></li><li><a href="Login.html">Login</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="overlayFunction.html">overlayFunction</a></li><li><a href="Poll.html">Poll</a></li><li><a href="PollOption.html">PollOption</a></li><li><a href="PollSection.html">PollSection</a></li><li><a href="TimeSelectBlock.html">TimeSelectBlock</a></li><li><a href="UserList.html">UserList</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 07 2022 23:49:32 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

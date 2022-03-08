@@ -7,6 +7,12 @@ import { editEvent, deleteEvent } from '../api/event';
 import { UserContext } from '../utils/context';
 import { EventButton } from './EventButton';
 
+/**
+ * Returns EventEdit component that allows User to create an Event
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function EventEdit(props) {
   const { user, setUser } = useContext(UserContext);
   //const [eventName, setEventName] = useState(props.editName);
