@@ -14,4 +14,4 @@ echo "Done."
 
 # npm run build --if-present
 
-npm test
+# npm test

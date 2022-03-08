@@ -50,14 +50,14 @@ jobs:
         HD_PORT: 5000
         HD_REACT_APP_API_URL: "https://cya-api-cs130.herokuapp.com/"
     - name: Deploy API
-        uses: akhileshns/heroku-deploy@v3.12.12 
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "cya-client-cs130" 
-          heroku_email: "elyseyao@g.ucla.edu"
-        env:
-          HD_APP_BASE: "server"
-          HD_DB_URI: ${{ secrets.DB_URI }}
-          HD_TESTDB_URI: ${{ secrets.TESTDB_URI }}
-          HD_SESSION_URI: ${{ secrets.SESSION_URI }}
-          HD_SECRET: ${{ secrets.SECRET }}
+      uses: akhileshns/heroku-deploy@v3.12.12 
+      with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: "cya-client-cs130" 
+        heroku_email: "elyseyao@g.ucla.edu"
+      env:
+        HD_APP_BASE: "server"
+        HD_DB_URI: ${{ secrets.DB_URI }}
+        HD_TESTDB_URI: ${{ secrets.TESTDB_URI }}
+        HD_SESSION_URI: ${{ secrets.SESSION_URI }}
+        HD_SECRET: ${{ secrets.SECRET }}
