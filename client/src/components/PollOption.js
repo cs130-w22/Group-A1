@@ -10,7 +10,7 @@ import {
 import EditIcon from '../assets/edit_icon_small.svg';
 import { UserContext, EventContext, PollContext } from '../utils/context';
 import { EventButton, overlayFunction } from './EventButton';
-import {number} from "prop-types";
+import { number } from "prop-types";
 
 const editButton = {
   boxSizing: 'content-box',
@@ -28,7 +28,7 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
   const { readOnly } = useContext(EventContext);
   const [optionId, setOptionId] = useState(data._id);
   const [optionText, setOptionText] = useState(data.text);
-  const [checked, setChecked] = useState(data.voters.includes(user.userId));
+  const [checked, setChecked] = useState(data.voters.filter((voter) => voter._id === user.userId).length > 0);
   const [editMode, setEditMode] = useState(editing);
   const [votes, setVotes] = useState(data.voters);
 
@@ -37,7 +37,7 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
       console.log("checked", checked);
       if (checked) {
         votingToggle(true);
-        setVotes(votes.filter((voter) => res.data.voters.includes(voter._id)));
+        setVotes(votes.filter((voter) => res.data.voters.includes(voter)));
         setChecked(!checked);
       } else {
         if (res.status === 201) {
@@ -58,21 +58,21 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
   };
 
   const saveText = (e) => {
-    //e.preventDefault();
+    e.preventDefault();
     if (readOnly) return;
     if (typeof optionId === 'number') { //new option case
       if (pollId !== '0') { // adding option to an existing poll
         addOption(pollId, optionText)
-            .then((opt) => {
-              setOptionId(opt._id);
-              setEditMode(false);
-            })
+          .then((opt) => {
+            setOptionId(opt._id);
+            setEditMode(false);
+          })
       }
     }
     else {
-      updateOption(optionId, {text: optionText})
-          .then(() => setEditMode(false))
-          .catch((err) => console.log(err));
+      updateOption(optionId, { text: optionText })
+        .then(() => setEditMode(false))
+        .catch((err) => console.log(err));
     }
   };
 
@@ -91,10 +91,10 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
     if (readOnly) return;
     if (typeof optionId === 'string') {
       deleteOption(optionId)
-          .then((res) => {
-            onDelete(res.data);
-          })
-          .catch((err) => console.log(err));
+        .then((res) => {
+          onDelete(res.data);
+        })
+        .catch((err) => console.log(err));
     }
     else {
       onDelete(data);
@@ -158,17 +158,17 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
               value={optionText || ''}
             />
             {!pollState &&
-                (<Button
-                    variant="success"
-                    className="align-self-center ms-2"
-                    hidden={!editMode}
-                    onClick={saveText}
-                >
-                  Save
-                </Button>)
+              (<Button
+                variant="success"
+                className="align-self-center ms-2"
+                hidden={!editMode}
+                onClick={saveText}
+              >
+                Save
+              </Button>)
             }
             {(editMode || pollState) &&
-                (<Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>)}
+              (<Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>)}
           </Form>
 
         )}

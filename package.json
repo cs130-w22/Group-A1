@@ -8,7 +8,8 @@
     "postinstall": "concurrently \"cd client && npm install\" \"cd server && npm install\"",
     "build": "cd client && npm run build",
     "test": "cd server && npm run test && cd ../client && npm run test",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "deploy": "npm ci && concurrently \"npm run start\" \"cd client && serve -s build\""
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.0",

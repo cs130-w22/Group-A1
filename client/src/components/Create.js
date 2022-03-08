@@ -20,12 +20,13 @@ function Create() {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [dates, setDates] = useState();
-  const [earlistTime, setEarliestTime] = useState(-1);
-  const [latestTime, setLatestTime] = useState(-1);
+  const [earliestTime, setEarliestTime] = useState(0);
+  const [latestTime, setLatestTime] = useState(23);
   const [description, setDescription] = useState('');
   const [timeZone, setTimeZone] = useState();
   const hoursInDay = Array.from({ length: 24 }, (x, i) => i);
   const [dateError, setDateError] = useState();
+  const [timeError, setTimeError] = useState();
 
   useEffect(() => {
     document.title = `${TITLE} - create`;
@@ -51,14 +52,18 @@ function Create() {
     if (dates == null || dates.length === 0) {
       return setDateError('Please select at least one date');
     }
+    if (earliestTime >= latestTime) {
+      return setTimeError('Latest time must be after earliest time');
+    }
     const body = {
       name: data.eventName,
       description,
-      timeEarliest: earlistTime,
+      timeEarliest: earliestTime,
       timeLatest: latestTime,
       dates,
       timeZone,
     };
+    setTimeError(null);
     setDateError(null);
 
     return createEvent(body)
@@ -106,7 +111,7 @@ function Create() {
   return (
     <div>
       {errors.form && <Alert variant="danger">{errors.form}</Alert>}
-      <h2 className="mb-3">Create Event</h2>
+      <h2 className="mb-3 fw-bold text-secondary">create event</h2>
 
       <Calendar
         value={dates}
@@ -174,7 +179,7 @@ function Create() {
             aria-label="Select earliest time"
             onChange={(e) => setEarliestTime(e.target.value)}
             className="selectEarliestDropdown"
-            defaultValue="0"
+            value={earliestTime}
           >
             {hoursInDay.map((hour) => (
               <option key={hour} value={hour}>
@@ -191,8 +196,9 @@ function Create() {
           <Form.Select
             aria-label="Select latest time"
             onChange={(e) => setLatestTime(e.target.value)}
+            value={latestTime}
+            isInvalid={timeError != null}
             className="selectLatestDropdown"
-            defaultValue="0"
           >
             {hoursInDay.map((hour) => (
               <option key={hour} value={hour}>
@@ -200,6 +206,9 @@ function Create() {
               </option>
             ))}
           </Form.Select>
+          <Form.Control.Feedback type="invalid">
+            {timeError}
+          </Form.Control.Feedback>
         </Form.Group>
         {/* <Form.Group controlId="formLatest" className="mb-3">
         
