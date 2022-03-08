@@ -39,6 +39,9 @@ function InviteList() {
       .then((res) => {
         console.log(`Accepted ${res.data.event}`);
         setInvites(invites.filter((invite) => invite._id !== id));
+        let url = `/event/${res.data.event}`;
+        console.log(url);
+        navigate(url);
       })
       .catch((err) => {
         if (err.response.status === 401) {
@@ -65,8 +68,8 @@ function InviteList() {
       });
   };
 
-  const invitesList = invites.map((invite) => (
-    <Card className="mx-0 shadow-sm border-primary" key={invite._id}>
+  const invitesList = invites?.map((invite) => (
+    <Card className="mx-0 shadow-sm border-primary mb-2" key={invite._id}>
       <Card.Body className="p-3 px-4">
         <div className="d-flex">
           <InviteText className="me-2">

@@ -125,10 +125,10 @@ function PollOption({ pollId, data, editing, pollState, votable, onDelete, votin
     if (readOnly) return;
     if (typeof optionId === 'string') {
       deleteOption(optionId)
-          .then((res) => {
-            onDelete(res.data);
-          })
-          .catch((err) => console.log(err));
+        .then((res) => {
+          onDelete(res.data);
+        })
+        .catch((err) => console.log(err));
     }
     else {
       onDelete(data);
@@ -192,17 +192,17 @@ function PollOption({ pollId, data, editing, pollState, votable, onDelete, votin
               value={optionText || ''}
             />
             {!pollState &&
-                (<Button
-                    variant="success"
-                    className="align-self-center ms-2"
-                    hidden={!editMode}
-                    onClick={saveText}
-                >
-                  Save
-                </Button>)
+              (<Button
+                variant="success"
+                className="align-self-center ms-2"
+                hidden={!editMode}
+                onClick={saveText}
+              >
+                Save
+              </Button>)
             }
             {(editMode || pollState) &&
-                (<Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>)}
+              (<Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>)}
           </Form>
 
         )}

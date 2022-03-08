@@ -10,6 +10,7 @@ import PollOption from './PollOption';
 import { EventContext } from '../utils/context';
 import { EventButton } from './EventButton';
 
+
 /**
  * Component for showing poll details
  * @param {string} pollId - Poll identifier ('0' if new poll that has not been saved yet)
@@ -23,14 +24,10 @@ import { EventButton } from './EventButton';
  * @constructor
  */
 function Poll({pollId, pollData: data, editMode: editState, votable, handleDelete, handleClose, updater}) {
-
-  /**
-   * The event context the poll is in
-   */
   const { eventId, readOnly } = useContext(EventContext);
   const [pollData, setPollData] = useState(data);
-  const [options, setOptions] = useState( data.options ? data.options.map((opt) => {
-    return {data: opt, editing: false}
+  const [options, setOptions] = useState(data.options ? data.options.map((opt) => {
+    return { data: opt, editing: false }
   }) : null); // includes edit property for poll Option for now
   const [editMode, setEditMode] = useState(editState);
   const [votesAllowed, setVotesAllowed] = useState(data.votesAllowed || 1);
@@ -60,7 +57,6 @@ function Poll({pollId, pollData: data, editMode: editState, votable, handleDelet
       let newOptions = [].concat(options);
       newOptions[optionId].data.text = text;
       setOptions(newOptions);
-      console.log(newOptions);
     }
   };
 
@@ -101,15 +97,15 @@ function Poll({pollId, pollData: data, editMode: editState, votable, handleDelet
 
   const createNewOption = () => {
     if (readOnly) return;
-      const option = {
-        data: {
-          _id: options.length,
-          text: '',
-          voters: [],
-        },
-        editing: true,
-      }
-      setOptions([...options, option]);
+    const option = {
+      data: {
+        _id: options.length,
+        text: '',
+        voters: [],
+      },
+      editing: true,
+    }
+    setOptions([...options, option]);
   };
 
   const allowEdits = () => {
@@ -118,16 +114,21 @@ function Poll({pollId, pollData: data, editMode: editState, votable, handleDelet
 
   const savePoll = (e) => {
     // update poll
-    e.preventDefault();
-    if (readOnly) return;
+    if (readOnly || e.key === 'Enter') return;
     if (pollTitle.length === 0) setErrorMsg('Poll title cannot be empty!');
     else {
       if (pollId === '0') { //new poll case
-        console.log("creating new poll");
-        console.log(options.length);
-        createPoll(eventId, pollTitle, options.length, votesAllowed, true).then(async (created) => {
+
+        for (let i = 0; i < options.length; i += 1) {
+          let option = options[i];
+          if (!option?.data?.text || option.data.text.length === 0) {
+            return setErrorMsg('Poll options cannot be empty!');
+          }
+        }
+
+        createPoll(eventId, pollTitle, options.length, votesAllowed || 1, true).then(async (created) => {
           let createdWithOpts = created.data;
-          console.log(created);
+
           let savedOpts = options.map((opt) => addOption(createdWithOpts.pData._id, opt.data.text));
           let resolved = await Promise.all(savedOpts);
           console.log("resolved", resolved);
@@ -136,20 +137,25 @@ function Poll({pollId, pollData: data, editMode: editState, votable, handleDelet
           setPollData(createdWithOpts.pData);
           console.log(pollData);
           updater(created.data);
-          setOptions(resolved.map((x) => ({data: x.data, editing: false})));
+          setOptions(resolved.map((x) => ({ data: x.data, editing: false })));
         }).catch((err) => console.log(err));
         handleClose();
       }
-       else {
-        updatePoll(pollId, {question: pollTitle, votesAllowed: votesAllowed})
-            .then((res) => {
-              setEditMode(false);
-              setPollData(res.data.pData);
-            })
-            .catch((err) => console.log(err));
+      else {
+        updatePoll(pollId, { question: pollTitle, votesAllowed: votesAllowed || 1 })
+          .then((res) => {
+            setEditMode(false);
+            setPollData(res.data.pData);
+            onRefresh();
+          })
+          .catch((err) => console.log(err));
       }
     }
   };
+
+  useEffect(() => {
+    setVotesAllowed(pollData.votesAllowed);
+  }, [pollData])
 
   const handleChange = (e) => {
     if (readOnly) return;
@@ -164,14 +170,6 @@ function Poll({pollId, pollData: data, editMode: editState, votable, handleDelet
     }).catch((err) => console.log(err));
   };
 
-  const voteOptions = () => {
-    let voteOpts = [<option key={0} value={1}>{1}</option>]
-    for (let i = 1; i < pollData.maxOptionId; i++) {
-      voteOpts.push(<option key={i} value={i+1}>{i+1}</option>)
-    }
-    return voteOpts;
-  }
-
   const updateVotesAllowed = e => setVotesAllowed(e.target.value);
 
   return (
@@ -184,36 +182,35 @@ function Poll({pollId, pollData: data, editMode: editState, votable, handleDelet
 
         )}
         {editMode && (
-          <div className="d-flex">
-            <Form className="w-100 d-flex" onSubmit={savePoll}>
+          <Form className="w-100 " onSubmit={(e) => e.preventDefault()}>
+            <div className="d-flex">
               <Form.Control
                 type="text"
                 placeholder="Poll Title"
                 onChange={handleChange}
                 value={pollTitle}
               />
-            </Form>
-            <EventButton variant="success" className="ms-2 " onClick={savePoll}>save</EventButton>
-            <EventButton variant="danger" className="ms-2 " onClick={onDelete}>delete</EventButton>
+              <EventButton variant="success" className="ms-2 " onClick={savePoll}>save</EventButton>
+              <EventButton variant="danger" className="ms-2 " onClick={onDelete}>delete</EventButton>
+            </div>
+            <hr />
+            <Form.Group>
+              <Form.Label>Votes Allowed</Form.Label>
+              <Form.Control type="text" onChange={updateVotesAllowed} value={votesAllowed}>
+              </Form.Control>
+            </Form.Group>
+
+          </Form>
+
+        )}
+        {!editMode && (
+          <div className="row">
+            <div className="col-md-6">Votes Allowed: {votesAllowed} </div>
+            {!canVote && <div className="col-md-6 text-right text-warning">Maximum Number of Votes Reached!</div>}
           </div>
         )}
         <hr />
-        {editMode && (
-          <div class="form-group">
-            <label for="vote-range">Votes Allowed</label>
-            <select class="form-control input-small" id="exampleFormControlSelect1" onChange={updateVotesAllowed} value={votesAllowed}>
-                {voteOptions()}
-            </select>
-          </div>
-        )}
-        {!editMode && (
-            <div className="row">
-              <div className="col-md-6">Votes Allowed: {votesAllowed} </div>
-              {!canVote && <div className="col-md-6 text-right text-warning">Maximum Number of Votes Reached!</div>}
-            </div>
-        )}
-        <hr/>
-        {(options === null || options.length === 0)  && <p className="text-muted">No options yet!</p>}
+        {(options === null || options.length === 0) && <p className="text-muted">No options yet!</p>}
         {(options !== null) && options.map((option, i) => (
           <PollOption
             key={option.data._id || i}

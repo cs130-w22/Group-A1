@@ -1,0 +1,9 @@
+server/routes/event.js 
+server/routes/auth.js 
+server/routes/cookie.js 
+server/routes/invite.js
+server/routes/login.js
+server/routes/logout.js
+server/routes/polls.js
+server/routes/signup.js
+server/controllers/availabilityController.js

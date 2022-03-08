@@ -18,7 +18,7 @@ function InviteBox({
   eventURL,
   onInvite,
 }) {
-  const { eventId } = useContext(EventContext);
+  const { eventId, readOnly } = useContext(EventContext);
   const [inviteField, setInviteField] = useState('');
   const [errorMsg, setErrorMsg] = useState();
   const [successMsg, setSuccessMsg] = useState();
@@ -77,6 +77,7 @@ function InviteBox({
             aria-describedby="basic-addon1"
             value={inviteField}
             onChange={handleChange}
+            disabled={readOnly}
             isInvalid={invalid}
           />
           <Form.Control.Feedback className="w-100" type="invalid">
@@ -90,7 +91,7 @@ function InviteBox({
         </InputGroup>
       </Form>
       <span className="mt-0 text-muted">
-        localhost:3000/event/
+        https://cya-client-cs130.herokuapp.com/event/
         {eventURL}
       </span>
     </Container>

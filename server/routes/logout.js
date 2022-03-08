@@ -1,8 +1,20 @@
+/** Express router providing logout related routes
+ * @module routers/logout
+ * @requires express
+ */
+
 const express = require('express');
 
 const router = express.Router();
 
-// logout and destroy session
+/**
+ * Logout current user and destroy session
+ * @name POST/logout
+ * @function
+ * @memberof module:routers/logout
+ * @inner
+ * @param {express.Request} req.session Request session
+ */
 router.post(
   '/',
   (req, res) => {

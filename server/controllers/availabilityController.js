@@ -1,9 +1,28 @@
+/** Controller providing availability related exports
+ * @module controllers/availabilityController
+ */
+
 const { ObjectId } = require('mongodb');
 const { isValidObjectId } = require('mongoose');
 const { set } = require('date-fns');
 const Event = require('../models/event');
 const Availability = require('../models/availability');
 
+/**
+ * Initialize new availability for an event
+ * @exports initializeAvailability
+ * @name initializeAvailability
+ * @function
+ * @memberof module:controllers/availabilityController
+ * @inner
+ * @async
+ * @param {express.Request} event Event details
+ * @param {int} event._id Event ID
+ * @param {Date[]} event.dates Possible event dates
+ * @param {int} event.blocks Possible time blocks
+ * @param {int} event.timeEarliest Earliest possible time
+ * @param {int} event.timeLatest Latest possible time
+ */
 exports.initializeAvailability = async (event) => {
   let earliest = event.timeEarliest || 0;
   let latest = event.timeLatest || 0;

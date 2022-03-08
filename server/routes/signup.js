@@ -1,3 +1,8 @@
+/** Express router providing signup related routes
+ * @module routers/signup
+ * @requires express
+ */
+
 const express = require('express');
 
 const router = express.Router();
@@ -5,7 +10,17 @@ const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/user');
 
-// sign up
+/**
+ * Add a new user profile
+ * @name POST/signup
+ * @function
+ * @memberof module:routers/signup
+ * @inner
+ * @param {express.Request} body Request body
+ * @param {string} body.username Username
+ * @param {string} body.email Email
+ * @param {string} body.password Password
+ */
 router.post(
   '/',
   body('username')
