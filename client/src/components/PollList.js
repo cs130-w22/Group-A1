@@ -11,7 +11,6 @@ import {
 } from 'react-bootstrap';
 import { ThemeProvider } from 'styled-components';
 import { getEventPolls } from '../api/event';
-import { createPoll, getPolls } from '../api/polls';
 import { EventContext } from '../utils/context';
 import { EventButton } from './EventButton';
 import Poll from './Poll';
@@ -29,11 +28,24 @@ function PollList() {
   };
 
   const updatePollList = (poll) => {
-      setPollList([...pollList, poll]);
+    setPollList([...pollList, poll]);
+  }
+
+  const refreshPolls = () => {
+    setPollList([]);
+    getEventPolls(eventId)
+      .then((res) => {
+        const resPolls = res.data.list;
+        setPollList(resPolls.map((resPoll) => resPoll)); //poll list contains poll data (pData) and voting ability (canVote)
+      })
+      .catch((error) => {
+        console.error(error);
+        setErrorMsg('Error fetching polls, please try again later!');
+      });
   }
 
   const handleClose = () => {
-      setCreating(false);
+    setCreating(false);
   };
 
   useEffect(() => {
@@ -53,23 +65,24 @@ function PollList() {
     if (readOnly) return;
     setCreating(true);
     const createPollData = {
-        question: '',
-        options: null
+      question: '',
+      options: null
     }
     const poll = (
-          <Poll
-            key={pollList.length}
-            pollId='0'
-            pollData={createPollData}
-            editMode
-            votable={true}
-            handleDelete={handleDelete}
-            handleClose={handleClose}
-            readOnly={readOnly}
-            updater={updatePollList}
-          />
-        );
-        setCreatingPoll(poll);
+      <Poll
+        key={pollList.length}
+        pollId='0'
+        pollData={createPollData}
+        editMode
+        votable={true}
+        handleDelete={handleDelete}
+        handleClose={handleClose}
+        readOnly={readOnly}
+        updater={updatePollList}
+        onRefresh={refreshPolls}
+      />
+    );
+    setCreatingPoll(poll);
   };
 
   return (
@@ -86,6 +99,7 @@ function PollList() {
           handleClose={handleClose}
           readOnly={readOnly}
           updater={updatePollList}
+          onRefresh={refreshPolls}
         />
       ))}
 
@@ -98,7 +112,7 @@ function PollList() {
       </EventButton>
       <Modal show={creating} onHide={handleClose}>
         <Modal.Header closeButton>
-          <h3>Create Poll</h3>
+          <h3 className='fw-bold text-secondary'>create poll</h3>
         </Modal.Header>
         <Modal.Body>
           <Card>{creatingPoll}</Card>

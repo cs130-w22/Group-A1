@@ -148,7 +148,11 @@ router.delete('/options/:optionId', (req, res) => {
       },
     })
     .then((option) => {
-      if (option == null || option.poll == null || option.poll.event == null) return res.sendStatus(404);
+      if (option == null
+        || option.poll == null
+        || option.poll.event == null) {
+        return res.sendStatus(404);
+      }
       if (option.poll.event.archived === true) return res.sendStatus(403);
       PollOption.findOneAndDelete({ _id: req.params.optionId }).then(
         (deleted) => (deleted ? res.json(deleted) : res.sendStatus(404)),

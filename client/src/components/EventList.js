@@ -83,7 +83,7 @@ function EventList(thisprops) {
   }, [calenderInfo]);
 
   const displayEvents = (events) => {
-
+    if (!events) return;
     //let props ={event:events, GcalActivate:GcalActivate}
     //displays archived events
     if (filter === 'archived') {
