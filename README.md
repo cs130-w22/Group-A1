@@ -1,5 +1,5 @@
 # cya 👋
-![NodeJS Build](cs130-w22/Group-A1/blob/main/.github/workflows/node.js.yml/badge.svg)
+![example workflow](https://github.com/cs130-w22/Group-A1/actions/workflows/node.js.yml/badge.svg)
 [![Release](https://img.shields.io/github/v/release/cs130-w21/template?label=release)](https://github.com/cs130-w21/template/releases/latest)
 
 Ever step away from your phone for a few minutes and miss 1000+ messages as your friends start planning some impromptu get-together? It's not fun scrolling all the way through to try and find all the scheduling details, when2meet links, and polls that've gotten buried by the time you realize what you're missing.
