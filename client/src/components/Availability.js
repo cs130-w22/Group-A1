@@ -10,6 +10,15 @@ import TimeBlock from './TimeBlock';
 
 // referenced from https://github.com/pablofierro/react-drag-select/blob/master/lib/Selection.js
 
+/**
+ * Returns event's Availability selector
+ * @param availability User's availability
+ * @param timeEarliest earliest time Event could be
+ * @param timeLatest latest time Event could be
+ * @param members Event members
+ * @returns {JSX.Element} React component representing Availability selector
+ * @constructor
+ */
 function Availability({
   availability, timeEarliest, timeLatest, members,
 }) {

@@ -1,3 +1,8 @@
+/** Express router providing event related routes
+ * @module routers/event
+ * @requires express
+ */
+
 /* eslint-disable prefer-promise-reject-errors */
 const express = require('express');
 const { isValidObjectId } = require('mongoose');
@@ -22,6 +27,7 @@ router.get('/all', (req, res) => {
     });
 });
 
+
 router.post(
   '/',
   body('name').exists().notEmpty().withMessage('Please enter an event name'),
@@ -30,14 +36,47 @@ router.post(
 );
 
 // get all events for user + specify whether I am owner or member
+/**
+ * Retrieve all events for a user with indications for owner and member events
+ * @name GET/event
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ */
 router.get('/', getEvents);
 
+/**
+ * Retrieve an event
+ * @name GET/event/:id
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.get('/:id', getEvent);
 
+/**
+ * Retrieve an event
+ * @name GET/event/:id
+ * @function
+ * @async
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 async function getPollVotability(poll, userId) {
   return poll.userCanVoteInPoll(userId);
 }
 
+/**
+ * Retrieve all polls associated with an event
+ * @name GET/event/:id/polls
+ * @function
+ * @async
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.get('/:id/polls', async (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   Poll.find({
@@ -63,16 +102,47 @@ router.get('/:id/polls', async (req, res) => {
     });
 });
 
-// get event availability
+/**
+ * Retrieve all availabilities for an event
+ * @name GET/event/:id/availability/
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.get('/:id/availability/', getAvailability);
 
-// get event availability for user
+/**
+* Retrieve the availability of a single user for an event
+ * @name GET/event/:id/availability/:userId
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ * @param {ObjectId} userId User ID
+ */
 router.get('/:id/availability/:userId', getUserAvailability);
 
-// set availability
+/**
+ * Update the availability for an event
+ * @name POST/event/:id/availability/update
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.post('/:id/availability/update', setAvailability);
 
-// update event
+/**
+ * Update the name and description of an event
+ * @name POST/event/:id
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ * @param {express.Request} req.body - body
+ * @param {String} req.body.name Event Name
+ */
 router.post(
   '/:id',
   body('name').exists().notEmpty().withMessage('Event name cannot be empty'),
@@ -102,6 +172,14 @@ router.post(
   },
 );
 
+/**
+ * Delete an event
+ * @name DELETE/event/:id
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.delete('/:id', (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   Event.findById(req.params.id)
@@ -119,11 +197,34 @@ router.delete('/:id', (req, res) => {
     });
 });
 
-// join event
+/**
+ * Join an event
+ * @name POST/event/:id/join
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.post('/:id/join', joinEvent);
 
+/**
+ * Leave an event
+ * @name POST/event/:id/leave
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.post('/:id/leave', leaveEvent);
 
+/**
+ * Get pending invites for an Event
+ * @name GET/event/:id/invites
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.get('/:id/invites', (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   EventInvite.find({ target: req.params.id })
@@ -135,6 +236,14 @@ router.get('/:id/invites', (req, res) => {
     });
 });
 
+/**
+ * Delete all invites for an Event
+ * @name DELETE/event/:id/invites
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.delete('/:id/invites', (req, res) => {
   if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
   EventInvite.deleteMany({ target: req.params.id })
@@ -144,6 +253,7 @@ router.delete('/:id/invites', (req, res) => {
       return res.sendStatus(500);
     });
 });
+
 
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
@@ -163,6 +273,14 @@ router.delete('/:id', (req, res) => {
     .catch((err) => console.log(err));
 });
 
+/**
+ * Archive an event
+ * @name POST/event/:id/archive
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.post('/:id/archive', (req, res) => {
   const { id } = req.params;
   const { userId } = req.session;
@@ -186,6 +304,14 @@ router.post('/:id/archive', (req, res) => {
     .catch((err) => console.log(err));
 });
 
+/**
+ * Unarchive an event
+ * @name POST/event/:id/unarchive
+ * @function
+ * @memberof module:routers/event
+ * @inner
+ * @param {ObjectId} id Event ID
+ */
 router.post('/:id/unarchive', (req, res) => {
   const { id } = req.params;
   const { userId } = req.session;

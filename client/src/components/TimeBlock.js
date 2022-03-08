@@ -6,7 +6,7 @@ import { Schedule } from './styled/availability.styled';
 function TimeBlock({
   users, members,
 }) {
-//   const [percent, setPercent] = useState('0.0');
+
   const [percent, setPercent] = useState(0);
   const [unavailable, setUnavailable] = useState([]);
 

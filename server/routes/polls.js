@@ -1,3 +1,8 @@
+/** Express router providing poll related routes
+ * @module routers/polls
+ * @requires express
+ */
+
 const express = require('express');
 
 const router = express.Router();
@@ -6,7 +11,16 @@ const Poll = require('../models/poll');
 const Event = require('../models/event');
 const User = require('../models/user');
 
-// toggle vote of current user (only if toggle does not exceed allotted votes)
+/**
+ * Toggle vote of current user (only if toggle does not exceed allotted votes)
+ * @name POST/polls/vote
+ * @function
+ * @memberof module:routers/polls
+ * @inner
+ * @param {express.Request} req.body Request body
+ * @param {string} req.body.optionId Option ID
+ * @param {express.Request} req.session Current user session
+ */
 router.post('/vote', (req, res) => {
   PollOption.findById(req.body.optionId)
     .populate({
@@ -52,7 +66,16 @@ router.post('/vote', (req, res) => {
     });
 });
 
-// update poll
+/**
+ * Update a poll
+ * @name PATCH/polls/:id
+ * @function
+ * @memberof module:routers/polls
+ * @inner
+ * @param {string} id Poll ID
+ * @param {express.Request} req.body Request body
+ * @param {express.Request} req.session Current user session
+ */
 router.patch('/:id', (req, res) => {
   const { update } = req.body;
   Poll.findById(req.params.id)
@@ -87,7 +110,14 @@ router.patch('/:id', (req, res) => {
     });
 });
 
-// get all options
+/**
+ * Get all options
+ * @name GET/polls/options
+ * @function
+ * @memberof module:routers/polls
+ * @inner
+ * @return {pollOption[]} Poll Options
+ */
 router.get('/options', (req, res) => {
   PollOption.find()
     .populate('voters', '_id username')
@@ -100,7 +130,14 @@ router.get('/options', (req, res) => {
     });
 });
 
-// delete option
+/**
+ * Delete a poll option
+ * @name DELETE/polls/options/:optionId
+ * @function
+ * @memberof module:routers/polls
+ * @inner
+ * @param {string} optionId Poll Option ID
+ */
 router.delete('/options/:optionId', (req, res) => {
   PollOption.findById(req.params.optionId)
     .populate({
@@ -111,7 +148,11 @@ router.delete('/options/:optionId', (req, res) => {
       },
     })
     .then((option) => {
-      if (option == null || option.poll == null || option.poll.event == null) return res.sendStatus(404);
+      if (option == null
+        || option.poll == null
+        || option.poll.event == null) {
+        return res.sendStatus(404);
+      }
       if (option.poll.event.archived === true) return res.sendStatus(403);
       PollOption.findOneAndDelete({ _id: req.params.optionId }).then(
         (deleted) => (deleted ? res.json(deleted) : res.sendStatus(404)),
@@ -123,7 +164,13 @@ router.delete('/options/:optionId', (req, res) => {
     });
 });
 
-// delete all options
+/**
+ * Delete all Options
+ * @name DELETE/polls/options/
+ * @function
+ * @memberof module:routers/polls
+ * @inner
+ */
 router.delete('/options', (req, res) => {
   PollOption.deleteMany()
     .then(() => res.sendStatus(204))
@@ -133,7 +180,13 @@ router.delete('/options', (req, res) => {
     });
 });
 
-// get all polls
+/**
+ * Get all polls
+ * @name GET/polls/
+ * @function
+ * @memberof module:routers/polls
+ * @inner
+ */
 router.get('/', (req, res) => {
   Poll.find()
     .populate('options')
@@ -141,7 +194,15 @@ router.get('/', (req, res) => {
     .catch((err) => console.error(err));
 });
 
-// create poll
+/**
+ * Create a new poll
+ * @name POST/polls/
+ * @function
+ * @memberof module:routers/polls
+ * @param {express.Request} req.body Request body
+ * @param {string} req.body.event Event ID
+ * @inner
+ */
 router.post('/', (req, res) => {
   Event.findById(req.body.event)
     .then((event) => {
@@ -158,7 +219,15 @@ router.post('/', (req, res) => {
     });
 });
 
-// get poll
+/**
+ * Get a poll
+ * @name POST/polls/:id
+ * @function
+ * @memberof module:routers/polls
+ * @param {string} id Poll ID
+ * @param {express.Request} req.session Current User Session
+ * @inner
+ */
 router.get('/:id', (req, res) => {
   Poll.findById(req.params.id)
     .populate({
@@ -187,7 +256,18 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// add option
+/**
+ * Add an option to a poll
+ * @name POST/polls/:id/options
+ * @function
+ * @memberof module:routers/polls
+ * @param {string} id Poll ID
+ * @param {express.Request} req.body Request Body
+ * @param {string} req.body.text Poll option description
+ * @param {int} req.body.votes (Optional) Poll option votes
+ * @param {Users[]} req.body.voters (Optional) Users voting for this option
+ * @inner
+ */
 router.post('/:id/options', (req, res) => {
   const pollId = req.params.id;
   if (req.body.text.length === 0) {
@@ -237,7 +317,16 @@ router.post('/:id/options', (req, res) => {
     });
 });
 
-// update option
+/**
+ * Update a poll option
+ * @name PATCH/polls/:id/:optionId
+ * @function
+ * @memberof module:routers/polls
+ * @param {string} optionId Poll Option ID
+ * @param {express.Request} req.body Update
+ * @param {express.Request} req.session Current User Session
+ * @inner
+ */
 router.patch('/options/:optionId', (req, res) => {
   const { optionId } = req.params;
   const { update } = req.body;
@@ -263,7 +352,14 @@ router.patch('/options/:optionId', (req, res) => {
     });
 });
 
-// get poll options
+/**
+ * Get poll options for a poll
+ * @name GET/polls/:id/options
+ * @function
+ * @memberof module:routers/polls
+ * @param {string} id Poll ID
+ * @inner
+ */
 router.get('/:id/options', (req, res) => {
   Poll.findById(req.params.id, 'options')
     .populate({
@@ -280,7 +376,13 @@ router.get('/:id/options', (req, res) => {
     });
 });
 
-// delete all polls
+/**
+ * Delete all polls
+ * @name DELETE/polls
+ * @function
+ * @memberof module:routers/polls
+ * @inner
+ */
 router.delete('/', (req, res) => {
   Poll.deleteMany()
     .then(() => {
@@ -292,7 +394,14 @@ router.delete('/', (req, res) => {
     });
 });
 
-// delete poll by id
+/**
+ * Delete a poll
+ * @name DELETE/polls/:id
+ * @function
+ * @memberof module:routers/polls
+ * @param {string} id Poll ID
+ * @inner
+ */
 router.delete('/:id', (req, res) => {
   Poll.findById(req.params.id)
     .populate({

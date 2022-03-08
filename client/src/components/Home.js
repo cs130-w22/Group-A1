@@ -9,6 +9,11 @@ import { UserContext } from '../utils/context';
 import EventList from './EventList';
 import InviteList from './InviteList';
 
+/**
+ * Returns Home component
+ * @returns {JSX.Element} Home component, including children EventList and InviteList
+ * @constructor
+ */
 function Home() {
   const { user, setUser } = useContext(UserContext);
   const [data, setData] = useState();

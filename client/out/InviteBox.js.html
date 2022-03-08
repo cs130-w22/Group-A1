@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: InviteBox.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: InviteBox.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useContext, useEffect, useState } from 'react';
+import {
+  Container, Form, FormControl, InputGroup,
+} from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import { SectionTitle } from './styled/headers';
+import { sendEventInvite } from '../api/invite';
+import { EventContext } from '../utils/context';
+
+/**
+ * Returns InviteBox component
+ * @param {string} eventURL URL to event that will be used as invite link
+ * @param {callback} onInvite callback function that will be called on Invite send
+ * @returns {JSX.Element} InviteBox component
+ * @constructor
+ */
+function InviteBox({
+  eventURL,
+  onInvite,
+}) {
+  const { eventId } = useContext(EventContext);
+  const [inviteField, setInviteField] = useState('');
+  const [errorMsg, setErrorMsg] = useState();
+  const [successMsg, setSuccessMsg] = useState();
+  const [invalid, setInvalid] = useState(false);
+
+  const resetMessages = () => {
+    setErrorMsg();
+    setSuccessMsg();
+    setInvalid(false);
+  };
+
+  const handleInvite = (e) => {
+    e.preventDefault();
+    resetMessages();
+    if (!inviteField || inviteField.length === 0) {
+      setErrorMsg('You must enter a username to invite someone!');
+      setInvalid(true);
+    } else {
+      sendEventInvite(eventId, inviteField)
+        .then((res) => {
+          setSuccessMsg('Invite sent!');
+          onInvite({ username: inviteField, _id: res.recipient });
+          setInviteField('');
+        }).catch((err) => {
+          const validationErrors = err.response.data?.errors;
+          if (validationErrors?.length > 0) {
+            setErrorMsg(validationErrors[0].msg);
+          } else {
+            setErrorMsg(err.response.data);
+          }
+          setInvalid(true);
+        });
+    }
+  };
+
+  useEffect(() => {
+
+  });
+
+  const handleChange = (e) => {
+    resetMessages();
+    setInviteField(e.target.value);
+  };
+
+  return (
+
+    &lt;Container>
+      &lt;SectionTitle>Invite Friends 💌&lt;/SectionTitle>
+      &lt;p>Invite people by username, or share the link below!&lt;/p>
+      &lt;Form onSubmit={handleInvite}>
+        &lt;InputGroup className="mb-2">
+          &lt;InputGroup.Text id="basic-addon1">@&lt;/InputGroup.Text>
+          &lt;FormControl
+            placeholder="Username"
+            aria-label="Username"
+            aria-describedby="basic-addon1"
+            value={inviteField}
+            onChange={handleChange}
+            isInvalid={invalid}
+          />
+          &lt;Form.Control.Feedback className="w-100" type="invalid">
+            {errorMsg}
+            {' '}
+          &lt;/Form.Control.Feedback>
+          &lt;span className="w-100 text-primary" type="valid">
+            {successMsg}
+            {' '}
+          &lt;/span>
+        &lt;/InputGroup>
+      &lt;/Form>
+      &lt;span className="mt-0 text-muted">
+        localhost:3000/event/
+        {eventURL}
+      &lt;/span>
+    &lt;/Container>
+  );
+}
+
+InviteBox.propTypes = {
+  eventURL: PropTypes.string.isRequired,
+  onInvite: PropTypes.func.isRequired,
+};
+
+export default InviteBox;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Availability.html">Availability</a></li><li><a href="AvailabilitySection.html">AvailabilitySection</a></li><li><a href="Create.html">Create</a></li><li><a href="EventEdit.html">EventEdit</a></li><li><a href="EventList.html">EventList</a></li><li><a href="EventMembers.html">EventMembers</a></li><li><a href="EventPage.html">EventPage</a></li><li><a href="Home.html">Home</a></li><li><a href="InviteBox.html">InviteBox</a></li><li><a href="InviteList.html">InviteList</a></li><li><a href="LoadingIndicator.html">LoadingIndicator</a></li><li><a href="Login.html">Login</a></li><li><a href="NotFound.html">NotFound</a></li><li><a href="overlayFunction.html">overlayFunction</a></li><li><a href="Poll.html">Poll</a></li><li><a href="PollOption.html">PollOption</a></li><li><a href="PollSection.html">PollSection</a></li><li><a href="TimeSelectBlock.html">TimeSelectBlock</a></li><li><a href="UserList.html">UserList</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 07 2022 23:49:32 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

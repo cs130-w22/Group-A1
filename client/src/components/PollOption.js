@@ -1,5 +1,5 @@
 import React, {
-  useContext, useEffect, useRef, useState,
+  useContext, useEffect, useState,
 } from 'react';
 import {
   ToggleButton, Button, CloseButton, Form, Row, Col, Container, Overlay, OverlayTrigger, Tooltip,
@@ -8,9 +8,12 @@ import {
   addOption, deleteOption, updateOption, voteOption,
 } from '../api/polls';
 import EditIcon from '../assets/edit_icon_small.svg';
-import { UserContext, EventContext, PollContext } from '../utils/context';
+import { UserContext, EventContext } from '../utils/context';
 import { EventButton, overlayFunction } from './EventButton';
-import {number} from "prop-types";
+<<<<<<< HEAD
+=======
+import { number } from "prop-types";
+>>>>>>> ab01e5401da6cf995bc63402f5667dd0d7283064
 
 const editButton = {
   boxSizing: 'content-box',
@@ -23,7 +26,20 @@ const editButton = {
   opacity: '0.5',
 };
 
-function PollOption({ pollId, data, onDelete, editing, pollState, votable, votingToggle, onUpdate }) {
+/**
+ * Component representing a single PollOption
+ * @param {string} pollId parent Poll identifier ('0' if new poll that has not been saved yet)
+ * @param {Object} data PollOption data from database ({_id: ObjectId, text: string, voters:[]})
+ * @param {boolean} editing true if PollOption is in edit mode
+ * @param {boolean} pollState true if parent Poll is in edit mode
+ * @param {boolean} votable true if User can vote in PollOption's parent Poll
+ * @param {callback} onDelete callback function to remove PollOption from parent Poll on delete
+ * @param {callback} votingToggle callback function to edit parent Poll canVote state on PollOption vote change
+ * @param {callback} onUpdate callback function to update parent Poll with current PollOption
+ * @return {JSX.Element}
+ * @constructor
+ */
+function PollOption({ pollId, data, editing, pollState, votable, onDelete, votingToggle, onUpdate }) {
   const { user } = useContext(UserContext);
   const { readOnly } = useContext(EventContext);
   const [optionId, setOptionId] = useState(data._id);
@@ -32,7 +48,14 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
   const [editMode, setEditMode] = useState(editing);
   const [votes, setVotes] = useState(data.voters);
 
-  const changeVote = (e) => {
+  useEffect(() => {
+    setVotes(data.voters);
+  }, [data, optionId]);
+
+  /**
+   * Function to add/remove User's vote from poll
+   */
+  const changeVote = () => {
     voteOption(optionId).then((res) => {
       console.log(res);
       if (checked) {
@@ -54,6 +77,10 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
     }).catch((err) => console.log(err));
   };
 
+  /**
+   * Function to save PollOption on button click
+   * @param e
+   */
   const saveText = (e) => {
     e.preventDefault();
     if (readOnly) return;
@@ -77,35 +104,45 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
     }
   };
 
+  /**
+   * Function to handle PollOption text changes and propagate them to parent Poll
+   * @param e
+   */
   const handleChange = (e) => {
     if (readOnly) return;
     setOptionText(e.target.value);
     onUpdate(optionId, e.target.value);
   };
 
+  /**
+   * Function to change editMode on Edit Button click
+   */
   const allowEdits = () => {
     if (readOnly) return;
     setEditMode(true);
   };
 
+  /**
+   * Function to delete PollOption and propagate change to parent Poll
+   */
   const removeOption = () => {
     if (readOnly) return;
     if (typeof optionId === 'string') {
       deleteOption(optionId)
-          .then((res) => {
-            onDelete(res.data);
-          })
-          .catch((err) => console.log(err));
+        .then((res) => {
+          onDelete(res.data);
+        })
+        .catch((err) => console.log(err));
     }
     else {
       onDelete(data);
     }
   };
 
-  useEffect(() => {
-    setVotes(data.voters);
-  }, [data, optionId]);
-
+  /**
+   * Component that displays PollOption voters as Tooltip
+   * @returns {JSX.Element}
+   */
   const votesOverlay = () => (
     <Tooltip hidden={votes.length === 0}>
       {votes.map((voter, i) => [
@@ -159,17 +196,17 @@ function PollOption({ pollId, data, onDelete, editing, pollState, votable, votin
               value={optionText || ''}
             />
             {!pollState &&
-                (<Button
-                    variant="success"
-                    className="align-self-center ms-2"
-                    hidden={!editMode}
-                    onClick={saveText}
-                >
-                  Save
-                </Button>)
+              (<Button
+                variant="success"
+                className="align-self-center ms-2"
+                hidden={!editMode}
+                onClick={saveText}
+              >
+                Save
+              </Button>)
             }
             {(editMode || pollState) &&
-                (<Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>)}
+              (<Button variant="secondary" className="align-self-center ms-2 text-white" onClick={removeOption}>Delete</Button>)}
           </Form>
 
         )}

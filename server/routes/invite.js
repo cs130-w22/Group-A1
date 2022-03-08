@@ -1,3 +1,8 @@
+/** Express router providing invite related routes
+ * @module routers/invite
+ * @requires express
+ */
+
 const express = require('express');
 const { body, oneOf } = require('express-validator');
 const {
@@ -17,8 +22,22 @@ router.post(
   sendInvite,
 );
 
+/**
+ * Accept an invite
+ * @name GET/invite/:id/accept
+ * @function
+ * @memberof module:routers/invite
+ * @inner
+ */
 router.post('/:id/accept', acceptInvite);
 
+/**
+ * Decline an invite
+ * @name GET/invite/:id/decline
+ * @function
+ * @memberof module:routers/invite
+ * @inner
+ */
 router.post('/:id/decline', declineInvite);
 
 module.exports = router;

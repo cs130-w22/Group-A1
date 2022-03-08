@@ -1,3 +1,8 @@
+/** Express router providing login related routes
+ * @module routers/login
+ * @requires express
+ */
+
 const express = require('express');
 
 const router = express.Router();
@@ -5,6 +10,17 @@ const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/user');
 
+/**
+ * User Login
+ * @name POST/login
+ * @function
+ * @memberof module:routers/login
+ * @inner
+ * @param {express.Request} body Request body
+ * @param {string} body.email Email
+ * @param {string} body.password Password
+ * @return {express.Response} User Session
+ */
 router.post(
   '/',
   body('email')

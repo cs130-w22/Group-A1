@@ -2,7 +2,7 @@ import { format, parse } from 'date-fns';
 import React, {
   useContext, useEffect, useState, createRef,
 } from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Alert, Col, Row } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { changeAvailability } from '../api/event';
 import { EventContext, UserContext } from '../utils/context';
@@ -13,9 +13,9 @@ import TimeSelectBlock from './TimeSelectBlock';
 // referenced from https://github.com/pablofierro/react-drag-select/blob/master/lib/Selection.js
 function intersects(a, b) {
   if (a.left <= b.left + b.width
-        && a.left + a.width >= b.left
-        && a.top <= b.top + b.height
-        && a.top + a.height >= b.top) {
+    && a.left + a.width >= b.left
+    && a.top <= b.top + b.height
+    && a.top + a.height >= b.top) {
     return true;
   }
   return false;
@@ -23,7 +23,7 @@ function intersects(a, b) {
 function Selector({
   availability, timeEarliest, timeLatest, onSelect,
 }) {
-  const { eventId } = useContext(EventContext);
+  const { eventId, readOnly, archived } = useContext(EventContext);
   const { user } = useContext(UserContext);
 
   // selector state
@@ -94,7 +94,7 @@ function Selector({
     }
     setRows(tempRows);
     setLoading(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availability]);
 
   const updateSelection = (ref, e) => {
@@ -129,19 +129,21 @@ function Selector({
   };
 
   useEffect(() => {
-    if (mouseDown) {
+    if (mouseDown && !readOnly) {
       // eslint-disable-next-line no-restricted-syntax
       const temp = new Set(selecting);
       selectableItems.forEach((value, key) => {
-        const itemCoords = {
-          left: value.current.offsetLeft,
-          top: value.current.offsetTop,
-          width: value.current.offsetWidth,
-          height: value.current.offsetHeight,
-        };
-        if (intersects(itemCoords, selection)) {
-          temp.add(key);
-        } else { temp.delete(key); }
+        if (value?.current) {
+          const itemCoords = {
+            left: value.current.offsetLeft,
+            top: value.current.offsetTop,
+            width: value.current.offsetWidth,
+            height: value.current.offsetHeight,
+          };
+          if (intersects(itemCoords, selection)) {
+            temp.add(key);
+          } else { temp.delete(key); }
+        }
       });
       setSelecting(Array.from(temp));
       if (append == null && temp.size > 0) {
@@ -211,43 +213,44 @@ function Selector({
     <>
       {loading && <LoadingIndicator />}
       {!loading && rows.length > 0 && (
-      <div>
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-        <div id="select-container" onMouseDown={onMouseDown}>
-          {rows.map((row) => (
-            <Row className="mb-5">
-              <Col xs={1}>
-                <Row>&nbsp;</Row>
-                {hours.map((h) => (
-                  <Row>
-                    <ScheduleTime className="mt-1 d-flex justify-content-center align-items-center text-center w-100">
-                      {h}
-                    </ScheduleTime>
-                  </Row>
-                ))}
-              </Col>
-              {row.map((day) => (
-                <Col className="me-2">
-                  <Row>
-                    <div className="d-flex justify-content-center align-items-center no-select fw-bold text-secondary me-2">{format(day.date, 'ccc MM/dd')}</div>
-                  </Row>
-                  {day.timeblocks.map((block) => (
-                    <TimeSelectBlock
-                      hour={block.hour}
-                      key={block._id}
-                      innerRef={block.ref}
-                      append={append}
-                      selected={selected.includes(block._id)}
-                      selecting={selecting?.includes(block._id) || false}
-                    />
+        <div>
+          {readOnly && archived && <Alert variant="info">This event has been archived. You can see but not edit your availability.</Alert>}
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+          <div id="select-container" onMouseDown={onMouseDown}>
+            {rows.map((row) => (
+              <Row className="mb-5">
+                <Col xs={1}>
+                  <Row>&nbsp;</Row>
+                  {hours.map((h) => (
+                    <Row>
+                      <ScheduleTime className="mt-1 d-flex justify-content-center align-items-center text-center w-100">
+                        {h}
+                      </ScheduleTime>
+                    </Row>
                   ))}
                 </Col>
-              ))}
-            </Row>
-          ))}
+                {row.map((day) => (
+                  <Col className="me-2">
+                    <Row>
+                      <div className="d-flex justify-content-center align-items-center no-select fw-bold text-secondary me-2">{format(day.date, 'ccc MM/dd')}</div>
+                    </Row>
+                    {day.timeblocks.map((block) => (
+                      <TimeSelectBlock
+                        hour={block.hour}
+                        key={block._id}
+                        innerRef={block.ref}
+                        append={append}
+                        selected={selected.includes(block._id)}
+                        selecting={selecting?.includes(block._id) || false}
+                      />
+                    ))}
+                  </Col>
+                ))}
+              </Row>
+            ))}
+          </div>
+          <SelectBox style={selection} />
         </div>
-        <SelectBox style={selection} />
-      </div>
       )}
     </>
   );

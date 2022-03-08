@@ -19,6 +19,11 @@ import { EventMembers } from './UserList';
 import { getEventInvites } from '../api/invite';
 import { TITLE } from '../assets/constants';
 
+/**
+ * Returns EventPage as a React component
+ * @returns {JSX.Element} EventPage including AvailabilitySection, PollSection, and Users
+ * @constructor
+ */
 function EventPage() {
   const { user, setUser } = useContext(UserContext);
   const { id } = useParams();
@@ -167,10 +172,10 @@ function EventPage() {
 
           <Modal show={showModal}>
             <Modal.Header>
-              <Modal.Title>Leave Group</Modal.Title>
+              <Modal.Title>Leave Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <p>Are you sure you want to leave this group?</p>
+              <p>Are you sure you want to leave this event?</p>
             </Modal.Body>
 
             <Modal.Footer>
@@ -193,7 +198,7 @@ function EventPage() {
 
           {!isMember && !errorMsg && (
             <Alert className="d-flex justify-content-between">
-              You are not a part of this group yet! You can take a look around,
+              You are not a part of this event yet! You can take a look around,
               or join the event to start planning!
               <Button
                 variant="outline-primary fw-bold btn-sm"

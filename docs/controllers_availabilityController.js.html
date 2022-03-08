@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/availabilityController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/availabilityController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** Controller providing availability related exports
+ * @module controllers/availabilityController
+ */
+
+const { ObjectId } = require('mongodb');
+const { isValidObjectId } = require('mongoose');
+const { set } = require('date-fns');
+const Event = require('../models/event');
+const Availability = require('../models/availability');
+
+/**
+ * Initialize new availability for an event
+ * @exports initializeAvailability
+ * @name initializeAvailability
+ * @function
+ * @memberof module:controllers/availabilityController
+ * @inner
+ * @async
+ * @param {express.Request} event Event details
+ * @param {int} event._id Event ID
+ * @param {Date[]} event.dates Possible event dates
+ * @param {int} event.blocks Possible time blocks
+ * @param {int} event.timeEarliest Earliest possible time
+ * @param {int} event.timeLatest Latest possible time
+ */
+exports.initializeAvailability = async (event) => {
+  let earliest = event.timeEarliest || 0;
+  let latest = event.timeLatest || 0;
+  if (earliest &lt; 0) earliest = 0;
+  if (latest &lt; 0) latest = 23;
+  event.dates.forEach((date) => {
+    for (let i = earliest; i &lt;= latest; i += 1) {
+      const datetime = set(date, { hours: i });
+      const availability = new Availability({ event: event._id, time: datetime });
+      availability.save();
+      event.blocks.push(availability);
+    }
+  });
+  await event.save();
+};
+
+exports.getUserAvailability = async (req, res) => {
+  if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
+  if (!isValidObjectId(req.params.userId)) return res.sendStatus(400);
+  try {
+    res.sendStatus(501);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+};
+
+exports.getAvailability = async (req, res) => {
+  if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
+  try {
+    // initialize availability if uninitialized/incorrect format
+    const event = await Event.findById(req.params.id);
+    if (event.blocks == null || event.blocks.length === 0) {
+      console.log('initializing');
+      await this.initializeAvailability(event);
+    }
+    const agg = await Availability.aggregate([
+      { $match: { event: ObjectId(req.params.id) } },
+      {
+        $project: {
+          time: '$time',
+          // TODO change these to timezone var
+          hour: { $hour: { date: '$time', timezone: 'America/Los_Angeles' } },
+          day: { $dayOfYear: { date: '$time', timezone: 'America/Los_Angeles' } },
+          users: 1,
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'users',
+          foreignField: '_id',
+          as: 'users',
+        },
+      },
+      {
+        $set: {
+          'users.password': '$$REMOVE',
+          'users.groups': '$$REMOVE',
+          'users.email': '$$REMOVE',
+          'users.invites': '$$REMOVE',
+          __v: '$$REMOVE',
+        },
+      },
+      {
+        $group: {
+          _id: '$day',
+          times: {
+            $addToSet: {
+              _id: '$_id',
+              userList: '$users',
+              hour: '$hour',
+            },
+          },
+          data: { $push: '$$ROOT' },
+        },
+      },
+      { $addFields: { day: '$_id' } },
+      { $project: { _id: 0 } },
+      { $sort: { day: -1 } },
+    ]);
+    return res.send(agg);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+};
+
+exports.setAvailability = async (req, res) => {
+  if (!isValidObjectId(req.params.id)) return res.sendStatus(400);
+  const { userId } = req.session;
+  try {
+    const { selected, deselected } = req.body;
+    const selectedUpdate = await Availability.updateMany(
+      {
+        event: req.params.id,
+        _id: {
+          $in: selected,
+        },
+      },
+      { $addToSet: { users: userId } },
+    );
+    const deselectedUpdate = await Availability.updateMany(
+      {
+        event: req.params.id,
+        _id: {
+          $in: deselected,
+        },
+      },
+      { $pull: { users: userId } },
+    );
+    return res.status(200).send({
+      selected: selectedUpdate.nModified,
+      deselected: deselectedUpdate.nModified,
+    });
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-controllers_availabilityController.html">controllers/availabilityController</a></li><li><a href="module-routers_auth.html">routers/auth</a></li><li><a href="module-routers_cookie.html">routers/cookie</a></li><li><a href="module-routers_event.html">routers/event</a></li><li><a href="module-routers_invite.html">routers/invite</a></li><li><a href="module-routers_login.html">routers/login</a></li><li><a href="module-routers_logout.html">routers/logout</a></li><li><a href="module-routers_polls.html">routers/polls</a></li><li><a href="module-routers_signup.html">routers/signup</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 07 2022 23:32:56 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

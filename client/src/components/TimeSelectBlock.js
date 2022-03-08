@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Schedule } from './styled/availability.styled';
 
+/**
+ * Component to represent an individual time block button
+ * @param hour
+ * @param selected
+ * @param selecting
+ * @param append
+ * @param innerRef
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function TimeSelectBlock({
   hour, selected, selecting, append, innerRef,
 }) {
