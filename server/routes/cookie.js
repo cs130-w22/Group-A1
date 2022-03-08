@@ -1,7 +1,24 @@
+/** Express router providing cookie related routes
+ * @module routers/cookie
+ * @requires express
+ */
+
 const express = require('express');
 
 const router = express.Router();
 
+/**
+ * Retrieve user cookie
+ * @name GET/cookie/
+ * @function
+ * @memberof module:routers/cookie
+ * @inner
+ * @param {express.Request} req.session - Current user session
+ * @param {String} req.session.userId - Session User ID
+ * @param {express.Request} req.cookies - Current session cookies
+ * @param {String} req.cookies.user - Cookie User ID
+ * @return {express.Response} Session Cookie
+ * */
 // get user cookie
 router.get(
   '/',
