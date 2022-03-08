@@ -1,4 +1,7 @@
 # cya 👋
+![NodeJS Build](cs130-w22/Group-A1/blob/main/.github/workflows/node.js.yml/badge.svg)
+[![Release](https://img.shields.io/github/v/release/cs130-w21/template?label=release)](https://github.com/cs130-w21/template/releases/latest)
+
 Ever step away from your phone for a few minutes and miss 1000+ messages as your friends start planning some impromptu get-together? It's not fun scrolling all the way through to try and find all the scheduling details, when2meet links, and polls that've gotten buried by the time you realize what you're missing.
 
 Our web app hopes to solve that by centralizing everything in one place. Miss the message? No worries, your friends can invite everyone by username or send you the link directly! Chat popping off? It's fine, all the polls and scheduling are all on one page. 
