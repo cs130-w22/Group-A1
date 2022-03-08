@@ -84,7 +84,7 @@ function InviteBox({
         </InputGroup>
       </Form>
       <span className="mt-0 text-muted">
-        localhost:3000/event/
+        https://cya-client-cs130.herokuapp.com/event/
         {eventURL}
       </span>
     </Container>
