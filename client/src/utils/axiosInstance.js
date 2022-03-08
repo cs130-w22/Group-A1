@@ -4,7 +4,7 @@ let base;
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
   base = '/api';
 } else {
-  base = 'http://localhost:5000'
+  base = 'https://cya-api-cs130.herokuapp.com/'
 }
 
 axios.defaults.withCredentials = true;

@@ -38,6 +38,9 @@ const createServer = (middleware) => {
   app.use('/polls', pollRouter);
   app.use('/event', eventRouter);
   app.use('/invite', inviteRouter);
+  app.get('/', (req, res) => {
+    res.send('Hello World!');
+  });
   return app;
 };
 
