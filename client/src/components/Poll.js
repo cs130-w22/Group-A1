@@ -1,50 +1,56 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
-  Card, Button, Alert, Container, Col, Row, Modal, Form,
+  Card, Alert, Form,
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import {
-  addOption, createPoll, deletePoll, getPoll, updatePoll,
+  addOption, deletePoll, createPoll, updatePoll,
 } from '../api/polls';
-// import { ThemeProvider } from 'styled-components';
 import PollOption from './PollOption';
 import { EventContext } from '../utils/context';
 import { EventButton } from './EventButton';
 
 function Poll({
-  pollId, pollData: data, editMode: editState, handleDelete,
+  pollId, pollData: data, editMode: editState, handleDelete, handleClose, votable, updater
 }) {
-  const { readOnly } = useContext(EventContext);
+  const { eventId, readOnly } = useContext(EventContext);
   const [pollData, setPollData] = useState(data);
-  const [options, setOptions] = useState([]); // includes edit property for poll Option for now
+  const [options, setOptions] = useState( data.options ? data.options.map((opt) => {
+    return {data: opt, editing: false}
+  }) : null); // includes edit property for poll Option for now
   const [editMode, setEditMode] = useState(editState);
   const [votesAllowed, setVotesAllowed] = useState(1);
   const [errorMsg, setErrorMsg] = useState();
-  const [pollTitle, setPollTitle] = useState(pollData?.question);
+  const [pollTitle, setPollTitle] = useState(data.question);
+  const [canVote, setCanVote] = useState(votable);
+
+  const toggleVoting = (toSet) => {
+    setCanVote(toSet);
+  }
 
   const onDeleteOption = (deleted) => {
-    const updatedOptions = options.filter((option) => option.data._id !== deleted._id);
-    setOptions(updatedOptions);
+    setOptions(options.filter((option) => option.data._id !== deleted._id));
   };
 
-  useEffect(() => {
-    if (pollId != null && pollId.length > 0) {
-      getPoll(pollId).then((res) => {
-        setPollData(res.data);
-      }).catch((err) => {
-        console.log(err);
-      });
+  const updateOptionInList = (optionId, text) => {
+    if (typeof optionId === 'number' && pollId === '0') {
+      let newOptions = [].concat(options);
+      newOptions[optionId].data.text = text;
+      setOptions(newOptions);
+      console.log(newOptions);
     }
-  }, [pollId]);
+  };
 
   useEffect(() => {
     setPollTitle(pollData?.question);
   }, [pollData]);
 
   useEffect(() => {
+    console.log("updatingOptions");
     if (pollData.options != null) {
       const newOptions = [];
       const pollOptions = pollData.options;
+      console.log(pollOptions);
       for (let i = 0; i < pollOptions.length; i += 1) {
         const option = {
           data: pollOptions[i],
@@ -55,25 +61,34 @@ function Poll({
       newOptions.sort((a, b) => b.data.voters.length - a.data.voters.length);
       setOptions(newOptions);
     }
-  }, [pollData]);
-
-  // useEffect(() => {
-  //   console.log(options);
-  // }, [options]);
+    else {
+      const initialOptions = [];
+      for (let i = 0; i < 2; i += 1) {
+        const option = {
+          data: {
+            _id: i,
+            text: '',
+            voters: [],
+          },
+          editing: false,
+        };
+        initialOptions.push(option);
+      }
+      setOptions(initialOptions);
+    }
+  }, [pollData, editMode]);
 
   const createNewOption = () => {
     if (readOnly) return;
-    addOption(pollId, 'New Option')
-      .then((res) => {
-        const option = {
-          data: res.data,
-          editing: true,
-        };
-        setOptions((prevOptions) => [...prevOptions, option]);
-      }).catch((error) => {
-        console.log(error);
-        setErrorMsg('Something went wrong! Please try again later.');
-      });
+      const option = {
+        data: {
+          _id: options.length,
+          text: '',
+          voters: [],
+        },
+        editing: true,
+      }
+      setOptions([...options, option]);
   };
 
   const allowEdits = () => {
@@ -86,12 +101,32 @@ function Poll({
     if (readOnly) return;
     if (pollTitle.length === 0) setErrorMsg('Poll title cannot be empty!');
     else {
-      updatePoll(pollId, { question: pollTitle, votesAllowed: votesAllowed})
-        .then((res) => {
+      if (pollId === '0') { //new poll case
+        console.log("creating new poll");
+        console.log(options.length);
+        createPoll(eventId, pollTitle, options.length, votesAllowed, true).then(async (created) => {
+          let createdWithOpts = created.data;
+          console.log(created);
+          let savedOpts = options.map((opt) => addOption(createdWithOpts.pData._id, opt.data.text));
+          let resolved = await Promise.all(savedOpts);
+          console.log("resolved", resolved);
           setEditMode(false);
-          setPollData(res.data);
-        })
-        .catch((err) => console.log(err));
+          createdWithOpts.pData.options = resolved.map((x) => x.data);
+          setPollData(createdWithOpts.pData);
+          console.log(pollData);
+          updater(created.data);
+          setOptions(resolved.map((x) => ({data: x.data, editing: false})));
+        }).catch((err) => console.log(err));
+        handleClose();
+      }
+       else {
+        updatePoll(pollId, {question: pollTitle, votesAllowed: votesAllowed})
+            .then((res) => {
+              setEditMode(false);
+              setPollData(res.data.pData);
+            })
+            .catch((err) => console.log(err));
+      }
     }
   };
 
@@ -110,7 +145,7 @@ function Poll({
 
   const voteOptions = () => {
     let voteOpts = [<option key={0} value={1}>{1}</option>]
-    for (let i = 1; i < options.length; i++) {
+    for (let i = 1; i < pollData.maxOptionId; i++) {
       voteOpts.push(<option key={i} value={i+1}>{i+1}</option>)
     }
     return voteOpts;
@@ -134,28 +169,42 @@ function Poll({
                 type="text"
                 placeholder="Poll Title"
                 onChange={handleChange}
-                value={pollTitle || ''}
+                value={pollTitle}
               />
             </Form>
-            <div class="form-group">
-            <label for="vote-range">Votes Allowed</label>
-            <select class="form-control" id="exampleFormControlSelect1" onChange={updateVotesAllowed} value={votesAllowed}>
-              {voteOptions()}
-    </select>
-            </div>
             <EventButton variant="success" className="ms-2 " onClick={savePoll}>save</EventButton>
             <EventButton variant="danger" className="ms-2 " onClick={onDelete}>delete</EventButton>
           </div>
         )}
         <hr />
-        {options.length === 0 && <p className="text-muted">No options yet!</p>}
-        {options.map((option, i) => (
+        {editMode && (
+          <div class="form-group">
+            <label for="vote-range">Votes Allowed</label>
+            <select class="form-control input-small" id="exampleFormControlSelect1" onChange={updateVotesAllowed} value={votesAllowed}>
+                {voteOptions()}
+            </select>
+          </div>
+        )}
+        {!editMode && (
+            <div className="row">
+              <div className="col-md-6">Votes Allowed: {votesAllowed} </div>
+              {!canVote && <div className="col-md-6 text-right text-warning">Maximum Number of Votes Reached!</div>}
+            </div>
+        )}
+        <hr/>
+        {(options === null || options.length === 0)  && <p className="text-muted">No options yet!</p>}
+        {(options !== null) && options.map((option, i) => (
           <PollOption
-            key={option.data._id}
+            key={option.data._id || i}
             keyProp={i}
+            pollId={pollId}
+            pollState={editMode}
             data={option.data}
             editing={option.editing}
+            votable={canVote}
+            votingToggle={toggleVoting}
             onDelete={onDeleteOption}
+            onUpdate={updateOptionInList}
             onError={setErrorMsg}
           />
         ))}
